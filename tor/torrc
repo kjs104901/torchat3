@@ -1,0 +1,16 @@
+
+SocksPort auto
+ControlPort auto
+ControlPortWriteToFile ./data/controlPort
+HashedControlPassword 16:7066910F7CA303FE60B7C0D1D791B9566984B66BC51561C5F1A683ADD7
+
+HiddenServiceDir ./hidden_service
+HiddenServiceVersion 3
+HiddenServicePort 12009 127.0.0.1:12762
+LongLivedPorts 12009
+
+UseBridges 1  
+Bridge 69.163.35.254:443 0E0F7DFFCB4284F4B191C4FF445F719D91DEB9AC
+
+DataDirectory ./data
+    
