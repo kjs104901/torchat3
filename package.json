@@ -1,0 +1,27 @@
+{
+  "name": "torchat3",
+  "version": "1.0.0",
+  "description": "torchat3",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kjs104901/torchat3.git"
+  },
+  "keywords": [
+    "tor",
+    "chat"
+  ],
+  "author": "kjs104901",
+  "license": "GPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/kjs104901/torchat3/issues"
+  },
+  "homepage": "https://github.com/kjs104901/torchat3#readme",
+  "devDependencies": {
+    "electron": "^5.0.0"
+  }
+}
