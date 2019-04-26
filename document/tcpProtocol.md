@@ -21,24 +21,19 @@ Client must unescape the arguments properly.
 
 # list of message -
 
+```
 ping [hostname] [randomStr] 
-
 pong [randomStr] [clientName] [clientVersion] 
 
 alive [userStatus] 
-
 profile [profileName] [profileInfo] 
 
 message [message] 
 
 filesend [fileID] [fileSize] [fileName] 
-
 fileaccept [fileID] 
-
 fileokay  [fileID] [blockIndex] 
-
 fileerror [fileID] [blockIndex] 
-
 filecancle [fileID] 
-
-filedata [fileID] [blockIndex] [blockHash] [blockData] 
+filedata [fileID] [blockIndex] [blockHash] [blockData]
+```
