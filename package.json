@@ -2,7 +2,7 @@
   "name": "torchat3",
   "version": "1.0.0",
   "description": "torchat3",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,5 +23,9 @@
   "homepage": "https://github.com/kjs104901/torchat3#readme",
   "devDependencies": {
     "electron": "^5.0.0"
+  },
+  "dependencies": {
+    "jquery": "^3.4.0",
+    "socks": "^2.3.2"
   }
 }
