@@ -1,5 +1,6 @@
 const config = require('../config');
 const User = require('./User');
+const EventEmitter = require('events');
 
 // ############################ user List ############################ //
 let userList = [];
@@ -47,6 +48,14 @@ exports.getUserList = () => {
     });
 }
 
+let eventEmitter = new EventEmitter();
+exports.on = eventEmitter.on; /*
+    userListUpdate
+    friendListUpdate
+    blackListUpdate
+    writeListUpdate
+*/
+
 function findUser(hostname) {
     let targetUser;
     userList.forEach(user => {
@@ -63,6 +72,8 @@ function addUser(hostname) {
 
     targetUser = new User(hostname);
     userList.push(targetUser);
+    eventEmitter.emit('userListUpdate');
+
     return targetUser;
 }
 
@@ -91,12 +102,18 @@ function addIncomingUser(hostname, randomStrPong) {
 exports.addIncomingUser = addIncomingUser;
 
 function removeDestroyedUser() {
+    let updated = false;
     userList = userList.filter((user) => {
         if (user.destroyed) {
+            updated = true;
             return false;
         }
         return true;
-    })
+    });
+
+    if (updated) {
+        eventEmitter.emit('userListUpdate');
+    }
 }
 
 // ############################ friend List ############################ //
@@ -115,6 +132,7 @@ exports.isFriend = (hostname) => {
 exports.addFriend = (hostname) => {
     if (friendList.indexOf(hostname) == -1) {
         friendList.push(hostname);
+        eventEmitter.emit('friendListUpdate');
         addUser(hostname);
     }
 }
@@ -122,6 +140,7 @@ exports.addFriend = (hostname) => {
 exports.removeFriend = (hostname) => {
     if (friendList.indexOf(hostname) > -1) {
         friendList.splice(friendList.indexOf(hostname), 1);
+        eventEmitter.emit('friendListUpdate');
     }
 }
 
@@ -142,12 +161,14 @@ exports.isBlack = isBlack;
 exports.addBlack = (hostname) => {
     if (blackList.indexOf(hostname) == -1) {
         blackList.push(hostname);
+        eventEmitter.emit('blackListUpdate');
     }
 }
 
 exports.removeBlack = (hostname) => {
     if (blackList.indexOf(hostname) > -1) {
         blackList.splice(blackList.indexOf(hostname), 1);
+        eventEmitter.emit('blackListUpdate');
     }
 }
 
@@ -168,11 +189,13 @@ exports.isWhite = isWhite;
 exports.addWhite = (hostname) => {
     if (whiteList.indexOf(hostname) == -1) {
         whiteList.push(hostname);
+        eventEmitter.emit('whiteListUpdate');
     }
 }
 
 exports.removeWhite = (hostname) => {
     if (whiteList.indexOf(hostname) > -1) {
         whiteList.splice(whiteList.indexOf(hostname), 1);
+        eventEmitter.emit('whiteListUpdate');
     }
 }

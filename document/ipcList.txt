@@ -4,7 +4,9 @@ bootInfoReq
 bootInfoRes { progress, logs }
 
 
-# action
+# Event
 
 bootSucc
 bootFail
+
+# Actions
