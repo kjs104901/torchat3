@@ -28,12 +28,12 @@ let server = net.createServer((client) => {
                 }
             }
             else {
-                if (!protocol.validate(dataList)) { continue; }
                 while (dataBuffer.indexOf('\n') > -1) {
                     let parsed = parser.buffer(dataBuffer);
                     const dataList = parsed.dataList;
                     dataBuffer = parsed.bufferAfter;
 
+                    if (!protocol.validate(dataList)) { continue; }
                     switch (dataList[0]) {
                         case 'ping':
                             hostname = dataList[1];
