@@ -13,7 +13,7 @@ exports.getUserListRaw = () => {
 exports.getUserList = () => {
     return userList.map((user) => {
         return {
-            hostname: user.hostname,
+            address: user.hostname,
             isConnected: user.isValid, // isConnected()
             status: user.status,
             profile: {
@@ -34,27 +34,47 @@ exports.getUserList = () => {
             sendFile: user.sendFileSend, // sendFile(filename) return Promise
             acceptFile: user.sendFileAccept, // acceptFile(fileID) return Promise
             cancleFile: user.fileCancle, // cancleFile(fileID)
+        };
+    });
+}
 
-            on: this.eventEmitter.on /*
-                connect
-                close
-                alive
-                profile
-                message / message, options
-                fileaccept / fileID
-                fileupdate / fileID
-            */
+exports.getUserListData = () => {
+    return userList.map((user) => {
+        return {
+            address: user.hostname,
+            connected: user.isValid(),
+            status: user.status,
+            profile: {
+                name: user.profileName,
+                info: user.profileInfo
+            },
+            client: {
+                name: user.clientName,
+                version: user.clientVersion,
+            }
         };
     });
 }
 
 let eventEmitter = new EventEmitter();
-exports.on = eventEmitter.on; /*
+exports.event = eventEmitter; /*
     userListUpdate
     friendListUpdate
     blackListUpdate
     writeListUpdate
 */
+
+let eventEmitterUser = new EventEmitter();
+exports.eventUser = eventEmitterUser; /*
+    userConnect [hostname]
+    userClose   [hostname]
+    userAlive [hostname] [status]
+    userProfile [hostname]
+    userMessage [hostname] [message] [options]
+    userFileaccept [hostname] [fileID]
+    userFileupdate [hostname] [fileID]
+*/
+
 
 function findUser(hostname) {
     let targetUser;
@@ -72,7 +92,15 @@ function addUser(hostname) {
 
     targetUser = new User(hostname);
     userList.push(targetUser);
+
     eventEmitter.emit('userListUpdate');
+    targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
+    targetUser.on('close', () => { eventEmitterUser.emit('userClose', hostname); })
+    targetUser.on('alive', (status) => { eventEmitterUser.emit('userAlive', hostname, status); })
+    targetUser.on('profile', () => { eventEmitterUser.emit('userProfile', hostname); })
+    targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
+    targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileaccept', hostname, fileID); })
+    targetUser.on('fileupdate', (fileID) => { eventEmitterUser.emit('userFileupdate', hostname, fileID); })
 
     return targetUser;
 }

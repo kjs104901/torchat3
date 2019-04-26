@@ -1,4 +1,4 @@
-// Constants
+// Constants // start with upper case
 const ClientName = "TorChat3";
 const ClientVersion = "0.1";
 
@@ -21,8 +21,8 @@ let userBridge = 0;
 let bridge = "";
 let servicePort = 0;
 
-let profileName = "Tester 1";
-let profileInfo = "this is test 1 \n haha";
+let profileName = "";
+let profileInfo = "";
 
 let chatListSize = 100;
 

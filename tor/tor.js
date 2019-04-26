@@ -12,7 +12,7 @@ let controlPasswordHashed;
 
 function makeTorrc() {
     let bridgeLine = '';
-    if (config.bridge == 1) { bridgeLine = "Bridge " +  config.bridge; }
+    if (config.bridge == 1) { bridgeLine = "Bridge " + config.bridge; }
 
     fs.writeFileSync(__dirname + '/torrc',
         `
@@ -62,10 +62,8 @@ exports.start = () => {
         makeTorrc();
         torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', __dirname + '/torrc'], { cwd: torDir });
 
-        torProcess.stdout.on('data', (data) => {
-            bootLogs.push(data.toString());
-        });
-        torProcess.stderr.on('data', (data) => { });
+        torProcess.stdout.on('data', (data) => { bootLogs.push(data.toString()); });
+        torProcess.stderr.on('data', (data) => { bootLogs.push(data.toString()); });
 
         torProcess.on('exit', (code) => {
             torProcess = null;

@@ -8,11 +8,22 @@ require('popper.js');
 require('bootstrap');
 
 //// ------------ html Modules ------------ ////
-const htmlModule = {};
-htmlModule.boot = fs.readFileSync(__dirname + '/mBoot.html');
-htmlModule.chat = fs.readFileSync(__dirname + '/mChat.html');
+const htmlBoot = fs.readFileSync(__dirname + '/mBoot.html', { encoding: "utf8" });
+const htmlChat = fs.readFileSync(__dirname + '/mChat.html', { encoding: "utf8" });
+const htmlUserList = fs.readFileSync(__dirname + '/mUserList.html', { encoding: "utf8" });
+
+function setContentBoot() { $('#content').html(htmlBoot); }
+function setContentChat() { $('#content').html(htmlChat); }
+
+function setSideContentUserList() {
+    $('#side-content').html(htmlUserList);
+    $('#button-add-friend').on("click", addFriend);
+}
 
 //// ------------ Booting ------------ ////
+let booting = false;
+setContentBoot()
+
 const bootInfoIntv = setInterval(() => {
     ipcRenderer.send('bootInfoReq');
 }, 100);
@@ -22,7 +33,8 @@ let logs = [];
 ipcRenderer.on('bootInfoRes', (event, message) => {
     if (progress >= 100) {
         clearInterval(bootInfoIntv);
-        $("#content").html('boot succ');
+
+        bootFinish();
     }
 
     if (progress != message.progress) {
@@ -38,17 +50,47 @@ ipcRenderer.on('bootInfoRes', (event, message) => {
 ipcRenderer.on('bootSucc', (event, message) => {
     clearInterval(bootInfoIntv);
 
-    $("#content").html('boot succ');
+    bootFinish();
 });
 
 ipcRenderer.on('bootFail', (event, message) => {
     clearInterval(bootInfoIntv);
 
-    $("#content").html('boot fail');
+    $('#tor-status').text("boot fail");
 });
 
-//// ------------ Chatting ------------ ////
+function bootFinish() {
+    if (!booting) {
+        booting = true;
+
+        setContentChat();
+        setSideContentUserList();
+    }
+}
+
+//// ------------ Side Contents ------------ ////
+let sideMenuSetting = false;
+let userList = [];
+
+ipcRenderer.on('userListUpdate', (event, message) => {
+    userList = message.data;
+    console.log(userList);
+
+    userList.forEach(user => {
+        $('#user-list').append(`<div>${user.address}</div>`)
+    });
+});
 
 
+//// ------------ Contents ------------ ////
+let chatUser;
 
-//// ------------ Chatting ------------ ////
+
+//// ------------ Actions ------------ ////
+function addFriend() {
+    const friendAddress = $('#input-add-friend-address').val();
+
+    ipcRenderer.send('addFriend', {
+        address: friendAddress,
+    })
+}

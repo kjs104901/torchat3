@@ -12,13 +12,16 @@ const protocol = require('./protocol');
 const fileHandler = require('./fileHandler');
 const contact = require('./contact');
 
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.socketCheck(); }); }, 1000 * 1); // seconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.bufferCheck(); }); }, 1000 * 0.01); // seconds
+setInterval(() => { contact.getUserListRaw().forEach(user => { user.socketCheck(); }); }, 1); // milliseconds
+setInterval(() => { contact.getUserListRaw().forEach(user => { user.bufferCheck(); }); }, 1); // milliseconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.sendAlive(); }); }, 1000 * 30); // seconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileTransCheck(); }); }, 10); // milliseconds
 
-class User {
+class User extends EventEmitter {
     constructor(hostname) {
+        super();
+        this.socksClient;
+
         this.hostname = hostname;
         this.valid = false;
         this.destroyed = false;
@@ -48,13 +51,11 @@ class User {
 
         this.fileSendList = [];
         this.fileRecvList = [];
-
-        this.eventEmitter = new EventEmitter();
     }
 
     socketCheck() {
         if (!this.socketOut && this.socketOutConnecting == false && this.socketOutRetryWait == false) {
-            if (contact.isFriend(this.hostname) || this.income) {
+            if (contact.isFriend(this.hostname) || this.income || this.socketIn) {
                 this.income = false;
                 console.log("Try connecting to server");
                 this.socketOutConnecting = true;
@@ -90,19 +91,21 @@ class User {
         options.destination.host = this.hostname + ".onion";
 
         return new Promise((resolve, reject) => {
-            SocksClient.createConnection(options)
-                .then((info) => {
-                    resolve(info.socket);
-                })
-                .catch((err) => {
-                    reject(err);
-                })
-        })
+            this.socksClient = new SocksClient(options);
+            this.socksClient.on('established', (info) => {
+                resolve(info.socket);
+            });
+            this.socksClient.on('error', (err) => {
+                this.socksClient = null;
+                reject(err);
+            });
+            this.socksClient.connect();
+        });
     }
 
     closeSocketOut() {
         if (this.socketOut && !this.socketOut.destroyed) { this.socketOut.destroy(); }
-        this.eventEmitter.emit('close');
+        this.emit('close');
 
         this.socketOut = null;
         this.socketOutConnecting = false;
@@ -114,7 +117,7 @@ class User {
 
     closeSocketIn() {
         if (this.socketIn && !this.socketIn.destroyed) { this.socketIn.destroy(); }
-        this.eventEmitter.emit('close');
+        this.emit('close');
 
         this.socketIn = null;
         this.bufferIn = "";
@@ -147,7 +150,7 @@ class User {
         }
         else {
             this.valid = true;
-            this.eventEmitter.emit('connect');
+            this.emit('connect');
 
             this.sendAlive();
             this.sendProfile();
@@ -246,7 +249,7 @@ class User {
                         status = dataList[1];
                         this.status = status * 1;
 
-                        this.eventEmitter.emit('alive');
+                        this.emit('alive', status);
                         break;
 
                     case 'profile':
@@ -255,8 +258,8 @@ class User {
 
                         this.profileName = parser.unescape(profileName);
                         this.profileInfo = parser.unescape(profileInfo);
-                        
-                        this.eventEmitter.emit('profile');
+
+                        this.emit('profile');
                         break;
 
                     case 'message':
@@ -382,8 +385,8 @@ class User {
     pushMessage(message, options) {
         this.messageList.push({ message, options });
         this.lastMessageDate = new Date();
-        
-        this.eventEmitter.emit('message', message, options);
+
+        this.emit('message', message, options);
 
         while (this.messageList.length > config.chatListSize) {
             this.messageList.shift();
@@ -442,7 +445,7 @@ class User {
         this.fileSendList.forEach(fileSend => {
             if (fileSend.fileID == fileID) {
                 fileSend.accepted = true;
-                this.eventEmitter.emit('fileaccept', fileID);
+                this.emit('fileaccept', fileID);
             }
         });
     }
@@ -495,7 +498,7 @@ class User {
                 if (blockNum - 1 <= filesend.okayBlock) {
                     filesend.finished = true;
                 }
-                this.eventEmitter.emit('fileupdate', filesend.fileID);
+                this.emit('fileupdate', filesend.fileID);
             }
         });
     }
@@ -542,14 +545,14 @@ class User {
                                 console.log(err);
                                 filesend.bufferSize -= config.FileBlockSize;
                                 filesend.accepted = false;
-                                this.eventEmitter.emit('fileupdate', filesend.fileID);
+                                this.emit('fileupdate', filesend.fileID);
                             })
                         filesend.sendBlock += 1;
                     }
 
                     if (blockNum <= filesend.sendBlock) {
                         filesend.accepted = false;
-                        this.eventEmitter.emit('fileupdate', filesend.fileID);
+                        this.emit('fileupdate', filesend.fileID);
                     }
                 }
             });
@@ -569,7 +572,7 @@ class User {
                         delete filerecv.bufferList[filerecv.blockIndex];
                         filerecv.blockIndex += 1;
                     }
-                    this.eventEmitter.emit('fileupdate', filerecv.fileID);
+                    this.emit('fileupdate', filerecv.fileID);
 
                     if (bufferSum.length > 0) {
                         filerecv.blockWriting = true;
@@ -582,13 +585,13 @@ class User {
                                 console.log(err);
                                 filerecv.blockWriting = false;
                                 filerecv.accepted = false;
-                                this.eventEmitter.emit('fileupdate', filerecv.fileID);
+                                this.emit('fileupdate', filerecv.fileID);
                             })
 
                         if (filerecv.fileSize <= filerecv.recvSize) {
                             filerecv.accepted = false;
                             filerecv.finished = true;
-                            this.eventEmitter.emit('fileupdate', filerecv.fileID);
+                            this.emit('fileupdate', filerecv.fileID);
                         }
                     }
                 }
