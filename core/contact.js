@@ -2,6 +2,24 @@ const config = require('../config');
 const User = require('./User');
 const EventEmitter = require('events');
 
+function normalizeHostname(hostname) {
+    hostname = hostname.toLowerCase();
+    if (hostname.indexOf('tc3:') == 0) { return hostname.substr('tc3:'.length); }
+    return hostname;
+}
+exports.normalizeHostname = normalizeHostname;
+
+function checkHostname(hostname) {
+    let valid = true;
+    hostname = normalizeHostname(hostname);
+    if (hostname.length != 56) { return false; }
+    hostname.split('').forEach(char => {
+        if (!char.match(/[0-9]|[a-z]/)) { valid = false; }
+    });
+    return valid;
+}
+exports.checkHostname = checkHostname;
+
 // ############################ user List ############################ //
 let userList = [];
 setInterval(removeDestroyedUser, 1000 * 1); // seconds
@@ -38,30 +56,9 @@ exports.getUserList = () => {
     });
 }
 
-exports.getUserListData = () => {
-    return userList.map((user) => {
-        return {
-            address: user.hostname,
-            connected: user.isValid(),
-            status: user.status,
-            profile: {
-                name: user.profileName,
-                info: user.profileInfo
-            },
-            client: {
-                name: user.clientName,
-                version: user.clientVersion,
-            }
-        };
-    });
-}
-
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter; /*
-    userListUpdate
-    friendListUpdate
-    blackListUpdate
-    writeListUpdate
+    newUser [hostname]
 */
 
 let eventEmitterUser = new EventEmitter();
@@ -69,10 +66,11 @@ exports.eventUser = eventEmitterUser; /*
     userConnect [hostname]
     userClose   [hostname]
     userAlive [hostname] [status]
-    userProfile [hostname]
+    userProfile [hostname] [name] [info]
+    userClient [hostname] [name] [version]
     userMessage [hostname] [message] [options]
-    userFileaccept [hostname] [fileID]
-    userFileupdate [hostname] [fileID]
+    userFileAccept [hostname] [fileID]
+    userFileUpdate [hostname] [fileID]
 */
 
 
@@ -93,14 +91,15 @@ function addUser(hostname) {
     targetUser = new User(hostname);
     userList.push(targetUser);
 
-    eventEmitter.emit('userListUpdate');
+    eventEmitter.emit('newUser', hostname);
     targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
     targetUser.on('close', () => { eventEmitterUser.emit('userClose', hostname); })
     targetUser.on('alive', (status) => { eventEmitterUser.emit('userAlive', hostname, status); })
-    targetUser.on('profile', () => { eventEmitterUser.emit('userProfile', hostname); })
+    targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
+    targetUser.on('client', (name, info) => { eventEmitterUser.emit('userClient', hostname, name, version); })
     targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
-    targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileaccept', hostname, fileID); })
-    targetUser.on('fileupdate', (fileID) => { eventEmitterUser.emit('userFileupdate', hostname, fileID); })
+    targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileID); })
+    targetUser.on('fileupdate', (fileID) => { eventEmitterUser.emit('userFileUpdate', hostname, fileID); })
 
     return targetUser;
 }
@@ -112,13 +111,12 @@ function removeUser(hostname) {
         removeDestroyedUser();
     }
 }
-exports.removeUser = removeUser;
 
 function addIncomingUser(hostname, randomStrPong) {
-    if (config.blackList && isBlack(hostname)) {
-        return;
-    }
-
+    hostname = normalizeHostname(hostname);
+    if (!checkHostname(hostname)) { return; }
+    
+    if (config.blackList && isBlack(hostname)) { return; }
     if (!config.whiteList || (config.whiteList && isWhite(hostname))) {
         let targetUser = addUser(hostname);
 
@@ -130,18 +128,12 @@ function addIncomingUser(hostname, randomStrPong) {
 exports.addIncomingUser = addIncomingUser;
 
 function removeDestroyedUser() {
-    let updated = false;
     userList = userList.filter((user) => {
         if (user.destroyed) {
-            updated = true;
             return false;
         }
         return true;
     });
-
-    if (updated) {
-        eventEmitter.emit('userListUpdate');
-    }
 }
 
 // ############################ friend List ############################ //
@@ -151,6 +143,8 @@ exports.getFriendList = () => {
 }
 
 exports.isFriend = (hostname) => {
+    hostname = normalizeHostname(hostname);
+
     if (friendList.indexOf(hostname) == -1) {
         return false;
     }
@@ -158,17 +152,21 @@ exports.isFriend = (hostname) => {
 }
 
 exports.addFriend = (hostname) => {
-    if (friendList.indexOf(hostname) == -1) {
+    hostname = normalizeHostname(hostname);
+
+    if (checkHostname(hostname) && friendList.indexOf(hostname) == -1) {
         friendList.push(hostname);
-        eventEmitter.emit('friendListUpdate');
         addUser(hostname);
+        return true;
     }
+    return false;
 }
 
 exports.removeFriend = (hostname) => {
+    hostname = normalizeHostname(hostname);
+
     if (friendList.indexOf(hostname) > -1) {
         friendList.splice(friendList.indexOf(hostname), 1);
-        eventEmitter.emit('friendListUpdate');
     }
 }
 
@@ -179,6 +177,8 @@ exports.getBlackList = () => {
 }
 
 function isBlack(hostname) {
+    hostname = normalizeHostname(hostname);
+
     if (blackList.indexOf(hostname) == -1) {
         return false;
     }
@@ -187,16 +187,20 @@ function isBlack(hostname) {
 exports.isBlack = isBlack;
 
 exports.addBlack = (hostname) => {
-    if (blackList.indexOf(hostname) == -1) {
+    hostname = normalizeHostname(hostname);
+
+    if (checkHostname(hostname) && blackList.indexOf(hostname) == -1) {
         blackList.push(hostname);
-        eventEmitter.emit('blackListUpdate');
+        return true;
     }
+    return false;
 }
 
 exports.removeBlack = (hostname) => {
+    hostname = normalizeHostname(hostname);
+
     if (blackList.indexOf(hostname) > -1) {
         blackList.splice(blackList.indexOf(hostname), 1);
-        eventEmitter.emit('blackListUpdate');
     }
 }
 
@@ -207,6 +211,8 @@ exports.getWhiteList = () => {
 }
 
 function isWhite(hostname) {
+    hostname = normalizeHostname(hostname);
+
     if (whiteList.indexOf(hostname) == -1) {
         return false;
     }
@@ -215,13 +221,19 @@ function isWhite(hostname) {
 exports.isWhite = isWhite;
 
 exports.addWhite = (hostname) => {
-    if (whiteList.indexOf(hostname) == -1) {
+    hostname = normalizeHostname(hostname);
+
+    if (checkHostname(hostname) && whiteList.indexOf(hostname) == -1) {
         whiteList.push(hostname);
         eventEmitter.emit('whiteListUpdate');
+        return true;
     }
+    return false;
 }
 
 exports.removeWhite = (hostname) => {
+    hostname = normalizeHostname(hostname);
+
     if (whiteList.indexOf(hostname) > -1) {
         whiteList.splice(whiteList.indexOf(hostname), 1);
         eventEmitter.emit('whiteListUpdate');

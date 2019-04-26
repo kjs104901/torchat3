@@ -62,11 +62,12 @@ ipcMain.on('addFriend', (event, message) => {
 });
 
 // contact listener
-contact.event.on('userListUpdate', () => { ipcSendToWindow(mainWindow, 'userListUpdate', { data: contact.getUserListData() }); });
+contact.event.on('newUser', (address) => { ipcSendToWindow(mainWindow, 'newUser', { address }); });
+
 contact.eventUser.on('userConnect', (address) => { ipcSendToWindow(mainWindow, 'userConnect', { address }); });
 contact.eventUser.on('userClose', (address) => { ipcSendToWindow(mainWindow, 'userClose', { address }); });
 contact.eventUser.on('userAlive', (address, status) => { ipcSendToWindow(mainWindow, 'userAlive', { address, status }); });
-contact.eventUser.on('userProfile', (address) => { ipcSendToWindow(mainWindow, 'userProfile', { address }); });
+contact.eventUser.on('userProfile', (address, name, info) => { ipcSendToWindow(mainWindow, 'userProfile', { address, name, info }); });
 contact.eventUser.on('userMessage', (address, message, options) => { ipcSendToWindow(mainWindow, 'userMessage', { address, message, options }); });
-contact.eventUser.on('userFileaccept', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileaccept', { address, fileID }); });
-contact.eventUser.on('userFileupdate', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileupdate', { address, fileID }); });
+contact.eventUser.on('userFileAccept', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileAccept', { address, fileID }); });
+contact.eventUser.on('userFileUpdate', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileUpdate', { address, fileID }); });

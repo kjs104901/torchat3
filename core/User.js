@@ -78,7 +78,10 @@ class User extends EventEmitter {
         }
 
         if (!this.socketOut || !this.socketIn || !this.valid) {
-            this.status = 0;
+            if (this.status == 0) {
+                this.status = 0;
+                this.emit('close');
+            }
         }
 
         if (this.bufferOut > config.BufferMaximum || this.bufferIn > config.BufferMaximum) {
@@ -96,7 +99,6 @@ class User extends EventEmitter {
                 resolve(info.socket);
             });
             this.socksClient.on('error', (err) => {
-                this.socksClient = null;
                 reject(err);
             });
             this.socksClient.connect();
@@ -105,7 +107,6 @@ class User extends EventEmitter {
 
     closeSocketOut() {
         if (this.socketOut && !this.socketOut.destroyed) { this.socketOut.destroy(); }
-        this.emit('close');
 
         this.socketOut = null;
         this.socketOutConnecting = false;
@@ -117,7 +118,6 @@ class User extends EventEmitter {
 
     closeSocketIn() {
         if (this.socketIn && !this.socketIn.destroyed) { this.socketIn.destroy(); }
-        this.emit('close');
 
         this.socketIn = null;
         this.bufferIn = "";
@@ -243,6 +243,8 @@ class User extends EventEmitter {
                         this.validate(randomStrPong);
                         this.clientName = clientName;
                         this.clientVersion = clientVersion;
+
+                        this.emit('client', clientName, clientVersion);
                         break;
 
                     case 'alive':
@@ -259,7 +261,7 @@ class User extends EventEmitter {
                         this.profileName = parser.unescape(profileName);
                         this.profileInfo = parser.unescape(profileInfo);
 
-                        this.emit('profile');
+                        this.emit('profile', profileName, profileInfo);
                         break;
 
                     case 'message':
@@ -406,7 +408,7 @@ class User extends EventEmitter {
             const fileSize = stat.size;
 
             this.pushMessage(fileName, { fromMe: true, isFile: true, fileSize: fileSize });
-            this.pushFileSendList(fileID, file);
+            this.pushFileSendList(fileID, file, stat.size);
 
             protocol.filesend(this.socketOut, fileID, fileSize, fileName);
 
@@ -414,9 +416,9 @@ class User extends EventEmitter {
         });
     }
 
-    pushFileSendList(fileID, file) {
+    pushFileSendList(fileID, file, fileSize) {
         this.fileSendList.push({
-            fileID, file,
+            fileID, file, fileSize,
             accepted: false, finished: false,
             sendBlock: 0, sendSize: 0, okayBlock: -1, okayList: [],
             bufferSize: 0,

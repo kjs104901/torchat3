@@ -13,7 +13,12 @@ const htmlChat = fs.readFileSync(__dirname + '/mChat.html', { encoding: "utf8" }
 const htmlUserList = fs.readFileSync(__dirname + '/mUserList.html', { encoding: "utf8" });
 
 function setContentBoot() { $('#content').html(htmlBoot); }
-function setContentChat() { $('#content').html(htmlChat); }
+
+function setContentChat() {
+    $('#content').html(htmlChat);
+
+    $('#button-message-send').on("click", sendMessage);
+}
 
 function setSideContentUserList() {
     $('#side-content').html(htmlUserList);
@@ -72,23 +77,62 @@ function bootFinish() {
 let sideMenuSetting = false;
 let userList = [];
 
-ipcRenderer.on('userListUpdate', (event, message) => {
-    userList = message.data;
-    console.log(userList);
-
+function findUser(address) {
+    let targetUser;
     userList.forEach(user => {
-        $('#user-list').append(`<div>${user.address}</div>`)
+        if (user.address == address) { targetUser = user; }
     });
+    return targetUser;
+}
+
+ipcRenderer.on('newUser', (event, message) => {
+    let address = message.address;
+    userList.push({
+        address,
+        connected: false, status: 0,
+        profile: { name: "", info: "" },
+        client: { name: "", version: "", },
+
+        messageList: [],
+        lastMessageDate: new Date(),
+        fileSendList: [], fileRecvList: [],
+    })
+
+    $('#user-list').empty();
+    userList.forEach(user => {
+        $('#user-list').append(`<div class='user' address='${user.address}'>${user.address}</div>`)
+    });
+
+    $('.user').on('click', function () {
+        chatUserAddress = $(this).attr('address');
+        showChatRoom(chatUserAddress);
+    })
 });
 
-
 //// ------------ Contents ------------ ////
-let chatUser;
+let chatUserAddress = "";
+
+function showChatRoom(address) {
+    console.log("showChatRoom", address);
+
+    setContentChat();
+}
+
+function sendMessage() {
+    if (chatUserAddress.length > 0) {
+        const message = $('#input-message').val();
+
+        ipcRenderer.send('sendMessage', {
+            address: chatUserAddress,
+            message: message
+        })
+    }
+}
 
 
 //// ------------ Actions ------------ ////
 function addFriend() {
-    const friendAddress = $('#input-add-friend-address').val();
+    const friendAddress = $('#input-friend-address').val();
 
     ipcRenderer.send('addFriend', {
         address: friendAddress,

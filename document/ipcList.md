@@ -8,16 +8,18 @@ bootInfoRes { progress, logs }
 bootSucc
 bootFail
 
-userListUpdate { data }
+newUser { address }
 
 userConnect { address }
 userClose { address }
 userAlive { address, status }
-userProfile { address }
+userProfile { address, name, info }
+userClient { address, name, version }
 userMessage { address, message, options }
-userFileaccept { address, fileID }
-userFileupdate { address, fileID }
+userFileAccept { address, fileID }
+userFileUpdate { address, fileID }
 
 # Actions
 
 addFriend { address }
+sendMessage { address, message }
