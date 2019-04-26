@@ -61,6 +61,18 @@ ipcMain.on('addFriend', (event, message) => {
     contact.addFriend(message.address);
 });
 
+ipcMain.on('sendMessage', (event, message) => {
+    const address = message.address;
+    const msg = message.message;
+
+    const targetUser = contact.findUser(address);
+    if (targetUser) {
+        targetUser.sendMessage(msg);
+        //test
+        console.log(msg);
+    }
+})
+
 // contact listener
 contact.event.on('newUser', (address) => { ipcSendToWindow(mainWindow, 'newUser', { address }); });
 

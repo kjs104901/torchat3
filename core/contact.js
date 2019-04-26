@@ -83,6 +83,7 @@ function findUser(hostname) {
     });
     return targetUser;
 }
+exports.findUser = findUser;
 
 function addUser(hostname) {
     let targetUser = findUser(hostname);
@@ -96,7 +97,7 @@ function addUser(hostname) {
     targetUser.on('close', () => { eventEmitterUser.emit('userClose', hostname); })
     targetUser.on('alive', (status) => { eventEmitterUser.emit('userAlive', hostname, status); })
     targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
-    targetUser.on('client', (name, info) => { eventEmitterUser.emit('userClient', hostname, name, version); })
+    targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })
     targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
     targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileID); })
     targetUser.on('fileupdate', (fileID) => { eventEmitterUser.emit('userFileUpdate', hostname, fileID); })

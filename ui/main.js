@@ -77,14 +77,6 @@ function bootFinish() {
 let sideMenuSetting = false;
 let userList = [];
 
-function findUser(address) {
-    let targetUser;
-    userList.forEach(user => {
-        if (user.address == address) { targetUser = user; }
-    });
-    return targetUser;
-}
-
 ipcRenderer.on('newUser', (event, message) => {
     let address = message.address;
     userList.push({
@@ -97,6 +89,8 @@ ipcRenderer.on('newUser', (event, message) => {
         lastMessageDate: new Date(),
         fileSendList: [], fileRecvList: [],
     })
+
+    // need to sort here
 
     $('#user-list').empty();
     userList.forEach(user => {
@@ -118,17 +112,6 @@ function showChatRoom(address) {
     setContentChat();
 }
 
-function sendMessage() {
-    if (chatUserAddress.length > 0) {
-        const message = $('#input-message').val();
-
-        ipcRenderer.send('sendMessage', {
-            address: chatUserAddress,
-            message: message
-        })
-    }
-}
-
 
 //// ------------ Actions ------------ ////
 function addFriend() {
@@ -137,4 +120,16 @@ function addFriend() {
     ipcRenderer.send('addFriend', {
         address: friendAddress,
     })
+}
+
+function sendMessage() {
+    if (chatUserAddress.length > 0) {
+        const message = $('#input-message').val();
+        $('#input-message').val('');
+
+        ipcRenderer.send('sendMessage', {
+            address: chatUserAddress,
+            message: message
+        })
+    }
 }
