@@ -21,28 +21,28 @@ Client must unescape the arguments properly.
 
 # list of message -
 
-ping [hostname] [randomStr](0x0A)
+ping [hostname] [randomStr]
 
-pong [randomStr] [clientName] [clientVersion](0x0A)
-
-
-alive [userStatus](0x0A)
+pong [randomStr] [clientName] [clientVersion]
 
 
-profile [profileName] [profileInfo](0x0A)
+alive [userStatus]
 
 
-message [message](0x0A)
+profile [profileName] [profileInfo]
 
 
-filesend [fileID] [fileSize] [fileName](0x0A)
+message [message]
 
-fileaccept [fileID](0x0A)
 
-fileokay  [fileID] [blockIndex](0x0A)
+filesend [fileID] [fileSize] [fileName]
 
-fileerror [fileID] [blockIndex](0x0A)
+fileaccept [fileID]
 
-filecancle [fileID](0x0A)
+fileokay  [fileID] [blockIndex]
 
-filedata [fileID] [blockIndex] [blockHash] [blockData](0x0A)
+fileerror [fileID] [blockIndex]
+
+filecancle [fileID]
+
+filedata [fileID] [blockIndex] [blockHash] [blockData]
