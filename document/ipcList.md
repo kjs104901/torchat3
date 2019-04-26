@@ -3,7 +3,6 @@
 bootInfoReq
 bootInfoRes { progress, logs }
 
-
 # Event
 
 bootSucc

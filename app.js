@@ -7,6 +7,7 @@ const tor = require('./tor/tor');
 let mainWindow;
 let mainWindowSetting = {
     width: 1600, height: 800,
+    minWidth: 600, minHeight: 400,
     resizable: true,
     webPreferences: {
         nodeIntegration: true
@@ -15,7 +16,7 @@ let mainWindowSetting = {
 
 app.on('ready', () => {
     mainWindow = new BrowserWindow(mainWindowSetting);
-    mainWindow.loadFile(__dirname + '/pages/main.html');
+    mainWindow.loadFile(__dirname + '/ui/main.html');
 
     mainWindow.webContents.openDevTools();
 
@@ -45,6 +46,7 @@ async function boot() {
             ipcSendToWindow(mainWindow, 'bootFail')
         })
 }
+
 //// ------------ IPC ------------ ////
 ipcMain.on('bootInfoReq', (event, message) => {
     event.sender.send("bootInfoRes", {

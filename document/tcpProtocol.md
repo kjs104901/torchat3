@@ -1,6 +1,10 @@
 # Introduce
 
-This protocol is on the tcp layer
+
+
+# Message
+
+The message is on the tcp layer
 
 Every message has new line(0x0A) as a footer.
 
@@ -19,7 +23,7 @@ If arguments have new line(0x0A) or space(0x20), they must be escaped.
 Client must unescape the arguments properly.
 
 
-# list of message -
+# list of message
 
 ```
 ping [hostname] [randomStr] 
