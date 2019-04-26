@@ -5,6 +5,7 @@ TODO
 tor/bin/data
 tor/bin/hidden_service
 tor/bin/*.dll
+tor/torrc
 
 ############### node.js default ###############
 # Logs

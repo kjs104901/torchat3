@@ -3,4 +3,11 @@ const { BrowserWindow } = remote;
 
 window.$ = window.jQuery = require('jquery');
 
-$("#tor-status").text("hello world!");
+setInterval(() => {
+    ipcRenderer.send('bootInfoReq');
+}, 100);
+
+ipcRenderer.on('bootInfoRes', (event, message) => {
+    $("#tor-status").text(message.progress);
+    $("#tor-logs").html(message.logs.join('<br><br>'))
+})

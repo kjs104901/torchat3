@@ -11,6 +11,9 @@ const controlPassword = crypto.randomBytes(20).toString('hex');
 let controlPasswordHashed;
 
 function makeTorrc() {
+    let bridgeLine = '';
+    if (config.bridge == 1) { bridgeLine = "Bridge " +  config.bridge; }
+
     fs.writeFileSync(__dirname + '/torrc',
         `
 SocksPort auto
@@ -24,7 +27,7 @@ HiddenServicePort ${config.ServiceInsidePort} 127.0.0.1:${config.servicePort}
 LongLivedPorts ${config.ServiceInsidePort}
 
 UseBridges ${config.userBridge}
-Bridge ${config.bridge}
+${bridgeLine}
 
 DataDirectory ./data
     ` + config.torrcExpand
@@ -60,7 +63,6 @@ exports.start = () => {
         torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', __dirname + '/torrc'], { cwd: torDir });
 
         torProcess.stdout.on('data', (data) => {
-            console.log(data.toString());
             bootLogs.push(data.toString());
         });
         torProcess.stderr.on('data', (data) => { });

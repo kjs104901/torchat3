@@ -1,0 +1,10 @@
+# Req/Res
+
+bootInfoReq
+bootInfoRes { progress, logs }
+
+
+# action
+
+bootSucc
+bootFail

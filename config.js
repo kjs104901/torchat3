@@ -17,7 +17,7 @@ const FileBufferSize = 1024 * 1024 * 1; // 1m byte
 let userStatus = 1
 
 let torrcExpand = "";
-let userBridge = false;
+let userBridge = 0;
 let bridge = "";
 let servicePort = 0;
 
