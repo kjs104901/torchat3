@@ -5,8 +5,7 @@ const tor = require('./tor/tor');
 const User = require('./core/User');
 const contact = require('./core/contact');
 
-//// ------------ Windows ------------ ////
-let mainWindow;
+let mainWindow
 let mainWindowSetting = {
     width: 1600, height: 800,
     minWidth: 600, minHeight: 400,
@@ -15,14 +14,14 @@ let mainWindowSetting = {
         nodeIntegration: true
     }
 };
-
 app.on('ready', () => {
     mainWindow = new BrowserWindow(mainWindowSetting);
-    mainWindow.loadFile(__dirname + '/ui/main.html');
 
+    mainWindow.loadURL(`file://${__dirname}/ui/index.html`)
+    
     mainWindow.once('ready-to-show', () => { });
     mainWindow.once('close', () => { mainWindow = null; });
-
+    
     mainWindow.webContents.openDevTools();
 
     boot();
@@ -70,9 +69,13 @@ ipcMain.on('sendMessage', (event, message) => {
 
     const targetUser = contact.findUser(address);
     if (targetUser) {
-        targetUser.sendMessage(msg);
         //test
         console.log(msg);
+        
+        targetUser.sendMessage(msg)
+            .catch((err) => {
+                console.log(err);
+            })
     }
 })
 
@@ -90,3 +93,5 @@ contact.eventUser.on('userFileFinished', (address, fileType, fileID) => { ipcSen
 contact.eventUser.on('userFileError', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileError', { address, fileType, fileID }); });
 contact.eventUser.on('userFileCancle', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileCancle', { address, fileType, fileID }); });
 contact.eventUser.on('userFileData', (address, fileType, fileID, dataSize, accumSize) => { ipcSendToWindow(mainWindow, 'userFileData', { address, fileType, fileID, dataSize, accumSize }); });
+
+/* */

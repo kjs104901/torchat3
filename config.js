@@ -4,8 +4,8 @@ const ClientVersion = "0.1";
 
 const BufferMaximum = 10000;
 
-const ConnectionTimeOut = 1000 * 60 * 5; // minuites
-const ProxyTimeOut = 1000 * 60 * 5; // minuites
+const ConnectionTimeOut = 1000 * 60 * 3; // minuites
+const ProxyTimeOut = 1000 * 60 * 3; // minuites
 const ConnectionRetryTime = 1000 * 20 // seconds
 
 const ServiceInsidePort = 12009;

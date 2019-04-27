@@ -14,7 +14,7 @@ const contact = require('./contact');
 
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.socketCheck(); }); }, 1); // milliseconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.bufferCheck(); }); }, 1); // milliseconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.sendAlive(); }); }, 1000 * 30); // seconds
+setInterval(() => { contact.getUserListRaw().forEach(user => { user.sendAlive(); }); }, 1000 * 20); // seconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileTransCheck(); }); }, 100); // milliseconds
 
 class User extends EventEmitter {

@@ -11,17 +11,17 @@ require('bootstrap');
 
 //// ------------ html Modules ------------ ////
 const htmlBoot = fs.readFileSync(__dirname + '/mBoot.html', { encoding: "utf8" });
-const htmlChat = fs.readFileSync(__dirname + '/mChat.html', { encoding: "utf8" });
+const htmlChatroom = fs.readFileSync(__dirname + '/mChatroom.html', { encoding: "utf8" });
 const htmlUserList = fs.readFileSync(__dirname + '/mUserList.html', { encoding: "utf8" });
 
 function setContentBoot() { $('#content').html(htmlBoot); }
 
-function setContentChat() {
-    $('#content').html(htmlChat);
+function setContentChatroom() {
+    $('#content').html(htmlChatroom);
     $('#button-message-send').on("click", sendMessage);
 }
 
-function setSideContentUserList() {
+function setSideUserList() {
     $('#side-content').html(htmlUserList);
     $('#button-add-friend').on("click", addFriend);
 }
@@ -109,6 +109,7 @@ ipcRenderer.on('userClient', (event, message) => {
 
 ipcRenderer.on('userMessage', (event, message) => {
     userList.message(message.address, message.message, message.options);
+    addMessage(message.address, message.message, message.options);
 });
 
 //// ------------ Contents ------------ ////
@@ -128,8 +129,8 @@ function switchMenu() {
 }
 
 function showChatPage() {
-    showSideContentUserList();
-    showContentChat();
+    showUserList();
+    showChatroom();
 }
 
 function showSettingPage() {
@@ -137,8 +138,8 @@ function showSettingPage() {
 }
 
 //// ------------ Side Contents ------------ ////
-function showSideContentUserList() {
-    setSideContentUserList();
+function showUserList() {
+    setSideUserList();
     userList.getList().forEach(user => {
         addUserList(user);
     });
@@ -163,7 +164,7 @@ function addUserList(user) {
 
 function sortUserList() {
     const parent = $('#user-list');
-    let items = parent.children('div').sort(function(userA, userB) {
+    let items = parent.children('div').sort(function (userA, userB) {
         return userList.compareUser(userA, userB);
     });
     parent.append(items);
@@ -175,7 +176,7 @@ function updateUserList(user) {
             .attr("connected", user.connected)
             .attr("status", user.status)
             .children('.user-name')
-                .text(user.profile.nam)
+            .text(user.profile.nam)
     }
 }
 
@@ -183,19 +184,32 @@ let selectedUser;
 function selectUser(address) {
     selectedUser = userList.findUser(address);
 
-    showContentChat();
+    showChatroom();
 }
 
 //// ------------ Main Contents ------------ ////
 
-function showContentChat() {
-    setContentChat();
+function showChatroom() {
+    setContentChatroom();
     if (selectedUser) {
-        
+        selectedUser.messageList.forEach((message) => {
+            addMessage(selectedUser.address, message.message, message.options)
+        })
     }
 }
 
+//TODO addMessage(message.address, message.message, message.options);
+function addMessage(address, message) {
+    $('#message-list')
+        .append(`
+        <div class='message'
+            <span>${message.message}</span>
+        </div>`)
+}
 
+function updateChatroom() {
+
+}
 
 //// ------------ Actions ------------ ////
 function addFriend() {

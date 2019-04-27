@@ -1,3 +1,8 @@
+const EventEmitter = require('events');
+
+let eventEmitter = new EventEmitter();
+exports.event = eventEmitter;
+
 let userList = [];
 
 class User {
@@ -5,8 +10,8 @@ class User {
         this.address = address;
         this.connected = false;
         this.status = 0;
-        this.profile = {name:"", info: ""};
-        this.client= { name: "", version: "" }
+        this.profile = { name: "", info: "" };
+        this.client = { name: "", version: "" }
 
         this.messageList = [];
         this.lastMessageDate = new Date();
@@ -43,6 +48,8 @@ exports.addUser = (address) => {
     if (!targetUser) {
         targetUser = new User(address)
         userList.push(targetUser);
+
+        eventEmitter.emit('updateUI');
         return targetUser;
     }
 }
@@ -50,7 +57,10 @@ exports.addUser = (address) => {
 exports.connect = (address) => {
     const targetUser = findUser(address);
     if (targetUser) {
-        targetUser.connected = true;
+        if (targetUser.connected != true) {
+            targetUser.connected = true;
+            eventEmitter.emit('updateUI');
+        }
         return targetUser;
     }
 }
@@ -58,7 +68,10 @@ exports.connect = (address) => {
 exports.disconnect = (address) => {
     const targetUser = findUser(address);
     if (targetUser) {
-        targetUser.connected = false;
+        if (targetUser.connected != false) {
+            targetUser.connected = false;
+            eventEmitter.emit('updateUI');
+        }
         return targetUser;
     }
 }
@@ -66,7 +79,10 @@ exports.disconnect = (address) => {
 exports.alive = (address, status) => {
     const targetUser = findUser(address);
     if (targetUser) {
-        targetUser.status = status;
+        if (targetUser.status != status) {
+            targetUser.status = status;
+            eventEmitter.emit('updateUI');
+        }
         return targetUser;
     }
 }
@@ -76,6 +92,8 @@ exports.profile = (address, name, info) => {
     if (targetUser) {
         targetUser.profile.name = name;
         targetUser.profile.info = info;
+        
+        eventEmitter.emit('updateUI');
         return targetUser;
     }
 }
@@ -94,6 +112,8 @@ exports.message = (address, message, options) => {
     if (targetUser) {
         targetUser.messageList.push({ message, options });
         targetUser.lastMessageDate = new Date();
+        
+        eventEmitter.emit('updateUI');
         return targetUser;
     }
 }
