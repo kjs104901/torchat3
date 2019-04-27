@@ -3,6 +3,8 @@ const fs = require('fs');
 const { remote, ipcRenderer } = require('electron');
 const { BrowserWindow } = remote;
 
+const userList = require('./userList');
+
 window.$ = window.jQuery = require('jquery');
 require('popper.js');
 require('bootstrap');
@@ -16,7 +18,6 @@ function setContentBoot() { $('#content').html(htmlBoot); }
 
 function setContentChat() {
     $('#content').html(htmlChat);
-
     $('#button-message-send').on("click", sendMessage);
 }
 
@@ -33,12 +34,11 @@ const bootInfoIntv = setInterval(() => {
     ipcRenderer.send('bootInfoReq');
 }, 100);
 
-let progress = 0;
+let progress = -1;
 let logs = [];
 ipcRenderer.on('bootInfoRes', (event, message) => {
     if (progress >= 100) {
         clearInterval(bootInfoIntv);
-
         bootFinish();
     }
 
@@ -54,63 +54,147 @@ ipcRenderer.on('bootInfoRes', (event, message) => {
 
 ipcRenderer.on('bootSucc', (event, message) => {
     clearInterval(bootInfoIntv);
-
     bootFinish();
 });
 
 ipcRenderer.on('bootFail', (event, message) => {
     clearInterval(bootInfoIntv);
-
-    $('#tor-status').text("boot fail");
+    bootFail();
 });
 
 function bootFinish() {
     if (!booting) {
         booting = true;
-
-        setContentChat();
-        setSideContentUserList();
+        showChatPage();
     }
 }
 
-//// ------------ Side Contents ------------ ////
-let sideMenuSetting = false;
-let userList = [];
+function bootFail() {
+    $('#tor-status').text("boot fail");
+}
 
+//// ------------ data control ------------ ////
 ipcRenderer.on('newUser', (event, message) => {
-    let address = message.address;
-    userList.push({
-        address,
-        connected: false, status: 0,
-        profile: { name: "", info: "" },
-        client: { name: "", version: "", },
+    const newUser = userList.addUser(message.address);
+    addUserList(newUser);
+    sortUserList();
+});
 
-        messageList: [],
-        lastMessageDate: new Date(),
-        fileSendList: [], fileRecvList: [],
-    })
+ipcRenderer.on('userConnect', (event, message) => {
+    const targetUser = userList.connect(message.address);
+    updateUserList(targetUser);
+    sortUserList();
+})
 
-    // need to sort here
+ipcRenderer.on('userDisconnect', (event, message) => {
+    const targetUser = userList.disconnect(message.address);
+    updateUserList(targetUser);
+    sortUserList();
+})
 
-    $('#user-list').empty();
-    userList.forEach(user => {
-        $('#user-list').append(`<div class='user' address='${user.address}'>${user.address}</div>`)
-    });
+ipcRenderer.on('userAlive', (event, message) => {
+    const targetUser = userList.alive(message.address, message.status);
+    updateUserList(targetUser);
+    sortUserList();
+})
 
-    $('.user').on('click', function () {
-        chatUserAddress = $(this).attr('address');
-        showChatRoom(chatUserAddress);
-    })
+ipcRenderer.on('userProfile', (event, message) => {
+    const targetUser = userList.profile(message.address, message.name, message.info);
+    updateUserList(targetUser);
+})
+
+ipcRenderer.on('userClient', (event, message) => {
+    userList.client(message.address, message.name, message.version);
+});
+
+ipcRenderer.on('userMessage', (event, message) => {
+    userList.message(message.address, message.message, message.options);
 });
 
 //// ------------ Contents ------------ ////
-let chatUserAddress = "";
+let settingMenu = false;
+let selectedSettingMenu = 0;
 
-function showChatRoom(address) {
-    console.log("showChatRoom", address);
-
-    setContentChat();
+function switchMenu() {
+    if (settingMenu) {
+        showChatPage();
+        settingMenu = false;
+    }
+    else {
+        showSettingPage();
+        settingMenu = true;
+        selectedSettingMenu = 0;
+    }
 }
+
+function showChatPage() {
+    showSideContentUserList();
+    showContentChat();
+}
+
+function showSettingPage() {
+
+}
+
+//// ------------ Side Contents ------------ ////
+function showSideContentUserList() {
+    setSideContentUserList();
+    userList.getList().forEach(user => {
+        addUserList(user);
+    });
+}
+
+function addUserList(user) {
+    if (user) {
+        $('#user-list')
+            .append(`
+                <div class='user'
+                    address='${user.address}'
+                    connected='${user.connected}'
+                    status='${user.status}'>
+                        <span class='user-name'>${user.profile.name}</span>
+                        <span class='user-address'>${user.address}</span>
+                </div>`)
+            .children(`[address='${user.address}']`).on('click', function () {
+                selectUser($(this).attr('address'));
+            })
+    }
+}
+
+function sortUserList() {
+    const parent = $('#user-list');
+    let items = parent.children('div').sort(function(userA, userB) {
+        return userList.compareUser(userA, userB);
+    });
+    parent.append(items);
+}
+
+function updateUserList(user) {
+    if (user) {
+        $('#user-list').children(`[address='${user.address}']`)
+            .attr("connected", user.connected)
+            .attr("status", user.status)
+            .children('.user-name')
+                .text(user.profile.nam)
+    }
+}
+
+let selectedUser;
+function selectUser(address) {
+    selectedUser = userList.findUser(address);
+
+    showContentChat();
+}
+
+//// ------------ Main Contents ------------ ////
+
+function showContentChat() {
+    setContentChat();
+    if (selectedUser) {
+        
+    }
+}
+
 
 
 //// ------------ Actions ------------ ////
@@ -123,12 +207,12 @@ function addFriend() {
 }
 
 function sendMessage() {
-    if (chatUserAddress.length > 0) {
+    if (selectedUser) {
         const message = $('#input-message').val();
         $('#input-message').val('');
 
         ipcRenderer.send('sendMessage', {
-            address: chatUserAddress,
+            address: selectedUser.address,
             message: message
         })
     }

@@ -64,7 +64,7 @@ exports.event = eventEmitter; /*
 let eventEmitterUser = new EventEmitter();
 exports.eventUser = eventEmitterUser; /*
     userConnect [hostname]
-    userClose   [hostname]
+    userDisconnect [hostname]
     userAlive [hostname] [status]
     userProfile [hostname] [name] [info]
     userClient [hostname] [name] [version]
@@ -76,7 +76,6 @@ exports.eventUser = eventEmitterUser; /*
     userFileCancle [hostname] [fileType] [fileID]
     userFileData [hostname] [fileType] [fileID] [dataSize] [accumSize]
 */
-
 
 function findUser(hostname) {
     let targetUser;
@@ -98,7 +97,7 @@ function addUser(hostname) {
 
     eventEmitter.emit('newUser', hostname);
     targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
-    targetUser.on('close', () => { eventEmitterUser.emit('userClose', hostname); })
+    targetUser.on('disconnect', () => { eventEmitterUser.emit('userDisconnect', hostname); })
     targetUser.on('alive', (status) => { eventEmitterUser.emit('userAlive', hostname, status); })
     targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
     targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })

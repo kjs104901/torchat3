@@ -20,6 +20,9 @@ app.on('ready', () => {
     mainWindow = new BrowserWindow(mainWindowSetting);
     mainWindow.loadFile(__dirname + '/ui/main.html');
 
+    mainWindow.once('ready-to-show', () => { });
+    mainWindow.once('close', () => { mainWindow = null; });
+
     mainWindow.webContents.openDevTools();
 
     boot();
@@ -77,7 +80,7 @@ ipcMain.on('sendMessage', (event, message) => {
 contact.event.on('newUser', (address) => { ipcSendToWindow(mainWindow, 'newUser', { address }); });
 
 contact.eventUser.on('userConnect', (address) => { ipcSendToWindow(mainWindow, 'userConnect', { address }); });
-contact.eventUser.on('userClose', (address) => { ipcSendToWindow(mainWindow, 'userClose', { address }); });
+contact.eventUser.on('userDisconnect', (address) => { ipcSendToWindow(mainWindow, 'userDisconnect', { address }); });
 contact.eventUser.on('userAlive', (address, status) => { ipcSendToWindow(mainWindow, 'userAlive', { address, status }); });
 contact.eventUser.on('userProfile', (address, name, info) => { ipcSendToWindow(mainWindow, 'userProfile', { address, name, info }); });
 contact.eventUser.on('userMessage', (address, message, options) => { ipcSendToWindow(mainWindow, 'userMessage', { address, message, options }); });

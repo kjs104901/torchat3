@@ -78,14 +78,14 @@ class User extends EventEmitter {
         }
 
         if (!this.socketOut || !this.socketIn || !this.valid) {
-            if (this.status == 0) {
+            if (this.status != 0) {
                 this.status = 0;
-                this.emit('close');
+                this.emit('disconnect');
             }
         }
 
         if (this.bufferOut > config.BufferMaximum || this.bufferIn > config.BufferMaximum) {
-            destroy();
+            this.destroy();
         }
     }
 
@@ -127,6 +127,7 @@ class User extends EventEmitter {
         this.closeSocketOut();
         this.closeSocketIn();
         this.destroyed = true;
+        this.emit('disconnect');
     }
 
     isConnected() {

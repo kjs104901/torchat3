@@ -62,7 +62,19 @@ exports.start = () => {
         makeTorrc();
         torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', __dirname + '/torrc'], { cwd: torDir });
 
-        torProcess.stdout.on('data', (data) => { bootLogs.push(data.toString()); });
+        torProcess.stdout.on('data', (data) => {
+            const line = data.toString();
+            bootLogs.push(line);
+            let s = line.indexOf('Bootstrapped ');
+            if (s > -1) {
+                s += 'Bootstrapped '.length;
+                let e = line.indexOf('%', s);
+                if (e > -1) {
+                    const percent = line.substring(s, e) * 1;
+                    if (0 < percent) { bootstrap = percent }
+                }
+            }
+        });
         torProcess.stderr.on('data', (data) => { bootLogs.push(data.toString()); });
 
         torProcess.on('exit', (code) => {
