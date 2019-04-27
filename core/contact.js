@@ -69,8 +69,12 @@ exports.eventUser = eventEmitterUser; /*
     userProfile [hostname] [name] [info]
     userClient [hostname] [name] [version]
     userMessage [hostname] [message] [options]
-    userFileAccept [hostname] [fileID]
-    userFileUpdate [hostname] [fileID]
+
+    userFileAccept [hostname] [fileType] [fileID]
+    userFileFinished [hostname] [fileType] [fileID]
+    userFileError [hostname] [fileType] [fileID]
+    userFileCancle [hostname] [fileType] [fileID]
+    userFileData [hostname] [fileType] [fileID] [dataSize] [accumSize]
 */
 
 
@@ -99,8 +103,12 @@ function addUser(hostname) {
     targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
     targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })
     targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
-    targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileID); })
-    targetUser.on('fileupdate', (fileID) => { eventEmitterUser.emit('userFileUpdate', hostname, fileID); })
+    
+    targetUser.on('fileaccept', (fileType, fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileType, fileID); })
+    targetUser.on('filefinished', (fileType, fileID) => { eventEmitterUser.emit('userFileFinished', hostname, fileType, fileID); })
+    targetUser.on('fileerror', (fileType, fileID) => { eventEmitterUser.emit('userFileError', hostname, fileType, fileID); })
+    targetUser.on('filecancle', (fileType, fileID) => { eventEmitterUser.emit('userFileCancle', hostname, fileType, fileID); })
+    targetUser.on('filedata', (fileType, fileID, dataSize, accumSize) => { eventEmitterUser.emit('userFileData', hostname, fileType, fileID, dataSize, accumSize); })
 
     return targetUser;
 }

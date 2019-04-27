@@ -15,7 +15,7 @@ const contact = require('./contact');
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.socketCheck(); }); }, 1); // milliseconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.bufferCheck(); }); }, 1); // milliseconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.sendAlive(); }); }, 1000 * 30); // seconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileTransCheck(); }); }, 10); // milliseconds
+setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileTransCheck(); }); }, 100); // milliseconds
 
 class User extends EventEmitter {
     constructor(hostname) {
@@ -399,16 +399,15 @@ class User extends EventEmitter {
         return new Promise((resolve, reject) => {
             if (!this.isValid()) { reject(new Error("Not connected")); return; }
             if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
-            const stat = fs.statSync(file);
-            if (!stat.isFile()) { reject(new Error("Not a File")); return; }
-            if (stat.size <= 0) { reject(new Error("File size zero")); return; }
+            if (!fileHandler.isFile(file)) { reject(new Error("Not a File")); return; }
+            if (fileHandler.getSize(file) <= 0) { reject(new Error("File size zero")); return; }
 
             const fileID = crypto.randomBytes(20).toString('hex');
             const fileName = path.basename(file);
-            const fileSize = stat.size;
+            const fileSize = fileHandler.getSize(file);
 
             this.pushMessage(fileName, { fromMe: true, isFile: true, fileSize: fileSize });
-            this.pushFileSendList(fileID, file, stat.size);
+            this.pushFileSendList(fileID, file, fileHandler.getSize(file));
 
             protocol.filesend(this.socketOut, fileID, fileSize, fileName);
 
@@ -447,7 +446,7 @@ class User extends EventEmitter {
         this.fileSendList.forEach(fileSend => {
             if (fileSend.fileID == fileID) {
                 fileSend.accepted = true;
-                this.emit('fileaccept', fileID);
+                this.emit('fileaccept', 'send', fileID);
             }
         });
     }
@@ -456,6 +455,7 @@ class User extends EventEmitter {
         this.fileRecvList.forEach(fileRecv => {
             if (fileRecv.fileID == fileID) {
                 fileRecv.accepted = true;
+                this.emit('fileaccept', 'recv', fileID);
             }
         });
     }
@@ -499,8 +499,8 @@ class User extends EventEmitter {
                 const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
                 if (blockNum - 1 <= filesend.okayBlock) {
                     filesend.finished = true;
+                    this.emit('filefinished', 'send', filesend.fileID);
                 }
-                this.emit('fileupdate', filesend.fileID);
             }
         });
     }
@@ -518,6 +518,14 @@ class User extends EventEmitter {
     fileCancle(fileID) { //interface
         this.fileSendList = this.fileSendList.filter((filesend) => {
             if (filesend.fileID == fileID) {
+                this.emit('filecancle', 'send', filesend.fileID);
+                return false;
+            }
+            return true;
+        })
+        this.fileRecvList = this.fileRecvList.filter((filerecv) => {
+            if (filerecv.fileID == fileID) {
+                this.emit('filecancle', 'recv', filesend.fileID);
                 return false;
             }
             return true;
@@ -541,20 +549,22 @@ class User extends EventEmitter {
                                 protocol.filedata(this.socketIn, filesend.fileID, blockIndex, blockHash, blockData)
                                     .then((sentSize) => {
                                         filesend.bufferSize -= config.FileBlockSize;
+
+                                        //test
+                                        this.emit('filedata', 'send', sentSize, filesend.sendSize);
                                     })
                             })
                             .catch((err) => {
                                 console.log(err);
                                 filesend.bufferSize -= config.FileBlockSize;
                                 filesend.accepted = false;
-                                this.emit('fileupdate', filesend.fileID);
+                                this.emit('fileerror', 'send', filesend.fileID);
                             })
                         filesend.sendBlock += 1;
                     }
 
                     if (blockNum <= filesend.sendBlock) {
                         filesend.accepted = false;
-                        this.emit('fileupdate', filesend.fileID);
                     }
                 }
             });
@@ -574,26 +584,27 @@ class User extends EventEmitter {
                         delete filerecv.bufferList[filerecv.blockIndex];
                         filerecv.blockIndex += 1;
                     }
-                    this.emit('fileupdate', filerecv.fileID);
 
                     if (bufferSum.length > 0) {
                         filerecv.blockWriting = true;
                         if (createFile) { fileHandler.writeFileClear(fileName); }
                         fileHandler.writeFileAppend(fileName, bufferSum)
-                            .then(() => {
+                            .then((recvSize) => {
                                 filerecv.blockWriting = false;
+                                
+                                this.emit('filedata', 'recv', recvSize, filerecv.recvSize);
                             })
                             .catch((err) => {
                                 console.log(err);
                                 filerecv.blockWriting = false;
                                 filerecv.accepted = false;
-                                this.emit('fileupdate', filerecv.fileID);
+                                this.emit('fileerror', 'recv', filerecv.fileID);
                             })
 
                         if (filerecv.fileSize <= filerecv.recvSize) {
                             filerecv.accepted = false;
                             filerecv.finished = true;
-                            this.emit('fileupdate', filerecv.fileID);
+                            this.emit('filefinished', 'recv', filerecv.fileID);
                         }
                     }
                 }

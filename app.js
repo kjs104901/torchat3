@@ -49,7 +49,7 @@ async function boot() {
         })
 }
 
-//// ------------ IPC ------------ ////
+//// ------------ IPC on ------------ ////
 ipcMain.on('bootInfoReq', (event, message) => {
     event.sender.send("bootInfoRes", {
         progress: tor.getBootstrap(),
@@ -73,7 +73,7 @@ ipcMain.on('sendMessage', (event, message) => {
     }
 })
 
-// contact listener
+//// ------------ contact listener to ipc ------------ ////
 contact.event.on('newUser', (address) => { ipcSendToWindow(mainWindow, 'newUser', { address }); });
 
 contact.eventUser.on('userConnect', (address) => { ipcSendToWindow(mainWindow, 'userConnect', { address }); });
@@ -81,5 +81,9 @@ contact.eventUser.on('userClose', (address) => { ipcSendToWindow(mainWindow, 'us
 contact.eventUser.on('userAlive', (address, status) => { ipcSendToWindow(mainWindow, 'userAlive', { address, status }); });
 contact.eventUser.on('userProfile', (address, name, info) => { ipcSendToWindow(mainWindow, 'userProfile', { address, name, info }); });
 contact.eventUser.on('userMessage', (address, message, options) => { ipcSendToWindow(mainWindow, 'userMessage', { address, message, options }); });
-contact.eventUser.on('userFileAccept', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileAccept', { address, fileID }); });
-contact.eventUser.on('userFileUpdate', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileUpdate', { address, fileID }); });
+
+contact.eventUser.on('userFileAccept', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileAccept', { address, fileType, fileID }); });
+contact.eventUser.on('userFileFinished', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileFinished', { address, fileType, fileID }); });
+contact.eventUser.on('userFileError', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileError', { address, fileType, fileID }); });
+contact.eventUser.on('userFileCancle', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileCancle', { address, fileType, fileID }); });
+contact.eventUser.on('userFileData', (address, fileType, fileID, dataSize, accumSize) => { ipcSendToWindow(mainWindow, 'userFileData', { address, fileType, fileID, dataSize, accumSize }); });

@@ -1,14 +1,27 @@
 const fs = require('fs');
 const crypto = require('crypto');
 
-function getBlockNum(file, blockSize) {
+function isFile(file) {
     const stats = fs.statSync(file);
-    if (stats.isFile()) {
-        return Math.ceil(stats.size / blockSize);
+    if (stats.isFile()) { return true; }
+    return false;
+}
+exports.isFile = isFile;
+
+function getSize(file) {
+    const stats = fs.statSync(file);
+    return stats.size;
+}
+exports.getSize = getSize;
+
+function getBlockNum(file, blockSize) {
+    if (isFile(file)) {
+        return Math.ceil(getSize(file) / blockSize);
     }
     return 0;
 }
 exports.getBlockNum = getBlockNum;
+
 
 function readFileBlock(file, blockSize, index) {
     return new Promise((resolve, reject) => {
@@ -49,7 +62,7 @@ function writeFileAppend(file, block) {
                     reject(err);
                 }
                 else {
-                    resolve();
+                    resolve(block.length);
                 }
             })
         }
