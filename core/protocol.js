@@ -69,13 +69,9 @@ exports.filecancel = (socket, fileID) => {
 }
 
 exports.filedata = (socket, fileID, blockIndex, blockHash, blockData) => {
-    return new Promise((resolve, reject) => {
-        if (isSocketOkay(socket)) {
-            socket.write("filedata " + fileID + ' ' + blockIndex + ' ' + blockHash + ' ' + parser.escape(blockData) + '\n', 'binary', ()=>{
-                resolve(blockData.length);
-            });
-        }
-    })
+    if (isSocketOkay(socket)) {
+        return socket.write("filedata " + fileID + ' ' + blockIndex + ' ' + blockHash + ' ' + parser.escape(blockData) + '\n', 'binary');
+    }
 }
 
 

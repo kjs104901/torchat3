@@ -60,6 +60,7 @@ class User extends EventEmitter {
         this.bufferOut = "";
 
         this.socketIn = null;
+        this.socketInDrain = true;
         this.bufferIn = "";
 
         this.messageList = [];
@@ -212,10 +213,14 @@ class User extends EventEmitter {
             console.log('error from client [timeout]');
             this.closeSocketIn();
         });
-
         this.socketIn.on('data', (data) => {
             this.bufferIn += data.toString();
         });
+        this.socketIn.on('drain', () => {
+            this.socketInDrain = true;
+            //test
+            console.log("drain")
+        })
     }
 
     hasIncome(randomStrPong) {
@@ -558,13 +563,14 @@ class User extends EventEmitter {
         this.fileSendList = this.fileSendList.filter((filesend) => {
             if (filesend.fileID == fileID) {
                 this.emit('filecancel', filesend.fileID);
+                this.sendFileCancel(fileID);
                 return false;
             }
             return true;
         })
         this.fileRecvList = this.fileRecvList.filter((filerecv) => {
             if (filerecv.fileID == fileID) {
-                this.emit('filecancel', filesend.fileID);
+                this.emit('filecancel', filerecv.fileID);
                 return false;
             }
             return true;
@@ -590,7 +596,8 @@ class User extends EventEmitter {
             this.fileSendList.forEach(filesend => {
                 if (filesend.accepted && !sendFirstFile) {
                     const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
-                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.bufferSize < config.FileBufferSize) {
+                    while (filesend.accepted && filesend.sendBlock < blockNum &&  filesend.sendBlock < filesend.okayBlock + config.FileBlockWindow 
+                        && filesend.bufferSize < config.FileBufferSize && this.socketInDrain) {
                         console.log("file read: ", path.basename(filesend.file));
                         filesend.bufferSize += config.FileBlockSize;
                         fileHandler.readFileBlock(filesend.file, config.FileBlockSize, filesend.sendBlock)
@@ -599,10 +606,12 @@ class User extends EventEmitter {
                                 const blockHash = fileHandler.getMD5(data.buffer);
                                 const blockData = data.buffer;
 
-                                protocol.filedata(this.socketIn, filesend.fileID, blockIndex, blockHash, blockData)
-                                    .then((sentSize) => {
-                                        filesend.bufferSize -= config.FileBlockSize;
-                                    })
+                                filesend.bufferSize -= config.FileBlockSize;
+
+                                const sendRst = protocol.filedata(this.socketIn, filesend.fileID, blockIndex, blockHash, blockData);
+                                if (sendRst == false) {
+                                    this.socketInDrain = false;
+                                }
                             })
                             .catch((err) => {
                                 console.log(err);
@@ -674,7 +683,7 @@ class User extends EventEmitter {
 
             this.fileRecvList.forEach(filerecv => {
                 if ((filerecv.accepted || filerecv.finished) && filerecv.tempSize > 0) {
-                    this.emit('filedata', filesend.fileID, filerecv.recvSize);
+                    this.emit('filedata', filerecv.fileID, filerecv.recvSize);
 
                     filerecv.speedSize += filerecv.tempSize;
                     filerecv.tempSize = 0;
@@ -701,7 +710,7 @@ class User extends EventEmitter {
             this.fileRecvList.forEach(filerecv => {
                 if ((filerecv.accepted || filerecv.finished) && filerecv.speedSize > 0) {
                     const speed = filerecv.speedSize;
-                    this.emit('filespeed', filesend.fileID, speed);
+                    this.emit('filespeed', filerecv.fileID, speed);
                     //test
                     console.log("filespeed", speed);
 

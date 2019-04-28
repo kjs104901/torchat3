@@ -11,6 +11,7 @@ const ConnectionRetryTime = 1000 * 30 // seconds
 const ServiceInsidePort = 12009;
 
 const FileBlockSize = 1024 * 8; // 8k byte
+const FileBlockWindow = 16;
 const FileBufferSize = 1024 * 1024 * 1; // 1m byte
 
 // Variables
@@ -43,7 +44,7 @@ module.exports = {
     BufferMaximum,
     ConnectionTimeOut, ProxyTimeOut, ConnectionRetryTime,
     ServiceInsidePort, ProxyOptions,
-    FileBlockSize, FileBufferSize,
+    FileBlockSize, FileBlockWindow, FileBufferSize,
 
     // Variables
     torrcExpand, servicePort, userBridge, bridge,

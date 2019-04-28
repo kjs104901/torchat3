@@ -74,10 +74,8 @@ ipcMain.on('sendMessage', (event, message) => {
     }
 })
 
-let dialogOpened = false;
 ipcMain.on('sendFile', (event, message) => {
-    if (mainWindow && dialogOpened == false) {
-        dialogOpened = true;
+    if (mainWindow) {
         dialog.showOpenDialog(mainWindow, { properties: ['openFile'] }, (files) => {
             if (files && files[0] && files[0].length > 0) {
                 const file = files[0];
@@ -87,7 +85,6 @@ ipcMain.on('sendFile', (event, message) => {
                         .catch((err) => { console.log(err); })
                 }
             }
-            dialogOpened = false;
         });
     }
 });
