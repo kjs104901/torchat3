@@ -12,7 +12,12 @@ exports.normalizeHostname = normalizeHostname;
 function checkHostname(hostname) {
     let valid = true;
     hostname = normalizeHostname(hostname);
-    if (hostname.length != 56) { return false; }
+    if (config.system.HiddenServiceVersion == 3) {
+        if (hostname.length != 56) { return false; }
+    }
+    else if (config.system.HiddenServiceVersion == 2) {
+        if (hostname.length != 16) { return false; }
+    }
     hostname.split('').forEach(char => {
         if (!char.match(/[0-9]|[a-z]/)) { valid = false; }
     });

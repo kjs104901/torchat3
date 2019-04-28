@@ -5,7 +5,7 @@ exports.event = eventEmitter;
 let setting = {};
 exports.setting = setting;
 
-exports.save = () => { ipcRenderer.send('settingReq', setting); }
+exports.save = () => { ipcRenderer.send('saveSetting', setting); }
 
 exports.set = (newSetting) => {
     setting = newSetting;

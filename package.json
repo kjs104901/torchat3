@@ -46,5 +46,20 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "socks": "^2.3.2"
+  },
+  "build": {
+    "appId": "com.kjs104901.torchat3",
+    "win": {
+      "target": [
+        "zip"
+      ],
+      "icon": "./assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "createDesktopShortcut": "always",
+      "installerHeaderIcon": "./assets/icon.ico"
+    },
+    "asar": false
   }
 }

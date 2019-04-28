@@ -34,10 +34,10 @@ export default class App extends Component {
             return ( <BootPage progress={this.state.bootProgress}></BootPage> )
         }
         else if (this.state.selectedPage == 1) {
-            return ( <ChatPage /> )
+            return ( <ChatPage selectPage={this.selectPage}/> )
         }
         else if (this.state.selectedPage == 2) {
-            return ( <SettingPage /> )
+            return ( <SettingPage selectPage={this.selectPage}/> )
         }
     }
 }

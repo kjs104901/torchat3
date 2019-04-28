@@ -3,6 +3,7 @@ TODO
 setting
 contact
 temp/
+dist/
 
 ############### Tor ###############
 tor/bin/data

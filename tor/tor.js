@@ -22,7 +22,7 @@ ControlPortWriteToFile ./data/controlPort
 HashedControlPassword ${controlPasswordHashed}
 
 HiddenServiceDir ./hidden_service
-HiddenServiceVersion 3
+HiddenServiceVersion ${config.system.HiddenServiceVersion}
 HiddenServicePort ${config.system.ServiceInsidePort} 127.0.0.1:${config.system.servicePort}
 LongLivedPorts ${config.system.ServiceInsidePort}
 

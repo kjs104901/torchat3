@@ -79,7 +79,13 @@ ipcMain.on('contactReq', (event, message) => {
 })
 
 ipcMain.on('settingReq', (event, message) => {
-    event.sender.send("settingRes", config.setting)
+    event.sender.send("settingRes", config.setting);
+})
+
+ipcMain.on('saveSetting', (event, message) => {
+    config.setting = message;
+    config.saveSetting();
+    event.sender.send("settingRes", config.setting);
 })
 
 ipcMain.on('addFriend', (event, message) => {

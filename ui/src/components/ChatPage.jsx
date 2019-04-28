@@ -11,14 +11,24 @@ export default class ChatPage extends Component {
     constructor(props) {
         super(props);
 
-        userList.event.on('updateUI', () => { this.forceUpdate(); });
-
         this.state = {
             selectedUser: null,
             inputUserAddress: "",
             inputMessage: "",
         };
     };
+
+    componentDidMount() {
+        userList.event.on('updateUI', this.updateUI);
+    }
+
+    componentWillUnmount() {
+        userList.event.removeListener('updateUI', this.updateUI);
+    }
+
+    updateUI = () => {
+        this.forceUpdate();
+    }
 
     addFriend = () => {
         ipcRenderer.send('addFriend', { address: this.state.inputUserAddress })
@@ -45,8 +55,13 @@ export default class ChatPage extends Component {
     renderUserList = () => {
         let row = [];
         userList.getList().forEach((user, index) => {
+            let color = 'red';
+            if (user.connected) {
+                color = 'green';
+            }
             row.push(
-                <div className="user" key={index} onClick={() => { this.setState({ selectedUser: user }) }}>
+                <div className="user" key={index} style={{ color }}
+                    onClick={() => { this.setState({ selectedUser: user }) }}>
                     {user.address}
                 </div>
             )
@@ -76,7 +91,10 @@ export default class ChatPage extends Component {
                     <div id='side-menu'>
                         <div id='my-name'>my name</div>
                         <div id='my-address'>my address</div>
-                        <div id='button-setting'>setting</div>
+                        <div id='button-setting'
+                            onClick={() => { this.props.selectPage(2) }}>
+                            setting
+                            </div>
                     </div>
                     <div id='side-content'>
                         <div id='user-list-menu'>
@@ -108,4 +126,5 @@ export default class ChatPage extends Component {
 }
 
 ChatPage.propTypes = {
+    selectPage: PropTypes.func,
 }

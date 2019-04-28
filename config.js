@@ -3,9 +3,11 @@ let system = {
     ClientName: "TorChat3",
     ClientVersion: "0.1",
 
+    HiddenServiceVersion: 2,
+
     BufferMaximum: 10000,
 
-    ConnectionTimeOut: 1000 * 60 * 3, // minuites
+    ConnectionTimeOut: 1000 * 60 * 5, // minuites
     ConnectionRetryTime: 1000 * 30, // seconds
 
     ServiceInsidePort: 12009,
@@ -27,7 +29,7 @@ let system = {
         proxy: { host: '127.0.0.1', port: null, type: 5 },
         command: 'connect',
         destination: { host: "", port: 12009 },
-        timeout: 1000 * 60 * 3, // minuites
+        timeout: 1000 * 60 * 5, // minuites
     },
 }
 exports.system = system;

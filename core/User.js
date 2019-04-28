@@ -79,7 +79,7 @@ class User extends EventEmitter {
                 this.connect()
                     .then((socket) => {
                         this.setSocketOut(socket);
-                        console.log("Connect success");
+                        console.log("Connect success", this.hostname);
                         this.socketOutConnecting = false;
                     })
                     .catch((err) => {
@@ -109,6 +109,9 @@ class User extends EventEmitter {
     connect() {
         let options = config.system.proxyOptions;
         options.destination.host = this.hostname + ".onion";
+
+        //test
+        console.log("options", options);
 
         return new Promise((resolve, reject) => {
             this.socksClient = new SocksClient(options);
@@ -170,6 +173,9 @@ class User extends EventEmitter {
             this.valid = true;
             this.emit('connect');
 
+            //test
+            console.log("valid")
+
             this.sendAlive();
             this.sendProfile();
         }
@@ -186,7 +192,7 @@ class User extends EventEmitter {
             this.closeSocketOut();
         })
         this.socketOut.on('error', (err) => {
-            console.log('error from server [timeout]');
+            console.log('error from server');
             this.closeSocketOut();
         });
 
@@ -210,7 +216,7 @@ class User extends EventEmitter {
             this.closeSocketIn();
         })
         this.socketIn.on('error', (err) => {
-            console.log('error from client [timeout]');
+            console.log('error from client');
             this.closeSocketIn();
         });
         this.socketIn.on('data', (data) => {
@@ -272,6 +278,9 @@ class User extends EventEmitter {
                     case 'alive':
                         status = dataList[1];
                         this.status = status * 1;
+
+                        //test
+                        console.log("recv Alive", this.hostname);
 
                         this.emit('alive', status);
                         break;
@@ -390,8 +399,11 @@ class User extends EventEmitter {
     }
 
     sendAlive() {
-        if (!this.isValid()) { return; }
+        //if (!this.isValid()) { return; } // to send alive while waiting for other side come.
+        if (!this.socketOut) { return; }
 
+        //test
+        console.log("send Alive", this.hostname);
         protocol.alive(this.socketOut, config.setting.userStatus);
     }
 
