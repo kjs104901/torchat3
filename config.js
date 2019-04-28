@@ -7,9 +7,11 @@ let system = {
 
     BufferMaximum: 10000,
 
-    ConnectionTimeOut: 1000 * 60 * 5, // minuites
+    ConnectionTimeOut: 1000 * 60 * 3, // minuites
     ConnectionRetryTime: 1000 * 30, // seconds
+    ProxyTimeOut: 1000 * 60 * 3, // minuites
 
+    proxyPort: null,
     ServiceInsidePort: 12009,
 
     FileBlockSize: 1024 * 8, // 8k byte
@@ -24,13 +26,6 @@ let system = {
 
     // Variables
     servicePort: 0,
-    
-    proxyOptions: {
-        proxy: { host: '127.0.0.1', port: null, type: 5 },
-        command: 'connect',
-        destination: { host: "", port: 12009 },
-        timeout: 1000 * 60 * 5, // minuites
-    },
 }
 exports.system = system;
 

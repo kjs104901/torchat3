@@ -107,8 +107,12 @@ class User extends EventEmitter {
     }
 
     connect() {
-        let options = config.system.proxyOptions;
-        options.destination.host = this.hostname + ".onion";
+        const options = {
+            proxy: { host: '127.0.0.1', port: config.system.proxyPort, type: 5 },
+            command: 'connect',
+            destination: { host: this.hostname + ".onion", port: 12009 },
+            timeout: config.system.ProxyTimeOut
+        };
 
         //test
         console.log("options", options);

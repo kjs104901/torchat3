@@ -42,8 +42,6 @@ let bootError = false;
 let bootLogs = [];
 
 let hostname = "";
-let publicKey = null;
-let privateKey = null;
 
 let socksPort;
 
@@ -106,10 +104,8 @@ exports.start = () => {
                 if (hostnameArr && hostnameArr[0]) {
                     hostname = hostnameArr[0].replace('\r', '').replace(".onion", '');
                 }
-                publicKey = fs.readFileSync(torDir + "/hidden_service/hs_ed25519_public_key");
-                privateKey = fs.readFileSync(torDir + "/hidden_service/hs_ed25519_secret_key");
 
-                config.system.proxyOptions.proxy.port = socksPort;
+                config.system.proxyPort = socksPort;
 
                 controlDisconnect(false);
 
@@ -133,8 +129,6 @@ exports.getBootstrap = () => { return bootstrap; }
 exports.getBootLogs = () => { return bootLogs; }
 
 exports.getHostname = () => { return hostname; }
-exports.getPublicKey = () => { return publicKey; }
-exports.getPrivateKey = () => { return privateKey; }
 
 
 // ############################ tor control ############################ //
