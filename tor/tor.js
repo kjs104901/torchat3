@@ -2,7 +2,7 @@ const fs = require('fs');
 const crypto = require("crypto");
 const net = require('net');
 const child_process = require('child_process');
-const config = require('../config');
+const config = require('../config').config;
 
 const torDir = __dirname + "/bin";
 
@@ -26,7 +26,7 @@ HiddenServiceVersion 3
 HiddenServicePort ${config.ServiceInsidePort} 127.0.0.1:${config.servicePort}
 LongLivedPorts ${config.ServiceInsidePort}
 
-UseBridges ${config.userBridge}
+UseBridges ${config.useBridge}
 ${bridgeLine}
 
 DataDirectory ./data

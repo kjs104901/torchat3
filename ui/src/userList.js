@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
 
@@ -146,7 +145,7 @@ exports.fileAccept = (address, fileID) => {
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.accepted = true;
-        
+
         eventEmitter.emit('updateFile', address);
         return targetMessage;
     }
@@ -156,7 +155,7 @@ exports.fileFinished = (address, fileID) => {
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.finished = true;
-        
+
         eventEmitter.emit('updateFile', address);
         return targetMessage;
     }
@@ -166,7 +165,7 @@ exports.fileError = (address, fileID) => {
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.error = true;
-        
+
         eventEmitter.emit('updateFile', address);
         return targetMessage;
     }
@@ -175,7 +174,7 @@ exports.fileCancel = (address, fileID) => {
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.canceled = true;
-        
+
         eventEmitter.emit('updateFile', address);
         return targetMessage;
     }
@@ -185,7 +184,7 @@ exports.fileData = (address, fileID, accumSize) => {
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.accumSize = accumSize;
-        
+
         eventEmitter.emit('updateFile', address);
         return targetMessage;
     }
@@ -195,8 +194,36 @@ exports.fileSpeed = (address, fileID, speed) => {
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.speed = speed;
-        
+
         eventEmitter.emit('updateFile', address);
         return targetMessage;
     }
+}
+
+/**
+ * contact update
+ */
+let friendList = [];
+let blackList = [];
+let whiteList = [];
+
+exports.contactUpdate = (newFriendList, newBlackList, newWhiteList) => {
+    friendList = newFriendList;
+    blackList = newBlackList;
+    whiteList = newWhiteList;
+}
+
+exports.isFriend = (address) => {
+    if (friendList.indexOf(address) > -1) { return true; }
+    return false;
+}
+
+exports.isBlack = (address) => {
+    if (blackList.indexOf(address) > -1) { return true; }
+    return false;
+}
+
+exports.isWhite = (address) => {
+    if (whiteList.indexOf(address) > -1) { return true;  }
+    return false;
 }

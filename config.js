@@ -1,54 +1,82 @@
-// Constants // start with upper case
-const ClientName = "TorChat3";
-const ClientVersion = "0.1";
+let config = {
+    // Constants // start with upper case
+    ClientName: "TorChat3",
+    ClientVersion: "0.1",
 
-const BufferMaximum = 10000;
+    BufferMaximum: 10000,
 
-const ConnectionTimeOut = 1000 * 60 * 3; // minuites
-const ProxyTimeOut = 1000 * 60 * 3; // minuites
-const ConnectionRetryTime = 1000 * 30 // seconds
+    ConnectionTimeOut: 1000 * 60 * 3, // minuites
+    ConnectionRetryTime: 1000 * 30, // seconds
 
-const ServiceInsidePort = 12009;
+    ServiceInsidePort: 12009,
+    ProxyOptions: {
+        proxy: { host: '127.0.0.1', port: null, type: 5 },
+        command: 'connect',
+        destination: { host: "", port: 12009 },
+        timeout: 1000 * 60 * 3, // minuites
+    },
 
-const FileBlockSize = 1024 * 8; // 8k byte
-const FileBlockWindow = 16;
-const FileBufferSize = 1024 * 1024 * 1; // 1m byte
+    FileBlockSize: 1024 * 8, // 8k byte
+    FileBlockWindow: 16,
+    FileBufferSize: 1024 * 1024 * 1, // 1m byte
 
-// Variables
-let userStatus = 1
-
-let torrcExpand = "";
-let userBridge = 0;
-let bridge = "";
-let servicePort = 0;
-
-let profileName = "";
-let profileInfo = "";
-
-let chatListSize = 100;
-
-let ProxyOptions = {
-    proxy: { host: '127.0.0.1', port: null, type: 5 },
-    command: 'connect',
-    destination: { host: "", port: ServiceInsidePort },
-    timeout: ProxyTimeOut,
-};
-
-let blackList = true;
-let whiteList = false;
-
-//exports
-module.exports = {
-    // Constants
-    ClientName, ClientVersion,
-    BufferMaximum,
-    ConnectionTimeOut, ProxyTimeOut, ConnectionRetryTime,
-    ServiceInsidePort, ProxyOptions,
-    FileBlockSize, FileBlockWindow, FileBufferSize,
+    TempDir: './temp',
+    ContactFile: './contact',
+    SettingFile: './setting',
 
     // Variables
-    torrcExpand, servicePort, userBridge, bridge,
-    userStatus, profileName, profileInfo,
-    chatListSize,
-    blackList, whiteList
+    torrcExpand: "",
+    servicePort: 0,
+    useBridge: 0,
+    bridge: "",
+
+    userStatus: 1,
+    profileName: "",
+    profileInfo: "",
+
+    chatListSize: 1000,
+
+    blackList: true,
+    whiteList: false,
+
+    nigthMode: false,
 }
+exports.config = config;
+
+/**
+ * low db
+ */
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const adapter = new FileSync(config.SettingFile);
+const settingDB = low(adapter);
+settingDB.defaults({
+    torrcExpand: config.torrcExpand,
+
+    useBridge: config.useBridge,
+    bridge: config.bridge,
+
+    profileName: config.profileName,
+    profileInfo: config.profileInfo,
+
+    nigthMode: config.nigthMode,
+})
+    .write()
+
+
+function saveSetting() {
+    settingDB.set({
+        torrcExpand: config.torrcExpand,
+
+        useBridge: config.useBridge,
+        bridge: config.bridge,
+
+        profileName: config.profileName,
+        profileInfo: config.profileInfo,
+
+        nigthMode: config.nigthMode,
+    })
+        .write()
+}
+exports.saveSetting = saveSetting;
+/** */

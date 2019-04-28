@@ -4,6 +4,7 @@ import App from './App.jsx'
 
 import { remote, ipcRenderer } from 'electron';
 import userList from './userList';
+import setting from './setting';
 
 let app = render(
     <App />,
@@ -54,3 +55,8 @@ ipcRenderer.on('userFileError', (event, message) => { userList.fileError(message
 ipcRenderer.on('userFileCancel', (event, message) => { userList.fileCancel(message.address, message.fileID) });
 ipcRenderer.on('userFileData', (event, message) => { userList.fileData(message.address, message.fileID, message.accumSize) });
 ipcRenderer.on('userFileSpeed', (event, message) => { userList.fileSpeed(message.address, message.fileID, message.speed) });
+
+ipcRenderer.send('contactReq');
+ipcRenderer.on('contactRes', (event, message) => { userList.contactUpdate(message.friendList, message.blackList, message.whiteList) });
+
+ipcRenderer.send('settingReq');

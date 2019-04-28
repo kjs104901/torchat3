@@ -1,5 +1,5 @@
 const net = require('net');
-const config = require('../config');
+const config = require('../config').config;
 const tor = require('../tor/tor');
 const contact = require('./contact');
 const protocol = require('./protocol');

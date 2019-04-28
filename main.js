@@ -43,12 +43,22 @@ async function boot() {
     await server.start();
     tor.start()
         .then(() => {
-            ipcSendToWindow(mainWindow, 'bootSucc')
+            ipcSendToWindow(mainWindow, 'bootSucc');
+            addUserFromFriend();
         })
         .catch((err) => {
             console.log(err);
-            ipcSendToWindow(mainWindow, 'bootFail')
+            ipcSendToWindow(mainWindow, 'bootFail');
         })
+}
+
+function addUserFromFriend() {
+    const friendList = contact.getFriendList();
+    friendList.forEach(address => {
+        contact.addUser(address);
+        //test
+        console.log("wtf", address);
+    });
 }
 
 //// ------------ IPC on ------------ ////
@@ -89,7 +99,6 @@ ipcMain.on('sendFile', (event, message) => {
     }
 });
 
-
 ipcMain.on('acceptFile', (event, message) => {
     const address = message.address;
     const fileID = message.fileID;
@@ -113,6 +122,9 @@ ipcMain.on('cancelFile', (event, message) => {
 
 //// ------------ connect listener to ipc ------------ ////
 contact.event.on('newUser', (address) => { ipcSendToWindow(mainWindow, 'newUser', { address }); });
+contact.event.on('contactUpdate', (friendList, blackList, whiteList) => {
+    ipcSendToWindow(mainWindow, 'contactRes', { friendList, blackList, whiteList });
+});
 
 contact.eventUser.on('userConnect', (address) => { ipcSendToWindow(mainWindow, 'userConnect', { address }); });
 contact.eventUser.on('userDisconnect', (address) => { ipcSendToWindow(mainWindow, 'userDisconnect', { address }); });
@@ -127,4 +139,3 @@ contact.eventUser.on('userFileCancel', (address, fileID) => { ipcSendToWindow(ma
 contact.eventUser.on('userFileData', (address, fileID, accumSize) => { ipcSendToWindow(mainWindow, 'userFileData', { address, fileID, accumSize }); });
 contact.eventUser.on('userFileSpeed', (address, fileID, speed) => { ipcSendToWindow(mainWindow, 'userFileSpeed', { address, fileID, speed }); });
 
-/* */

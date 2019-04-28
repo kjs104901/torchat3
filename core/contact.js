@@ -1,4 +1,4 @@
-const config = require('../config');
+const config = require('../config').config;
 const User = require('./User');
 const EventEmitter = require('events');
 
@@ -29,9 +29,10 @@ exports.getUserListRaw = () => {
 }
 
 let eventEmitter = new EventEmitter();
-exports.event = eventEmitter; 
+exports.event = eventEmitter;
 /**
  * newUser [hostname]
+ * contactUpdate [friendlist] [blacklist] [whitelist]
  */
 
 let eventEmitterUser = new EventEmitter();
@@ -69,6 +70,9 @@ function addUser(hostname) {
     targetUser = new User(hostname);
     userList.push(targetUser);
 
+    //test
+    console.log("EMIT?")
+
     eventEmitter.emit('newUser', hostname);
     targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
     targetUser.on('disconnect', () => { eventEmitterUser.emit('userDisconnect', hostname); })
@@ -86,6 +90,7 @@ function addUser(hostname) {
 
     return targetUser;
 }
+exports.addUser = addUser;
 
 function removeUser(hostname) {
     let targetUser = findUser(hostname);
@@ -119,8 +124,27 @@ function removeDestroyedUser() {
     });
 }
 
+/**
+ * low db
+ */
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const adapter = new FileSync(config.ContactFile);
+const contactDB = low(adapter);
+contactDB.defaults({ friend: [], black: [], white: [] })
+    .write()
+    
+function saveContact() {
+    contactDB.set('friend', friendList).write();
+    contactDB.set('black', blackList).write();
+    contactDB.set('white', whiteList).write();
+
+    eventEmitter.emit('contactUpdate', friendList, blackList, whiteList);
+}
+/** */
+
 // ############################ friend List ############################ //
-let friendList = [];
+let friendList = contactDB.get('friend').value();
 exports.getFriendList = () => {
     return friendList;
 }
@@ -134,27 +158,30 @@ exports.isFriend = (hostname) => {
     return true;
 }
 
-exports.addFriend = (hostname) => {
+function addFriend(hostname) {
     hostname = normalizeHostname(hostname);
 
     if (checkHostname(hostname) && friendList.indexOf(hostname) == -1) {
         friendList.push(hostname);
         addUser(hostname);
+        saveContact();
         return true;
     }
     return false;
 }
+exports.addFriend = addFriend;
 
 exports.removeFriend = (hostname) => {
     hostname = normalizeHostname(hostname);
 
     if (friendList.indexOf(hostname) > -1) {
         friendList.splice(friendList.indexOf(hostname), 1);
+        saveContact();
     }
 }
 
 // ############################ Black List ############################ //
-let blackList = [];
+let blackList = contactDB.get('black').value();
 exports.getBlackList = () => {
     return blackList;
 }
@@ -174,6 +201,7 @@ exports.addBlack = (hostname) => {
 
     if (checkHostname(hostname) && blackList.indexOf(hostname) == -1) {
         blackList.push(hostname);
+        saveContact();
         return true;
     }
     return false;
@@ -184,11 +212,12 @@ exports.removeBlack = (hostname) => {
 
     if (blackList.indexOf(hostname) > -1) {
         blackList.splice(blackList.indexOf(hostname), 1);
+        saveContact();
     }
 }
 
 // ############################ White List ############################ //
-let whiteList = [];
+let whiteList = contactDB.get('white').value();
 exports.getWhiteList = () => {
     return whiteList;
 }
@@ -208,7 +237,7 @@ exports.addWhite = (hostname) => {
 
     if (checkHostname(hostname) && whiteList.indexOf(hostname) == -1) {
         whiteList.push(hostname);
-        eventEmitter.emit('whiteListUpdate');
+        saveContact();
         return true;
     }
     return false;
@@ -219,6 +248,6 @@ exports.removeWhite = (hostname) => {
 
     if (whiteList.indexOf(hostname) > -1) {
         whiteList.splice(whiteList.indexOf(hostname), 1);
-        eventEmitter.emit('whiteListUpdate');
+        saveContact();
     }
 }

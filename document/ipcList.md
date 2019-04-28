@@ -5,12 +5,18 @@ One is on the main, the other is on the renderer.
 The main part is responsible for core functions such as networking, file I/O.
 While, the renderer part is responsible for displaying information.
 
-So, information must be sent between these two processes via IPC.
+Therefore, information must be sent between these two processes via IPC.
 
 ## Req/Res
 
 bootInfoReq
 bootInfoRes { progress, logs }
+
+contactReq
+contactRes { friendList, blackList, whiteList }
+
+settingReq
+settingRes { setttings... }
 
 ## Event
 

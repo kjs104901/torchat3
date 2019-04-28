@@ -19,7 +19,7 @@ const path = require('path');
 const EventEmitter = require('events');
 
 const tor = require('../tor/tor');
-const config = require('../config');
+const config = require('../config').config;
 
 const parser = require('./parser');
 const protocol = require('./protocol');
@@ -596,8 +596,9 @@ class User extends EventEmitter {
             this.fileSendList.forEach(filesend => {
                 if (filesend.accepted && !sendFirstFile) {
                     const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
-                    while (filesend.accepted && filesend.sendBlock < blockNum &&  filesend.sendBlock < filesend.okayBlock + config.FileBlockWindow 
+                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.sendBlock < filesend.okayBlock + config.FileBlockWindow
                         && filesend.bufferSize < config.FileBufferSize && this.socketInDrain) {
+                        //test
                         console.log("file read: ", path.basename(filesend.file));
                         filesend.bufferSize += config.FileBlockSize;
                         fileHandler.readFileBlock(filesend.file, config.FileBlockSize, filesend.sendBlock)
