@@ -4,6 +4,7 @@ const server = require('./core/server');
 const tor = require('./tor/tor');
 const User = require('./core/User');
 const contact = require('./core/contact');
+const config = require('./config');
 
 let mainWindow
 let mainWindowSetting = {
@@ -68,6 +69,18 @@ ipcMain.on('bootInfoReq', (event, message) => {
         logs: tor.getBootLogs()
     });
 });
+
+ipcMain.on('contactReq', (event, message) => {
+    event.sender.send("contactRes", {
+        friendList: contact.getFriendList(),
+        blackList: contact.getBlackList(),
+        whiteList: contact.getWhiteList()
+    })
+})
+
+ipcMain.on('settingReq', (event, message) => {
+    event.sender.send("settingRes", config.setting)
+})
 
 ipcMain.on('addFriend', (event, message) => {
     contact.addFriend(message.address);

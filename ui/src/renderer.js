@@ -60,3 +60,4 @@ ipcRenderer.send('contactReq');
 ipcRenderer.on('contactRes', (event, message) => { userList.contactUpdate(message.friendList, message.blackList, message.whiteList) });
 
 ipcRenderer.send('settingReq');
+ipcRenderer.on('settingRes', (event, message) => { setting.set(message) })

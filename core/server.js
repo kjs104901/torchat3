@@ -1,5 +1,5 @@
 const net = require('net');
-const config = require('../config').config;
+const config = require('../config');
 const tor = require('../tor/tor');
 const contact = require('./contact');
 const protocol = require('./protocol');
@@ -11,7 +11,7 @@ let server = net.createServer((client) => {
     let arrivedPong;
 
     console.log('Client connection in');
-    client.setTimeout(config.ConnectionTimeOut);
+    client.setTimeout(config.system.ConnectionTimeOut);
 
     let hostname, randomStrPong, targetUser, clientName, clientVersion;
     client.on('data', (data) => {
@@ -20,7 +20,7 @@ let server = net.createServer((client) => {
         }
         else {
             dataBuffer += data.toString();
-            if (dataBuffer.length > config.BufferMaximum) {
+            if (dataBuffer.length > config.system.BufferMaximum) {
                 dataBuffer = "";
 
                 if (client && !client.destroyed) {
@@ -84,7 +84,7 @@ exports.start = () => {
         });
 
         server.listen(0, () => {
-            config.servicePort = server.address().port;
+            config.system.servicePort = server.address().port;
             resolve();
         });
     });

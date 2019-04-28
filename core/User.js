@@ -19,7 +19,7 @@ const path = require('path');
 const EventEmitter = require('events');
 
 const tor = require('../tor/tor');
-const config = require('../config').config;
+const config = require('../config');
 
 const parser = require('./parser');
 const protocol = require('./protocol');
@@ -101,13 +101,13 @@ class User extends EventEmitter {
             }
         }
 
-        if (this.bufferOut > config.BufferMaximum || this.bufferIn > config.BufferMaximum) {
+        if (this.bufferOut > config.system.BufferMaximum || this.bufferIn > config.system.BufferMaximum) {
             this.destroy();
         }
     }
 
     connect() {
-        let options = config.ProxyOptions;
+        let options = config.system.proxyOptions;
         options.destination.host = this.hostname + ".onion";
 
         return new Promise((resolve, reject) => {
@@ -130,7 +130,7 @@ class User extends EventEmitter {
         this.socketOutRetryWait = true;
         this.bufferOut = "";
 
-        setTimeout(() => { this.socketOutRetryWait = false; }, config.ConnectionRetryTime);
+        setTimeout(() => { this.socketOutRetryWait = false; }, config.system.ConnectionRetryTime);
     }
 
     closeSocketIn() {
@@ -385,20 +385,20 @@ class User extends EventEmitter {
     sendPong() {
         if (!this.isConnected()) { return; }
 
-        protocol.pong(this.socketOut, this.randomStrPong, config.ClientName, config.ClientVersion);
+        protocol.pong(this.socketOut, this.randomStrPong, config.system.ClientName, config.system.ClientVersion);
         this.sendPongReq = false;
     }
 
     sendAlive() {
         if (!this.isValid()) { return; }
 
-        protocol.alive(this.socketOut, config.userStatus);
+        protocol.alive(this.socketOut, config.setting.userStatus);
     }
 
     sendProfile() {
         if (!this.isValid()) { return; }
 
-        protocol.profile(this.socketOut, config.profileName, config.profileInfo);
+        protocol.profile(this.socketOut, config.setting.profileName, config.setting.profileInfo);
     }
 
     sendMessage(message) { //interface
@@ -417,7 +417,7 @@ class User extends EventEmitter {
 
         this.emit('message', message, options);
 
-        while (this.messageList.length > config.chatListSize) {
+        while (this.messageList.length > config.system.ChatListSize) {
             this.messageList.shift();
         }
     }
@@ -520,11 +520,11 @@ class User extends EventEmitter {
                 if (!filesend.okayList[blockIndex]) {
                     filesend.okayList[blockIndex] = true;
 
-                    filesend.sendSize += config.FileBlockSize;
-                    filesend.tempSize += config.FileBlockSize;
+                    filesend.sendSize += config.system.FileBlockSize;
+                    filesend.tempSize += config.system.FileBlockSize;
                 }
 
-                const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
+                const blockNum = fileHandler.getBlockNum(filesend.file, config.system.FileBlockSize);
                 for (let index = 0; index <= blockNum; index++) {
                     if (filesend.okayList[index]) {
                         filesend.okayBlock = index;
@@ -595,19 +595,19 @@ class User extends EventEmitter {
             let sendFirstFile = false;
             this.fileSendList.forEach(filesend => {
                 if (filesend.accepted && !sendFirstFile) {
-                    const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
-                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.sendBlock < filesend.okayBlock + config.FileBlockWindow
-                        && filesend.bufferSize < config.FileBufferSize && this.socketInDrain) {
+                    const blockNum = fileHandler.getBlockNum(filesend.file, config.system.FileBlockSize);
+                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.sendBlock < filesend.okayBlock + config.system.FileBlockWindow
+                        && filesend.bufferSize < config.system.FileBufferSize && this.socketInDrain) {
                         //test
                         console.log("file read: ", path.basename(filesend.file));
-                        filesend.bufferSize += config.FileBlockSize;
-                        fileHandler.readFileBlock(filesend.file, config.FileBlockSize, filesend.sendBlock)
+                        filesend.bufferSize += config.system.FileBlockSize;
+                        fileHandler.readFileBlock(filesend.file, config.system.FileBlockSize, filesend.sendBlock)
                             .then((data) => {
                                 const blockIndex = data.index;
                                 const blockHash = fileHandler.getMD5(data.buffer);
                                 const blockData = data.buffer;
 
-                                filesend.bufferSize -= config.FileBlockSize;
+                                filesend.bufferSize -= config.system.FileBlockSize;
 
                                 const sendRst = protocol.filedata(this.socketIn, filesend.fileID, blockIndex, blockHash, blockData);
                                 if (sendRst == false) {
@@ -616,7 +616,7 @@ class User extends EventEmitter {
                             })
                             .catch((err) => {
                                 console.log(err);
-                                filesend.bufferSize -= config.FileBlockSize;
+                                filesend.bufferSize -= config.system.FileBlockSize;
                                 filesend.accepted = false;
                                 this.emit('fileerror', filesend.fileID);
                             })

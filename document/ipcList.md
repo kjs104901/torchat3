@@ -50,3 +50,5 @@ sendMessage { address, message }
 sendFile { address }
 acceptFile { address, fileID }
 cancelFile { address, fileID }
+
+saveSetting { settings... }

@@ -2,7 +2,7 @@ const fs = require('fs');
 const crypto = require("crypto");
 const net = require('net');
 const child_process = require('child_process');
-const config = require('../config').config;
+const config = require('../config');
 
 const torDir = __dirname + "/bin";
 
@@ -12,7 +12,7 @@ let controlPasswordHashed;
 
 function makeTorrc() {
     let bridgeLine = '';
-    if (config.bridge == 1) { bridgeLine = "Bridge " + config.bridge; }
+    if (config.setting.bridge == 1) { bridgeLine = "Bridge " + config.setting.bridge; }
 
     fs.writeFileSync(__dirname + '/torrc',
         `
@@ -23,14 +23,14 @@ HashedControlPassword ${controlPasswordHashed}
 
 HiddenServiceDir ./hidden_service
 HiddenServiceVersion 3
-HiddenServicePort ${config.ServiceInsidePort} 127.0.0.1:${config.servicePort}
-LongLivedPorts ${config.ServiceInsidePort}
+HiddenServicePort ${config.system.ServiceInsidePort} 127.0.0.1:${config.system.servicePort}
+LongLivedPorts ${config.system.ServiceInsidePort}
 
-UseBridges ${config.useBridge}
+UseBridges ${config.setting.useBridge}
 ${bridgeLine}
 
 DataDirectory ./data
-    ` + config.torrcExpand
+    ` + config.setting.torrcExpand
     );
 }
 
@@ -109,7 +109,7 @@ exports.start = () => {
                 publicKey = fs.readFileSync(torDir + "/hidden_service/hs_ed25519_public_key");
                 privateKey = fs.readFileSync(torDir + "/hidden_service/hs_ed25519_secret_key");
 
-                config.ProxyOptions.proxy.port = socksPort;
+                config.system.proxyOptions.proxy.port = socksPort;
 
                 controlDisconnect(false);
 

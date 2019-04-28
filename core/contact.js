@@ -1,4 +1,4 @@
-const config = require('../config').config;
+const config = require('../config');
 const User = require('./User');
 const EventEmitter = require('events');
 
@@ -104,8 +104,8 @@ function addIncomingUser(hostname, randomStrPong) {
     hostname = normalizeHostname(hostname);
     if (!checkHostname(hostname)) { return; }
 
-    if (config.blackList && isBlack(hostname)) { return; }
-    if (!config.whiteList || (config.whiteList && isWhite(hostname))) {
+    if (config.setting.blackList && isBlack(hostname)) { return; }
+    if (!config.setting.whiteList || (config.setting.whiteList && isWhite(hostname))) {
         let targetUser = addUser(hostname);
 
         targetUser.hasIncome(randomStrPong);
@@ -129,7 +129,7 @@ function removeDestroyedUser() {
  */
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync(config.ContactFile);
+const adapter = new FileSync(config.system.ContactFile);
 const contactDB = low(adapter);
 contactDB.defaults({ friend: [], black: [], white: [] })
     .write()
