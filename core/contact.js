@@ -28,55 +28,28 @@ exports.getUserListRaw = () => {
     return userList;
 }
 
-exports.getUserList = () => {
-    return userList.map((user) => {
-        return {
-            address: user.hostname,
-            isConnected: user.isValid, // isConnected()
-            status: user.status,
-            profile: {
-                name: user.profileName,
-                info: user.profileInfo
-            },
-            client: {
-                name: user.clientName,
-                version: user.clientVersion,
-            },
-
-            messages: user.messageList,
-            lastMessageDate: user.lastMessageDate,
-            sendMessage: user.sendMessage, // sendMessage(message) return Promise
-
-            fileSendList: user.fileSendList,
-            fileRecvList: user.fileRecvList,
-            sendFile: user.sendFileSend, // sendFile(filename) return Promise
-            acceptFile: user.sendFileAccept, // acceptFile(fileID) return Promise
-            cancelFile: user.fileCancel, // cancelFile(fileID)
-        };
-    });
-}
-
 let eventEmitter = new EventEmitter();
-exports.event = eventEmitter; /*
-    newUser [hostname]
-*/
+exports.event = eventEmitter; 
+/**
+ * newUser [hostname]
+ */
 
 let eventEmitterUser = new EventEmitter();
-exports.eventUser = eventEmitterUser; /*
-    userConnect [hostname]
-    userDisconnect [hostname]
-    userAlive [hostname] [status]
-    userProfile [hostname] [name] [info]
-    userClient [hostname] [name] [version]
-    userMessage [hostname] [message] [options]
-
-    userFileAccept [hostname] [fileID]
-    userFileFinished [hostname] [fileID]
-    userFileError [hostname] [fileID]
-    userFileCancel [hostname] [fileID]
-    userFileData [hostname] [fileID] [accumSize]
-    userFileSpeed [hostname] [fileID] [speed]
-*/
+exports.eventUser = eventEmitterUser;
+/**
+ * userConnect [hostname]
+ * userDisconnect [hostname]
+ * userAlive [hostname] [status]
+ * userProfile [hostname] [name] [info]
+ * userClient [hostname] [name] [version]
+ * userMessage [hostname] [message] [options]
+ * userFileAccept [hostname] [fileID]
+ * userFileFinished [hostname] [fileID]
+ * userFileError [hostname] [fileID]
+ * userFileCancel [hostname] [fileID]
+ * userFileData [hostname] [fileID] [accumSize]
+ * userFileSpeed [hostname] [fileID] [speed]
+ */
 
 function findUser(hostname) {
     let targetUser;

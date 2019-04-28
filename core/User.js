@@ -1,3 +1,17 @@
+
+/**
+ *           interface
+ * 
+ * isValid() return value
+ * 
+ * sendMessage(message) return Promise
+ * 
+ * sendFileSend(filename) return Promise
+ * sendFileAccept(fileID) return Promise
+ * fileCancel(fileID)
+ * 
+ */
+
 const SocksClient = require('socks').SocksClient;
 const crypto = require("crypto");
 const fs = require('fs');
@@ -577,6 +591,7 @@ class User extends EventEmitter {
                 if (filesend.accepted && !sendFirstFile) {
                     const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
                     while (filesend.accepted && filesend.sendBlock < blockNum && filesend.bufferSize < config.FileBufferSize) {
+                        console.log("file read: ", path.basename(filesend.file));
                         filesend.bufferSize += config.FileBlockSize;
                         fileHandler.readFileBlock(filesend.file, config.FileBlockSize, filesend.sendBlock)
                             .then((data) => {
@@ -651,8 +666,6 @@ class User extends EventEmitter {
             this.fileSendList.forEach(filesend => {
                 if ((filesend.accepted || filesend.finished) && filesend.tempSize > 0) {
                     this.emit('filedata', filesend.fileID, filesend.sendSize);
-                    //test
-                    console.log("filedata", filesend.sendSize);
 
                     filesend.speedSize += filesend.tempSize;
                     filesend.tempSize = 0;
@@ -662,8 +675,6 @@ class User extends EventEmitter {
             this.fileRecvList.forEach(filerecv => {
                 if ((filerecv.accepted || filerecv.finished) && filerecv.tempSize > 0) {
                     this.emit('filedata', filesend.fileID, filerecv.recvSize);
-                    //test
-                    console.log("filedata", filerecv.recvSize);
 
                     filerecv.speedSize += filerecv.tempSize;
                     filerecv.tempSize = 0;

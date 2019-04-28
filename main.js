@@ -69,13 +69,8 @@ ipcMain.on('sendMessage', (event, message) => {
 
     const targetUser = contact.findUser(address);
     if (targetUser) {
-        //test
-        console.log(msg);
-
         targetUser.sendMessage(msg)
-            .catch((err) => {
-                console.log(err);
-            })
+            .catch((err) => { console.log(err); })
     }
 })
 
@@ -88,13 +83,36 @@ ipcMain.on('sendFile', (event, message) => {
                 const file = files[0];
                 const targetUser = contact.findUser(message.address);
                 if (targetUser) {
-                    targetUser.sendFileSend(file);
+                    targetUser.sendFileSend(file)
+                        .catch((err) => { console.log(err); })
                 }
             }
             dialogOpened = false;
         });
     }
-})
+});
+
+
+ipcMain.on('acceptFile', (event, message) => {
+    const address = message.address;
+    const fileID = message.fileID;
+
+    const targetUser = contact.findUser(address);
+    if (targetUser) {
+        targetUser.sendFileAccept(fileID)
+            .catch((err) => { console.log(err); })
+    }
+});
+
+ipcMain.on('cancelFile', (event, message) => {
+    const address = message.address;
+    const fileID = message.fileID;
+    
+    const targetUser = contact.findUser(address);
+    if (targetUser) {
+        targetUser.fileCancel(fileID);
+    }
+});
 
 //// ------------ connect listener to ipc ------------ ////
 contact.event.on('newUser', (address) => { ipcSendToWindow(mainWindow, 'newUser', { address }); });

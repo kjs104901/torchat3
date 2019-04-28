@@ -42,3 +42,5 @@ userFileSpeed { address, fileID, speed }
 addFriend { address }
 sendMessage { address, message }
 sendFile { address }
+acceptFile { address, fileID }
+cancelFile { address, fileID }

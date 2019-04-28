@@ -182,8 +182,6 @@ exports.fileCancel = (address, fileID) => {
 }
 
 exports.fileData = (address, fileID, accumSize) => {
-    //test
-    console.log("fileData", address, fileID, accumSize);
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.accumSize = accumSize;
