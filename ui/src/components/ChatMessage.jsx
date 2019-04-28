@@ -9,6 +9,7 @@ export default class ChatMessage extends Component {
 
         userList.event.on('updateFile', (address) => {
             if (address == this.props.selectedUser.address) {
+                //if file
                 this.forceUpdate();
                 console.log(this.props.selectedUser.messageList)
             }
@@ -29,8 +30,8 @@ export default class ChatMessage extends Component {
             return (
                 <div className='message'>
                     {options.fromMe? 'Me': 'User'} : {message} <br />
-                    file: size:{options.fileSize} acc:{options.accepted} 
-                    fin:{options.finished} err:{options.error} can:{options.canceled} spd:{options.speed}
+                    file: size:{options.fileSize} accsize:{options.accumSize} acc:{options.accepted?"true":"false"}<br />
+                     fin:{options.finished?"true":"false"} err:{options.error?"true":"false"} can:{options.canceled?"true":"false"} spd:{options.speed}
                 </div>
             )
         }

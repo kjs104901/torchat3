@@ -81,9 +81,9 @@ ipcMain.on('sendMessage', (event, message) => {
 
 let dialogOpened = false;
 ipcMain.on('sendFile', (event, message) => {
-    if (dialogOpened == false) {
+    if (mainWindow && dialogOpened == false) {
         dialogOpened = true;
-        dialog.showOpenDialog({ properties: ['openFile'] }, (files) => {
+        dialog.showOpenDialog(mainWindow, { properties: ['openFile'] }, (files) => {
             if (files && files[0] && files[0].length > 0) {
                 const file = files[0];
                 const targetUser = contact.findUser(message.address);
@@ -96,7 +96,7 @@ ipcMain.on('sendFile', (event, message) => {
     }
 })
 
-//// ------------ contact listener to ipc ------------ ////
+//// ------------ connect listener to ipc ------------ ////
 contact.event.on('newUser', (address) => { ipcSendToWindow(mainWindow, 'newUser', { address }); });
 
 contact.eventUser.on('userConnect', (address) => { ipcSendToWindow(mainWindow, 'userConnect', { address }); });
@@ -109,6 +109,7 @@ contact.eventUser.on('userFileAccept', (address, fileID) => { ipcSendToWindow(ma
 contact.eventUser.on('userFileFinished', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileFinished', { address, fileID }); });
 contact.eventUser.on('userFileError', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileError', { address, fileID }); });
 contact.eventUser.on('userFileCancel', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileCancel', { address, fileID }); });
-contact.eventUser.on('userFileData', (address, fileID, speed, accumSize) => { ipcSendToWindow(mainWindow, 'userFileData', { address, fileID, speed, accumSize }); });
+contact.eventUser.on('userFileData', (address, fileID, accumSize) => { ipcSendToWindow(mainWindow, 'userFileData', { address, fileID, accumSize }); });
+contact.eventUser.on('userFileSpeed', (address, fileID, speed) => { ipcSendToWindow(mainWindow, 'userFileSpeed', { address, fileID, speed }); });
 
 /* */

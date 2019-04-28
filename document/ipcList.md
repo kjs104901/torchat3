@@ -34,7 +34,8 @@ userFileAccept { address, fileID }
 userFileFinished { address, fileID }
 userFileError { address, fileID }
 userFileCancel { address, fileID }
-userFileData { address, fileID, speed, accumSize }
+userFileData { address, fileID, accumSize }
+userFileSpeed { address, fileID, speed }
 
 ## Actions
 

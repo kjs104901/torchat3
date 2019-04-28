@@ -38,7 +38,8 @@ ipcRenderer.on('bootFail', (event, message) => {
 ipcRenderer.on('newUser', (event, message) => {
     //test
     console.log("newUser")
-    userList.addUser(message.address); });
+    userList.addUser(message.address);
+});
 
 ipcRenderer.on('userConnect', (event, message) => { userList.connect(message.address); })
 ipcRenderer.on('userDisconnect', (event, message) => { userList.disconnect(message.address); })
@@ -47,8 +48,9 @@ ipcRenderer.on('userProfile', (event, message) => { userList.profile(message.add
 ipcRenderer.on('userClient', (event, message) => { userList.client(message.address, message.name, message.version); });
 ipcRenderer.on('userMessage', (event, message) => { userList.message(message.address, message.message, message.options); });
 
-ipcRenderer.on('userFileAccept', (event, message) => { userList.fileAccept(message.address, message.fileID)} );
-ipcRenderer.on('userFileFinished', (event, message) => { userList.fileFinished(message.address, message.fileID)} );
-ipcRenderer.on('userFileError', (event, message) => { userList.fileError(message.address, message.fileID)} );
-ipcRenderer.on('userFileCancel', (event, message) => { userList.fileCancel(message.address, message.fileID)} );
-ipcRenderer.on('userFileData', (event, message) => { userList.fileData(message.address, message.fileID, message.speed, message.accumSize)} );
+ipcRenderer.on('userFileAccept', (event, message) => { userList.fileAccept(message.address, message.fileID) });
+ipcRenderer.on('userFileFinished', (event, message) => { userList.fileFinished(message.address, message.fileID) });
+ipcRenderer.on('userFileError', (event, message) => { userList.fileError(message.address, message.fileID) });
+ipcRenderer.on('userFileCancel', (event, message) => { userList.fileCancel(message.address, message.fileID) });
+ipcRenderer.on('userFileData', (event, message) => { userList.fileData(message.address, message.fileID, message.accumSize) });
+ipcRenderer.on('userFileSpeed', (event, message) => { userList.fileSpeed(message.address, message.fileID, message.speed) });

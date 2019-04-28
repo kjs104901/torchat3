@@ -74,7 +74,8 @@ exports.eventUser = eventEmitterUser; /*
     userFileFinished [hostname] [fileID]
     userFileError [hostname] [fileID]
     userFileCancel [hostname] [fileID]
-    userFileData [hostname] [fileID] [speed] [accumSize]
+    userFileData [hostname] [fileID] [accumSize]
+    userFileSpeed [hostname] [fileID] [speed]
 */
 
 function findUser(hostname) {
@@ -107,10 +108,8 @@ function addUser(hostname) {
     targetUser.on('filefinished', (fileID) => { eventEmitterUser.emit('userFileFinished', hostname, fileID); })
     targetUser.on('fileerror', (fileID) => { eventEmitterUser.emit('userFileError', hostname, fileID); })
     targetUser.on('filecancel', (fileID) => { eventEmitterUser.emit('userFileCancel', hostname, fileID); })
-    targetUser.on('filedata', (fileID, speed, accumSize) => {
-        //test 
-        console.log('fildata', hostname, fileID, speed, accumSize);
-        eventEmitterUser.emit('userFileData', hostname, fileID, speed, accumSize); })
+    targetUser.on('filedata', (fileID, accumSize) => { eventEmitterUser.emit('userFileData', hostname, fileID, accumSize); })
+    targetUser.on('filespeed', (fileID, speed) => { eventEmitterUser.emit('userFileSpeed', hostname, fileID, speed); })
 
     return targetUser;
 }

@@ -142,7 +142,7 @@ function findMessage(address, fileID) {
 
 exports.fileAccept = (address, fileID) => {
     //test
-    console.log(address, fileID);
+    console.log("accepted", address, fileID);
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.accepted = true;
@@ -181,13 +181,22 @@ exports.fileCancel = (address, fileID) => {
     }
 }
 
-exports.fileData = (address, fileID, speed, accumSize) => {
+exports.fileData = (address, fileID, accumSize) => {
     //test
-    console.log("fileData", address, fileID, speed, accumSize);
+    console.log("fileData", address, fileID, accumSize);
+    const targetMessage = findMessage(address, fileID)
+    if (targetMessage) {
+        targetMessage.options.accumSize = accumSize;
+        
+        eventEmitter.emit('updateFile', address);
+        return targetMessage;
+    }
+}
+
+exports.fileSpeed = (address, fileID, speed) => {
     const targetMessage = findMessage(address, fileID)
     if (targetMessage) {
         targetMessage.options.speed = speed;
-        targetMessage.options.accumSize = accumSize;
         
         eventEmitter.emit('updateFile', address);
         return targetMessage;

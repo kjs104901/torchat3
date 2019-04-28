@@ -16,7 +16,8 @@ setInterval(() => { contact.getUserListRaw().forEach(user => { user.socketCheck(
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.bufferCheck(); }); }, 1); // milliseconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.sendAlive(); }); }, 1000 * 20); // seconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileTransCheck(); }); }, 100); // milliseconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileSpeedCheck(); }); }, 100); // seconds
+setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileDataRecvCheck(); }); }, 1000 * 0.1); // seconds
+setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileSpeedCheck(); }); }, 1000 * 1); // seconds
 
 class User extends EventEmitter {
     constructor(hostname) {
@@ -295,9 +296,6 @@ class User extends EventEmitter {
                         fileID = dataList[1];
                         blockIndex = dataList[2] * 1;
 
-                        //test
-                        console.log('fileokay')
-
                         this.fileOkay(fileID, blockIndex);
                         break;
 
@@ -432,7 +430,7 @@ class User extends EventEmitter {
         this.fileSendList.push({
             fileID, file, fileSize,
             accepted: false, finished: false,
-            sendBlock: 0, sendSize: 0, speedSize: 0,
+            sendBlock: 0, sendSize: 0, tempSize: 0, speedSize: 0,
             okayBlock: -1, okayList: [],
             bufferSize: 0,
         })
@@ -442,7 +440,7 @@ class User extends EventEmitter {
         this.fileRecvList.push({
             fileID, fileSize,
             accepted: false, finished: false,
-            bufferList: {}, recvSize: 0, speedSize: 0,
+            bufferList: {}, recvSize: 0, tempSize: 0, speedSize: 0,
             blockIndex: 0, blockWriting: false
         })
     }
@@ -504,13 +502,11 @@ class User extends EventEmitter {
                     filesend.okayList[blockIndex] = true;
 
                     filesend.sendSize += config.FileBlockSize;
-                    filesend.speedSize += config.FileBlockSize;
+                    filesend.tempSize += config.FileBlockSize;
                 }
 
-                //test
-                console.log("speedSize", filesend.speedSize);
-
-                for (let index = 0; index <= blockIndex; index++) {
+                const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
+                for (let index = 0; index <= blockNum; index++) {
                     if (filesend.okayList[index]) {
                         filesend.okayBlock = index;
                     }
@@ -519,11 +515,10 @@ class User extends EventEmitter {
                     }
                 }
 
-                const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
-                //test
-                console.log("blockNum", blockNum, filesend.okayBlock);
                 if (blockNum - 1 <= filesend.okayBlock) {
+                    filesend.accepted = false;
                     filesend.finished = true;
+                    this.fileSlowFree(filesend.fileID);
                     this.emit('filefinished', filesend.fileID);
 
                     //test
@@ -537,6 +532,8 @@ class User extends EventEmitter {
         this.fileSendList.forEach(filesend => {
             if (filesend.fileID == fileID) {
                 if (blockIndex < filesend.sendBlock) {
+                    //test
+                    console.log("fileError", blockIndex)
                     filesend.sendBlock = blockIndex;
                 }
             }
@@ -560,13 +557,25 @@ class User extends EventEmitter {
         })
     }
 
+    fileSlowFree(fileID) {
+        setTimeout(() => {
+            this.fileSendList = this.fileSendList.filter((filesend) => {
+                if (filesend.fileID == fileID) { return false; }
+                return true;
+            })
+            this.fileRecvList = this.fileRecvList.filter((filerecv) => {
+                if (filerecv.fileID == fileID) { return false; }
+                return true;
+            })
+        }, 1000 * 10)
+    }
+
     fileTransCheck() {
         if (this.isValid()) {
+            let sendFirstFile = false;
             this.fileSendList.forEach(filesend => {
-                if (filesend.accepted) {
+                if (filesend.accepted && !sendFirstFile) {
                     const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
-                    //test
-                    console.log("wtf", filesend.sendBlock, blockNum, filesend.bufferSize, config.FileBufferSize);
                     while (filesend.accepted && filesend.sendBlock < blockNum && filesend.bufferSize < config.FileBufferSize) {
                         filesend.bufferSize += config.FileBlockSize;
                         fileHandler.readFileBlock(filesend.file, config.FileBlockSize, filesend.sendBlock)
@@ -587,12 +596,9 @@ class User extends EventEmitter {
                                 this.emit('fileerror', filesend.fileID);
                             })
                         filesend.sendBlock += 1;
-                        //test
-                        console.log("wtf2", filesend.sendBlock, blockNum, filesend.bufferSize);
                     }
-
-                    if (blockNum <= filesend.sendBlock) {
-                        filesend.accepted = false;
+                    if (filesend.accepted && !filesend.finished) {
+                        sendFirstFile = true;
                     }
                 }
             });
@@ -608,7 +614,7 @@ class User extends EventEmitter {
                         bufferSum += filerecv.bufferList[filerecv.blockIndex]
 
                         filerecv.recvSize += filerecv.bufferList[filerecv.blockIndex].length;
-                        filerecv.speedSize += filerecv.bufferList[filerecv.blockIndex].length;
+                        filerecv.tempSize += filerecv.bufferList[filerecv.blockIndex].length;
 
                         delete filerecv.bufferList[filerecv.blockIndex];
                         filerecv.blockIndex += 1;
@@ -627,24 +633,55 @@ class User extends EventEmitter {
                                 filerecv.accepted = false;
                                 this.emit('fileerror', filerecv.fileID);
                             })
-
-                        if (filerecv.fileSize <= filerecv.recvSize) {
-                            filerecv.accepted = false;
-                            filerecv.finished = true;
-                            this.emit('filefinished', filerecv.fileID);
-                        }
                     }
                 }
+
+                if (filerecv.fileSize <= filerecv.recvSize && filerecv.blockWriting == false) {
+                    filerecv.accepted = false;
+                    filerecv.finished = true;
+                    this.fileSlowFree(filerecv.fileID);
+                    this.emit('filefinished', filerecv.fileID);
+                }
             })
+        }
+    }
+
+    fileDataRecvCheck() {
+        if (this.isValid()) {
+            this.fileSendList.forEach(filesend => {
+                if ((filesend.accepted || filesend.finished) && filesend.tempSize > 0) {
+                    this.emit('filedata', filesend.fileID, filesend.sendSize);
+                    //test
+                    console.log("filedata", filesend.sendSize);
+
+                    filesend.speedSize += filesend.tempSize;
+                    filesend.tempSize = 0;
+                }
+            });
+
+            this.fileRecvList.forEach(filerecv => {
+                if ((filerecv.accepted || filerecv.finished) && filerecv.tempSize > 0) {
+                    this.emit('filedata', filesend.fileID, filerecv.recvSize);
+                    //test
+                    console.log("filedata", filerecv.recvSize);
+
+                    filerecv.speedSize += filerecv.tempSize;
+                    filerecv.tempSize = 0;
+                }
+            });
         }
     }
 
     fileSpeedCheck() {
         if (this.isValid()) {
             this.fileSendList.forEach(filesend => {
+                //test
+                //console.log("WTF", filesend.accepted, filesend.finished, filesend.speedSize);
                 if ((filesend.accepted || filesend.finished) && filesend.speedSize > 0) {
-                    const speed = filesend.speedSize * 10;
-                    this.emit('filedata', filesend.fileID, speed, filesend.sendSize);
+                    const speed = filesend.speedSize;
+                    this.emit('filespeed', filesend.fileID, speed);
+                    //test
+                    console.log("filespeed", speed);
 
                     filesend.speedSize = 0;
                 }
@@ -652,8 +689,10 @@ class User extends EventEmitter {
 
             this.fileRecvList.forEach(filerecv => {
                 if ((filerecv.accepted || filerecv.finished) && filerecv.speedSize > 0) {
-                    const speed = filerecv.speedSize * 10;
-                    this.emit('filedata', filesend.fileID, speed, filerecv.recvSize);
+                    const speed = filerecv.speedSize;
+                    this.emit('filespeed', filesend.fileID, speed);
+                    //test
+                    console.log("filespeed", speed);
 
                     filerecv.speedSize = 0;
                 }

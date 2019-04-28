@@ -18,7 +18,3 @@ npm install
 ```
 npm start
 ```
-or
-```
-electron .
-```
