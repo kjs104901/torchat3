@@ -38,6 +38,6 @@ filesend [fileID] [fileSize] [fileName]
 fileaccept [fileID] 
 fileokay  [fileID] [blockIndex] 
 fileerror [fileID] [blockIndex] 
-filecancle [fileID] 
+filecancel [fileID] 
 filedata [fileID] [blockIndex] [blockHash] [blockData]
 ```

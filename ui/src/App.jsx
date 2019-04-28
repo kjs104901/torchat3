@@ -31,22 +31,13 @@ export default class App extends Component {
 
     render() {
         if (this.state.bootSuccess == false || this.state.bootFailed == true) {
-            // booting page
-            return (
-                <BootPage progress={this.state.bootProgress}></BootPage>
-            )
+            return ( <BootPage progress={this.state.bootProgress}></BootPage> )
         }
         else if (this.state.selectedPage == 1) {
-            // Chatting page
-            return (
-                <ChatPage></ChatPage>
-            )
+            return ( <ChatPage /> )
         }
         else if (this.state.selectedPage == 2) {
-            // Setting page
-            return (
-                <SettingPage></SettingPage>
-            )
+            return ( <SettingPage /> )
         }
     }
 }

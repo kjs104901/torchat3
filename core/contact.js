@@ -51,7 +51,7 @@ exports.getUserList = () => {
             fileRecvList: user.fileRecvList,
             sendFile: user.sendFileSend, // sendFile(filename) return Promise
             acceptFile: user.sendFileAccept, // acceptFile(fileID) return Promise
-            cancleFile: user.fileCancle, // cancleFile(fileID)
+            cancelFile: user.fileCancel, // cancelFile(fileID)
         };
     });
 }
@@ -70,11 +70,11 @@ exports.eventUser = eventEmitterUser; /*
     userClient [hostname] [name] [version]
     userMessage [hostname] [message] [options]
 
-    userFileAccept [hostname] [fileType] [fileID]
-    userFileFinished [hostname] [fileType] [fileID]
-    userFileError [hostname] [fileType] [fileID]
-    userFileCancle [hostname] [fileType] [fileID]
-    userFileData [hostname] [fileType] [fileID] [dataSize] [accumSize]
+    userFileAccept [hostname] [fileID]
+    userFileFinished [hostname] [fileID]
+    userFileError [hostname] [fileID]
+    userFileCancel [hostname] [fileID]
+    userFileData [hostname] [fileID] [speed] [accumSize]
 */
 
 function findUser(hostname) {
@@ -102,12 +102,15 @@ function addUser(hostname) {
     targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
     targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })
     targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
-    
-    targetUser.on('fileaccept', (fileType, fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileType, fileID); })
-    targetUser.on('filefinished', (fileType, fileID) => { eventEmitterUser.emit('userFileFinished', hostname, fileType, fileID); })
-    targetUser.on('fileerror', (fileType, fileID) => { eventEmitterUser.emit('userFileError', hostname, fileType, fileID); })
-    targetUser.on('filecancle', (fileType, fileID) => { eventEmitterUser.emit('userFileCancle', hostname, fileType, fileID); })
-    targetUser.on('filedata', (fileType, fileID, dataSize, accumSize) => { eventEmitterUser.emit('userFileData', hostname, fileType, fileID, dataSize, accumSize); })
+
+    targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileID); })
+    targetUser.on('filefinished', (fileID) => { eventEmitterUser.emit('userFileFinished', hostname, fileID); })
+    targetUser.on('fileerror', (fileID) => { eventEmitterUser.emit('userFileError', hostname, fileID); })
+    targetUser.on('filecancel', (fileID) => { eventEmitterUser.emit('userFileCancel', hostname, fileID); })
+    targetUser.on('filedata', (fileID, speed, accumSize) => {
+        //test 
+        console.log('fildata', hostname, fileID, speed, accumSize);
+        eventEmitterUser.emit('userFileData', hostname, fileID, speed, accumSize); })
 
     return targetUser;
 }
@@ -123,7 +126,7 @@ function removeUser(hostname) {
 function addIncomingUser(hostname, randomStrPong) {
     hostname = normalizeHostname(hostname);
     if (!checkHostname(hostname)) { return; }
-    
+
     if (config.blackList && isBlack(hostname)) { return; }
     if (!config.whiteList || (config.whiteList && isWhite(hostname))) {
         let targetUser = addUser(hostname);

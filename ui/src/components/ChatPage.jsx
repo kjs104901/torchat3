@@ -5,6 +5,8 @@ import { remote, ipcRenderer } from 'electron';
 import userList from '../userList';
 import { use } from 'builder-util';
 
+import ChatMessage from './ChatMessage';
+
 export default class ChatPage extends Component {
     constructor(props) {
         super(props);
@@ -34,6 +36,12 @@ export default class ChatPage extends Component {
         }
     }
 
+    sendFile = () => {
+        if (this.state.selectedUser) {
+            ipcRenderer.send('sendFile', { address: this.state.selectedUser.address })
+        }
+    }
+
     renderUserList = () => {
         let row = [];
         userList.getList().forEach((user, index) => {
@@ -51,9 +59,10 @@ export default class ChatPage extends Component {
         if (this.state.selectedUser) {
             this.state.selectedUser.messageList.forEach((message, index) => {
                 row.push(
-                    <div className="message" key={index}>
-                        {message.message}
-                    </div>
+                    <ChatMessage
+                        selectedUser={this.state.selectedUser}
+                        message={message}
+                        key={index} />
                 )
             });
         }
@@ -89,7 +98,8 @@ export default class ChatPage extends Component {
                         <input type="text"
                             value={this.state.inputMessage}
                             onChange={(e) => { this.setState({ inputMessage: e.target.value }) }} />
-                        <div onClick={() => { this.sendMessage() }}>>전송</div>
+                        <span onClick={() => { this.sendMessage() }}>>전송</span>
+                        <span onClick={() => { this.sendFile() }}>>파일</span>
                     </div>
                 </div>
             </React.Fragment>

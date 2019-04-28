@@ -6,7 +6,7 @@ const BufferMaximum = 10000;
 
 const ConnectionTimeOut = 1000 * 60 * 3; // minuites
 const ProxyTimeOut = 1000 * 60 * 3; // minuites
-const ConnectionRetryTime = 1000 * 20 // seconds
+const ConnectionRetryTime = 1000 * 30 // seconds
 
 const ServiceInsidePort = 12009;
 

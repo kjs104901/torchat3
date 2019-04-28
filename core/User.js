@@ -16,6 +16,7 @@ setInterval(() => { contact.getUserListRaw().forEach(user => { user.socketCheck(
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.bufferCheck(); }); }, 1); // milliseconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.sendAlive(); }); }, 1000 * 20); // seconds
 setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileTransCheck(); }); }, 100); // milliseconds
+setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileSpeedCheck(); }); }, 100); // seconds
 
 class User extends EventEmitter {
     constructor(hostname) {
@@ -275,19 +276,27 @@ class User extends EventEmitter {
                         fileSize = dataList[2] * 1;
                         fileName = parser.unescape(dataList[3]);
 
-                        this.pushMessage(fileName, { fromMe: false, isFile: true, fileSize: fileSize });
+                        this.pushMessage(fileName, {
+                            fromMe: false,
+                            fileID: fileID, fileSize: fileSize,
+                        });
                         this.pushFileRecvList(fileID, fileSize);
 
                         break;
                     case 'fileaccept':
                         fileID = dataList[1];
 
+                        //test
+                        console.log('fileaccept', fileID);
                         this.acceptFileSend(fileID);
                         break;
 
                     case 'fileokay':
                         fileID = dataList[1];
                         blockIndex = dataList[2] * 1;
+
+                        //test
+                        console.log('fileokay')
 
                         this.fileOkay(fileID, blockIndex);
                         break;
@@ -299,10 +308,10 @@ class User extends EventEmitter {
                         this.fileError(fileID, blockIndex);
                         break;
 
-                    case 'filecancle':
+                    case 'filecancel':
                         fileID = dataList[1];
 
-                        this.fileCancle(fileID);
+                        this.fileCancel(fileID);
                         break;
 
                     default:
@@ -343,7 +352,7 @@ class User extends EventEmitter {
                             }
                         }
                         else {
-                            this.sendFileCancle(fileID);
+                            this.sendFileCancel(fileID);
                         }
 
                         break;
@@ -407,7 +416,10 @@ class User extends EventEmitter {
             const fileName = path.basename(file);
             const fileSize = fileHandler.getSize(file);
 
-            this.pushMessage(fileName, { fromMe: true, isFile: true, fileSize: fileSize });
+            this.pushMessage(fileName, {
+                fromMe: true,
+                fileID: fileID, fileSize: fileSize,
+            });
             this.pushFileSendList(fileID, file, fileHandler.getSize(file));
 
             protocol.filesend(this.socketOut, fileID, fileSize, fileName);
@@ -420,7 +432,8 @@ class User extends EventEmitter {
         this.fileSendList.push({
             fileID, file, fileSize,
             accepted: false, finished: false,
-            sendBlock: 0, sendSize: 0, okayBlock: -1, okayList: [],
+            sendBlock: 0, sendSize: 0, speedSize: 0,
+            okayBlock: -1, okayList: [],
             bufferSize: 0,
         })
     }
@@ -429,7 +442,8 @@ class User extends EventEmitter {
         this.fileRecvList.push({
             fileID, fileSize,
             accepted: false, finished: false,
-            bufferList: {}, recvSize: 0, blockIndex: 0, blockWriting: false
+            bufferList: {}, recvSize: 0, speedSize: 0,
+            blockIndex: 0, blockWriting: false
         })
     }
 
@@ -447,7 +461,7 @@ class User extends EventEmitter {
         this.fileSendList.forEach(fileSend => {
             if (fileSend.fileID == fileID) {
                 fileSend.accepted = true;
-                this.emit('fileaccept', 'send', fileID);
+                this.emit('fileaccept', fileID);
             }
         });
     }
@@ -456,7 +470,7 @@ class User extends EventEmitter {
         this.fileRecvList.forEach(fileRecv => {
             if (fileRecv.fileID == fileID) {
                 fileRecv.accepted = true;
-                this.emit('fileaccept', 'recv', fileID);
+                this.emit('fileaccept', fileID);
             }
         });
     }
@@ -469,8 +483,8 @@ class User extends EventEmitter {
         protocol.fileerror(this.socketOut, fileID, blockIndex);
     }
 
-    sendFileCancle(fileID) {
-        protocol.filecancle(this.socketOut, fileID);
+    sendFileCancel(fileID) {
+        protocol.filecancel(this.socketOut, fileID);
     }
 
     filedataRecv(fileID, blockIndex, blockData) {
@@ -486,7 +500,15 @@ class User extends EventEmitter {
     fileOkay(fileID, blockIndex) {
         this.fileSendList.forEach(filesend => {
             if (filesend.fileID == fileID) {
-                filesend.okayList[blockIndex] = true;
+                if (!filesend.okayList[blockIndex]) {
+                    filesend.okayList[blockIndex] = true;
+
+                    filesend.sendSize += config.FileBlockSize;
+                    filesend.speedSize += config.FileBlockSize;
+                }
+
+                //test
+                console.log("speedSize", filesend.speedSize);
 
                 for (let index = 0; index <= blockIndex; index++) {
                     if (filesend.okayList[index]) {
@@ -498,9 +520,14 @@ class User extends EventEmitter {
                 }
 
                 const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
+                //test
+                console.log("blockNum", blockNum, filesend.okayBlock);
                 if (blockNum - 1 <= filesend.okayBlock) {
                     filesend.finished = true;
-                    this.emit('filefinished', 'send', filesend.fileID);
+                    this.emit('filefinished', filesend.fileID);
+
+                    //test
+                    console.log("filefinished1");
                 }
             }
         });
@@ -516,17 +543,17 @@ class User extends EventEmitter {
         });
     }
 
-    fileCancle(fileID) { //interface
+    fileCancel(fileID) { //interface
         this.fileSendList = this.fileSendList.filter((filesend) => {
             if (filesend.fileID == fileID) {
-                this.emit('filecancle', 'send', filesend.fileID);
+                this.emit('filecancel', filesend.fileID);
                 return false;
             }
             return true;
         })
         this.fileRecvList = this.fileRecvList.filter((filerecv) => {
             if (filerecv.fileID == fileID) {
-                this.emit('filecancle', 'recv', filesend.fileID);
+                this.emit('filecancel', filesend.fileID);
                 return false;
             }
             return true;
@@ -538,7 +565,9 @@ class User extends EventEmitter {
             this.fileSendList.forEach(filesend => {
                 if (filesend.accepted) {
                     const blockNum = fileHandler.getBlockNum(filesend.file, config.FileBlockSize);
-                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.bufferSize < config.fileBufferSize) {
+                    //test
+                    console.log("wtf", filesend.sendBlock, blockNum, filesend.bufferSize, config.FileBufferSize);
+                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.bufferSize < config.FileBufferSize) {
                         filesend.bufferSize += config.FileBlockSize;
                         fileHandler.readFileBlock(filesend.file, config.FileBlockSize, filesend.sendBlock)
                             .then((data) => {
@@ -546,22 +575,20 @@ class User extends EventEmitter {
                                 const blockHash = fileHandler.getMD5(data.buffer);
                                 const blockData = data.buffer;
 
-                                filesend.sendSize += blockData.length;
                                 protocol.filedata(this.socketIn, filesend.fileID, blockIndex, blockHash, blockData)
                                     .then((sentSize) => {
                                         filesend.bufferSize -= config.FileBlockSize;
-
-                                        //test
-                                        this.emit('filedata', 'send', sentSize, filesend.sendSize);
                                     })
                             })
                             .catch((err) => {
                                 console.log(err);
                                 filesend.bufferSize -= config.FileBlockSize;
                                 filesend.accepted = false;
-                                this.emit('fileerror', 'send', filesend.fileID);
+                                this.emit('fileerror', filesend.fileID);
                             })
                         filesend.sendBlock += 1;
+                        //test
+                        console.log("wtf2", filesend.sendBlock, blockNum, filesend.bufferSize);
                     }
 
                     if (blockNum <= filesend.sendBlock) {
@@ -581,6 +608,7 @@ class User extends EventEmitter {
                         bufferSum += filerecv.bufferList[filerecv.blockIndex]
 
                         filerecv.recvSize += filerecv.bufferList[filerecv.blockIndex].length;
+                        filerecv.speedSize += filerecv.bufferList[filerecv.blockIndex].length;
 
                         delete filerecv.bufferList[filerecv.blockIndex];
                         filerecv.blockIndex += 1;
@@ -592,24 +620,44 @@ class User extends EventEmitter {
                         fileHandler.writeFileAppend(fileName, bufferSum)
                             .then((recvSize) => {
                                 filerecv.blockWriting = false;
-                                
-                                this.emit('filedata', 'recv', recvSize, filerecv.recvSize);
                             })
                             .catch((err) => {
                                 console.log(err);
                                 filerecv.blockWriting = false;
                                 filerecv.accepted = false;
-                                this.emit('fileerror', 'recv', filerecv.fileID);
+                                this.emit('fileerror', filerecv.fileID);
                             })
 
                         if (filerecv.fileSize <= filerecv.recvSize) {
                             filerecv.accepted = false;
                             filerecv.finished = true;
-                            this.emit('filefinished', 'recv', filerecv.fileID);
+                            this.emit('filefinished', filerecv.fileID);
                         }
                     }
                 }
             })
+        }
+    }
+
+    fileSpeedCheck() {
+        if (this.isValid()) {
+            this.fileSendList.forEach(filesend => {
+                if ((filesend.accepted || filesend.finished) && filesend.speedSize > 0) {
+                    const speed = filesend.speedSize * 10;
+                    this.emit('filedata', filesend.fileID, speed, filesend.sendSize);
+
+                    filesend.speedSize = 0;
+                }
+            });
+
+            this.fileRecvList.forEach(filerecv => {
+                if ((filerecv.accepted || filerecv.finished) && filerecv.speedSize > 0) {
+                    const speed = filerecv.speedSize * 10;
+                    this.emit('filedata', filesend.fileID, speed, filerecv.recvSize);
+
+                    filerecv.speedSize = 0;
+                }
+            });
         }
     }
 }

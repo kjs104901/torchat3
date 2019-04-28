@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 
 const server = require('./core/server');
 const tor = require('./tor/tor');
@@ -18,10 +18,10 @@ app.on('ready', () => {
     mainWindow = new BrowserWindow(mainWindowSetting);
 
     mainWindow.loadURL(`file://${__dirname}/ui/index.html`)
-    
+
     mainWindow.once('ready-to-show', () => { });
     mainWindow.once('close', () => { mainWindow = null; });
-    
+
     mainWindow.webContents.openDevTools();
 
     boot();
@@ -71,11 +71,28 @@ ipcMain.on('sendMessage', (event, message) => {
     if (targetUser) {
         //test
         console.log(msg);
-        
+
         targetUser.sendMessage(msg)
             .catch((err) => {
                 console.log(err);
             })
+    }
+})
+
+let dialogOpened = false;
+ipcMain.on('sendFile', (event, message) => {
+    if (dialogOpened == false) {
+        dialogOpened = true;
+        dialog.showOpenDialog({ properties: ['openFile'] }, (files) => {
+            if (files && files[0] && files[0].length > 0) {
+                const file = files[0];
+                const targetUser = contact.findUser(message.address);
+                if (targetUser) {
+                    targetUser.sendFileSend(file);
+                }
+            }
+            dialogOpened = false;
+        });
     }
 })
 
@@ -88,10 +105,10 @@ contact.eventUser.on('userAlive', (address, status) => { ipcSendToWindow(mainWin
 contact.eventUser.on('userProfile', (address, name, info) => { ipcSendToWindow(mainWindow, 'userProfile', { address, name, info }); });
 contact.eventUser.on('userMessage', (address, message, options) => { ipcSendToWindow(mainWindow, 'userMessage', { address, message, options }); });
 
-contact.eventUser.on('userFileAccept', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileAccept', { address, fileType, fileID }); });
-contact.eventUser.on('userFileFinished', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileFinished', { address, fileType, fileID }); });
-contact.eventUser.on('userFileError', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileError', { address, fileType, fileID }); });
-contact.eventUser.on('userFileCancle', (address, fileType, fileID) => { ipcSendToWindow(mainWindow, 'userFileCancle', { address, fileType, fileID }); });
-contact.eventUser.on('userFileData', (address, fileType, fileID, dataSize, accumSize) => { ipcSendToWindow(mainWindow, 'userFileData', { address, fileType, fileID, dataSize, accumSize }); });
+contact.eventUser.on('userFileAccept', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileAccept', { address, fileID }); });
+contact.eventUser.on('userFileFinished', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileFinished', { address, fileID }); });
+contact.eventUser.on('userFileError', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileError', { address, fileID }); });
+contact.eventUser.on('userFileCancel', (address, fileID) => { ipcSendToWindow(mainWindow, 'userFileCancel', { address, fileID }); });
+contact.eventUser.on('userFileData', (address, fileID, speed, accumSize) => { ipcSendToWindow(mainWindow, 'userFileData', { address, fileID, speed, accumSize }); });
 
 /* */

@@ -62,9 +62,9 @@ exports.fileerror = (socket, fileID, blockIndex) => {
     }
 }
 
-exports.filecancle = (socket, fileID) => {
+exports.filecancel = (socket, fileID) => {
     if (isSocketOkay(socket)) {
-        socket.write("filecancle " + fileID + '\n');
+        socket.write("filecancel " + fileID + '\n');
     }
 }
 
@@ -91,7 +91,7 @@ exports.validate = (dataList) => {
         case 'fileaccept': isValid = (dataList.length == 2); break;
         case 'fileokay': isValid = (dataList.length == 3); break;
         case 'fileerror': isValid = (dataList.length == 3); break;
-        case 'filecancle': isValid = (dataList.length == 2); break;
+        case 'filecancel': isValid = (dataList.length == 2); break;
         case 'filedata': isValid = (dataList.length == 5); break;
         default: isValid = true;  break;
     }

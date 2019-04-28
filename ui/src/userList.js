@@ -15,8 +15,6 @@ class User {
 
         this.messageList = [];
         this.lastMessageDate = new Date();
-        this.fileSendList = [];
-        this.fileRecvList = [];
     }
 }
 
@@ -92,7 +90,7 @@ exports.profile = (address, name, info) => {
     if (targetUser) {
         targetUser.profile.name = name;
         targetUser.profile.info = info;
-        
+
         eventEmitter.emit('updateUI');
         return targetUser;
     }
@@ -110,10 +108,88 @@ exports.client = (address, name, version) => {
 exports.message = (address, message, options) => {
     const targetUser = findUser(address);
     if (targetUser) {
+        if (options.fileID) { // file message
+            //options.fileID = "";
+            //options.fileSize = 0;
+            options.accepted = false;
+            options.finished = false;
+            options.error = false;
+            options.canceled = false;
+            options.accumSize = 0;
+            options.speed = 0;
+        }
+
         targetUser.messageList.push({ message, options });
         targetUser.lastMessageDate = new Date();
-        
+
         eventEmitter.emit('updateUI');
         return targetUser;
+    }
+}
+
+function findMessage(address, fileID) {
+    const targetUser = findUser(address);
+    if (targetUser) {
+        let targetMessage;
+        targetUser.messageList.forEach(message => {
+            if (message.options.fileID == fileID) {
+                targetMessage = message;
+            }
+        });
+        return targetMessage;
+    }
+}
+
+exports.fileAccept = (address, fileID) => {
+    //test
+    console.log(address, fileID);
+    const targetMessage = findMessage(address, fileID)
+    if (targetMessage) {
+        targetMessage.options.accepted = true;
+        
+        eventEmitter.emit('updateFile', address);
+        return targetMessage;
+    }
+}
+
+exports.fileFinished = (address, fileID) => {
+    const targetMessage = findMessage(address, fileID)
+    if (targetMessage) {
+        targetMessage.options.finished = true;
+        
+        eventEmitter.emit('updateFile', address);
+        return targetMessage;
+    }
+}
+
+exports.fileError = (address, fileID) => {
+    const targetMessage = findMessage(address, fileID)
+    if (targetMessage) {
+        targetMessage.options.error = true;
+        
+        eventEmitter.emit('updateFile', address);
+        return targetMessage;
+    }
+}
+exports.fileCancel = (address, fileID) => {
+    const targetMessage = findMessage(address, fileID)
+    if (targetMessage) {
+        targetMessage.options.canceled = true;
+        
+        eventEmitter.emit('updateFile', address);
+        return targetMessage;
+    }
+}
+
+exports.fileData = (address, fileID, speed, accumSize) => {
+    //test
+    console.log("fileData", address, fileID, speed, accumSize);
+    const targetMessage = findMessage(address, fileID)
+    if (targetMessage) {
+        targetMessage.options.speed = speed;
+        targetMessage.options.accumSize = accumSize;
+        
+        eventEmitter.emit('updateFile', address);
+        return targetMessage;
     }
 }

@@ -198,7 +198,6 @@ function showChatroom() {
     }
 }
 
-//TODO addMessage(message.address, message.message, message.options);
 function addMessage(address, message) {
     $('#message-list')
         .append(`

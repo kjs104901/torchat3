@@ -27,14 +27,17 @@ userProfile { address, name, info }
 userClient { address, name, version }
 
 userMessage { address, message, options }
+- { message, options: { fromMe, fileID, fileSize }}
+- { message, options: { fromMe } }
 
-userFileAccept { address, fileType, fileID }
-userFileFinished { address, fileType, fileID }
-userFileError { address, fileType, fileID }
-userFileCancle { address, fileType, fileID }
-userFileData { address, fileType, fileID, dataSize, accumSize }
+userFileAccept { address, fileID }
+userFileFinished { address, fileID }
+userFileError { address, fileID }
+userFileCancel { address, fileID }
+userFileData { address, fileID, speed, accumSize }
 
 ## Actions
 
 addFriend { address }
 sendMessage { address, message }
+sendFile { address }
