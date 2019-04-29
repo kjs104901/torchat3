@@ -62,6 +62,7 @@ settingDB.get('setting')
         whiteList: false,
 
         nigthMode: false,
+        language: "English",
     }).write();
 
 let setting = settingDB.get('setting').value();
@@ -83,3 +84,4 @@ exports.setBlackList = (data) => { setting.blackList = data; eventEmitter.emit('
 exports.setWhiteList = (data) => { setting.whiteList = data; eventEmitter.emit('settingUpdate'); }
 
 exports.setNigthMode = (data) => { setting.nigthMode = data; eventEmitter.emit('settingUpdate'); }
+exports.setLanguage = (lang) => { setting.language = lang; eventEmitter.emit('settingUpdate'); }

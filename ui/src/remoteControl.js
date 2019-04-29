@@ -45,10 +45,6 @@ exports.getSetting = () => {
     return config.getSetting();
 }
 
-exports.saveSetting = () => {
-    config.saveSetting();
-}
-
 exports.saveProfile = (name, info) => {
     config.setProfileName(name);
     config.setProfileInfo(info);
@@ -63,6 +59,11 @@ exports.saveConnection = (torrcExpand, bridge) => {
 
 exports.switchNightMode = () => {
     config.setNigthMode(!config.getSetting().nigthMode);
+    config.saveSetting();
+}
+
+exports.setLanguage = (lang) => {
+    config.setLanguage(lang);
     config.saveSetting();
 }
 

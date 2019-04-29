@@ -1,6 +1,9 @@
 const { remote } = require('electron');
 const contact = remote.require('./core/contact');
 
+const fileHandler = remote.require('./core/fileHandler');
+const Identicon = require('identicon.js');
+
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
@@ -9,18 +12,22 @@ let userList = [];
 
 class User {
     constructor(address) {
+        const hash = fileHandler.getMD5(address).substr(0, 32);
+
         this.address = address;
         this.connected = false;
         this.status = 0;
-        this.profile = { name: "", info: "" };
-        this.client = { name: "", version: "" }
+        this.profile = {
+            name: "", info: "",
+            image: new Identicon(hash, { format: 'svg' }).toString()
+        };
+        this.client = { name: "", version: "" };
 
         this.messageList = [];
         this.lastMessageDate = new Date();
     }
 }
 exports.getList = () => { return userList; }
-exports.setList = (newList) => { userList = newList; }
 
 function findUser(address) {
     let targetUser;

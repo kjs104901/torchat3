@@ -72,24 +72,24 @@ export default class ChatPage extends Component {
                 color = 'green';
             }
 
-            let friendButton = (<div onClick={() => { this.addFriend(user.address); }}>친추</div>);
+            let friendButton = (<span onClick={() => { this.addFriend(user.address); }}>친추</span>);
             if (remoteControl.isFriend(user.address)) {
-                friendButton = (<div onClick={() => { this.removeFriend(user.address); }}>친삭</div>);
+                friendButton = (<span onClick={() => { this.removeFriend(user.address); }}>친삭</span>);
             }
 
-            let blackButton = (<div onClick={() => { this.addBlack(user.address); }}>차단</div>);
+            let blackButton = (<span onClick={() => { this.addBlack(user.address); }}>차단</span>);
             if (remoteControl.isBlack(user.address)) {
-                blackButton = (<div onClick={() => { this.removeBlack(user.address); }}>해제</div>);
+                blackButton = (<span onClick={() => { this.removeBlack(user.address); }}>해제</span>);
             }
-
             row.push(
                 <div className="user" key={index} style={{ color }}>
+                    <img src={"data:image/svg+xml;base64," + user.profile.image} />
                     {friendButton}
                     {blackButton}
-                    <div
+                    <span
                         onClick={() => { this.setState({ selectedUser: user }) }}>
                         {user.address}
-                    </div>
+                    </span>
                 </div>
             )
         });
