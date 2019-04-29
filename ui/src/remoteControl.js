@@ -18,16 +18,18 @@ exports.getSuccess = () => { return tor.getSuccess(); }
 exports.getFail = () => { return tor.getFail(); }
 
 // contact
+exports.isFriend = (address) => { return contact.isFriend(address); }
 exports.addFriend = (address) => {
     contact.addFriend(address);
     contact.addUserFromFriendList();
     contact.saveContact();
 }
-
 exports.removeFriend = (address) => {
     contact.removeFriend(address);
+    contact.saveContact();
 }
 
+exports.isBlack = (address) => { return contact.isBlack(address); }
 exports.addBlack = (address) => {
     contact.addBlack(address);
     contact.saveContact();
@@ -35,10 +37,6 @@ exports.addBlack = (address) => {
 
 exports.removeBlack = (address) => {
     contact.removeBlack(address);
-    contact.saveContact();
-}
-
-exports.saveContact = () => {
     contact.saveContact();
 }
 

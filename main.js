@@ -37,6 +37,10 @@ async function boot() {
     await server.start();
     tor.start();
 
-    tor.event.once('success', () => { contact.addUserFromFriendList(); });
+    tor.event.once('success', () => { setInterval(autuAddUser, 1000 * 0.1); });
     tor.event.once('fail', () => { console.log(err); });
+}
+
+function autuAddUser() {
+    contact.addUserFromFriendList();
 }

@@ -90,6 +90,10 @@ class User extends EventEmitter {
             }
         }
 
+        if (contact.isBlack(this.hostname)) {
+            this.destroy();
+        }
+
         if (this.sendPongReq) {
             this.sendPong();
         }

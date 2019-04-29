@@ -32,13 +32,12 @@ export default class ChatPage extends Component {
         this.forceUpdate();
     }
 
-    addFriend = () => {
-        remoteControl.addFriend(this.state.inputUserAddress);
-    }
+    addFriendInput = () => { remoteControl.addFriend(this.state.inputUserAddress); }
 
-    removeFriend = (targetAddress) => {
-        remoteControl.removeFriend(targetAddress);
-    }
+    addFriend = (targetAddress) => { remoteControl.addFriend(targetAddress); }
+    removeFriend = (targetAddress) => { remoteControl.removeFriend(targetAddress); }
+    addBlack = (targetAddress) => { remoteControl.addBlack(targetAddress); }
+    removeBlack = (targetAddress) => { remoteControl.removeBlack(targetAddress); }
 
     sendMessage = () => {
         if (this.state.selectedUser && this.state.inputMessage.length > 0) {
@@ -63,15 +62,34 @@ export default class ChatPage extends Component {
 
     renderUserList = () => {
         let row = [];
-        userList.getList().forEach((user, index) => {
+
+        let targetUserList = userList.getList();
+        targetUserList.sort((a, b) => { return userList.compareUser(a, b); });
+
+        targetUserList.forEach((user, index) => {
             let color = 'red';
             if (user.connected) {
                 color = 'green';
             }
+
+            let friendButton = (<div onClick={() => { this.addFriend(user.address); }}>친추</div>);
+            if (remoteControl.isFriend(user.address)) {
+                friendButton = (<div onClick={() => { this.removeFriend(user.address); }}>친삭</div>);
+            }
+
+            let blackButton = (<div onClick={() => { this.addBlack(user.address); }}>차단</div>);
+            if (remoteControl.isBlack(user.address)) {
+                blackButton = (<div onClick={() => { this.removeBlack(user.address); }}>해제</div>);
+            }
+
             row.push(
-                <div className="user" key={index} style={{ color }}
-                    onClick={() => { this.setState({ selectedUser: user }) }}>
-                    {user.address}
+                <div className="user" key={index} style={{ color }}>
+                    {friendButton}
+                    {blackButton}
+                    <div
+                        onClick={() => { this.setState({ selectedUser: user }) }}>
+                        {user.address}
+                    </div>
                 </div>
             )
         });
@@ -123,7 +141,7 @@ export default class ChatPage extends Component {
                             <input type="text"
                                 value={this.state.inputUserAddress}
                                 onChange={(e) => { this.setState({ inputUserAddress: e.target.value }) }} />
-                            <div onClick={() => { this.addFriend() }}>새 유저 추가</div>
+                            <div onClick={() => { this.addFriendInput() }}>새 유저 추가</div>
                         </div>
                         <div id='user-list'>
                             {this.renderUserList()}
@@ -131,11 +149,11 @@ export default class ChatPage extends Component {
                     </div>
                 </div>
                 <div id='content'>
-                    <div id='message-list'>
-                        <FileDrop onDrop={this.handleDrop}>
+                    <FileDrop onDrop={this.handleDrop}>
+                        <div id='message-list'>
                             {this.renderMessages()}
-                        </FileDrop>
-                    </div>
+                        </div>
+                    </FileDrop>
                     <div id='message-input'>
                         <input type="text"
                             value={this.state.inputMessage}

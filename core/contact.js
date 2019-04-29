@@ -75,9 +75,6 @@ function addUser(hostname) {
     targetUser = new User(hostname);
     userList.push(targetUser);
 
-    //test
-    console.log("EMIT?")
-
     eventEmitter.emit('newUser', hostname);
     targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
     targetUser.on('disconnect', () => { eventEmitterUser.emit('userDisconnect', hostname); })
@@ -107,12 +104,12 @@ function removeUser(hostname) {
 
 function addUserFromFriendList() {
     friendList.forEach(address => {
-        let hostname = normalizeHostname(address);
-        if (!checkHostname(hostname)) { return; }
-        addUser(hostname);
-
-        //test
-        console.log("wtf", hostname);
+        if (config.getSetting().blackList && isBlack(address)) { return; }
+        if (!config.getSetting().whiteList || (config.getSetting().whiteList && isWhite(address))) {
+            let hostname = normalizeHostname(address);
+            if (!checkHostname(hostname)) { return; }
+            addUser(hostname);
+        }
     });
 }
 exports.addUserFromFriendList = addUserFromFriendList;
@@ -179,8 +176,8 @@ exports.addFriend = (address) => {
 exports.removeFriend = (address) => {
     const hostname = normalizeHostname(address);
     if (friendList.indexOf(hostname) == -1) { return; }
-    
-    friendList = friendList.splice(friendList.indexOf(hostname), 1);
+
+    friendList.splice(friendList.indexOf(hostname), 1);
     eventEmitter.emit('contactUpdate')
 }
 
@@ -205,8 +202,8 @@ exports.addBlack = (address) => {
 exports.removeBlack = (address) => {
     const hostname = normalizeHostname(address);
     if (blackList.indexOf(hostname) == -1) { return; }
-    
-    blackList = blackList.splice(blackList.indexOf(hostname), 1);
+
+    blackList.splice(blackList.indexOf(hostname), 1);
     eventEmitter.emit('contactUpdate')
 }
 
@@ -231,7 +228,7 @@ exports.addWhite = (address) => {
 exports.removeWhite = (address) => {
     const hostname = normalizeHostname(address);
     if (whiteList.indexOf(hostname) == -1) { return; }
-    
-    whiteList = whiteList.splice(whiteList.indexOf(hostname), 1);
+
+    whiteList.splice(whiteList.indexOf(hostname), 1);
     eventEmitter.emit('contactUpdate')
 }

@@ -1,3 +1,6 @@
+const { remote } = require('electron');
+const contact = remote.require('./core/contact');
+
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
@@ -31,11 +34,20 @@ function findUser(address) {
 exports.findUser = findUser;
 
 exports.compareUser = (userA, userB) => {
-    //TODO need to compare properly
-
-    const vA = userA.lastMessageDate;
-    const vB = userB.lastMessageDate;
-    return (vA < vB) ? -1 : (vA > vB) ? 1 : 0;
+    if (userA.connected && !userB.connected) { return -1; }
+    else if (!userA.connected && userB.connected) { return 1; }
+    else if (userA.connected && userB.connected) {
+        if (userA.lastMessageDate > userB.lastMessageDate) { return -1; }
+        else if (userA.lastMessageDate < userB.lastMessageDate) { return 1; }
+        else { return 0; }
+    }
+    else if (!userA.connected && !userB.connected) {
+        if (!contact.isBlack(userA.address) && contact.isBlack(userB.address)) { return -1; }
+        else if (contact.isBlack(userA.address) && !contact.isBlack(userB.address)) { return 1; }
+        else if (contact.isFriend(userA.address) && !contact.isFriend(userB.address)) { return -1; }
+        else if (!contact.isFriend(userA.address) && contact.isFriend(userB.address)) { return 1; }
+        else { return 0; }
+    }
 }
 
 exports.addUser = (address) => {
