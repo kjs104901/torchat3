@@ -17,6 +17,7 @@ let system = {
     FileBlockSize: 1024 * 8, // 8k byte
     FileBlockWindow: 16,
     FileBufferSize: 1024 * 1024 * 1, // 1m byte
+    FileMaximumSize: 1024 * 1024 * 500, // 500m byte
 
     TempDir: './temp',
     ContactFile: './contact',

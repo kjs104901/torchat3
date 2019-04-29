@@ -6,6 +6,44 @@ html, body, #app, #page, .file-drop {
     overflow: hidden;
 }
 
+.centered {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+input {
+    height: 20px;
+    border-radius: 5px;
+}
+
+textarea {
+    height: 20px;
+    border-radius: 5px;
+}
+
+input[type=text], textarea {
+    -webkit-transition: all 0.30s ease-in-out;
+    -moz-transition: all 0.30s ease-in-out;
+    -ms-transition: all 0.30s ease-in-out;
+    -o-transition: all 0.30s ease-in-out;
+    outline: none;
+    padding: 3px 0px 3px 3px;
+    margin: 5px 1px 3px 0px;
+    border: 1px solid #DDDDDD;
+
+    overflow:hidden;
+    resize: none;
+}
+
+input[type=text]:focus, textarea:focus {
+    box-shadow: 0 0 3px #735A93;
+    padding: 3px 0px 3px 3px;
+    margin: 5px 1px 3px 0px;
+    border: 1px solid #5C3E73;
+}
+
 /* ------ Side bar ------ */
 
 #side-bar {

@@ -8,7 +8,7 @@ import remoteControl from '../remoteControl';
 export default class SettingPage extends Component {
     constructor(props) {
         super(props);
-        
+
         this.settingValue = remoteControl.getSetting();
         //test
         console.log("settingValue1", remoteControl.getSetting());
@@ -94,7 +94,7 @@ export default class SettingPage extends Component {
         else if (this.state.selectedSetting == 3) {
             let low = [];
 
-            userList.getBlackList().forEach((black, index) => {
+            remoteControl.getBlackList().forEach((black, index) => {
                 low.push(
                     <div className="black" key={index}>
                         {black}
@@ -110,6 +110,15 @@ export default class SettingPage extends Component {
                         onChange={(e) => { this.setState({ inputBlackAddress: e.target.value }) }} />
                     <div onClick={() => { this.addBlack() }}>추가</div>
                     {low}
+                </React.Fragment>)
+
+        }
+        else if (this.state.selectedSetting == 4) {
+            return (
+                <React.Fragment>
+                    <div onClick={() => { this.switchNightMode() }}>
+                        {this.settingValue.nigthMode ? "nightmode" : "daymode"}
+                    </div>  
                 </React.Fragment>)
 
         }
@@ -131,7 +140,7 @@ export default class SettingPage extends Component {
                         <div onClick={() => { this.selectSetting(1) }}>user profile</div>
                         <div onClick={() => { this.selectSetting(2) }}>connection</div>
                         <div onClick={() => { this.selectSetting(3) }}>blackList</div>
-                        <div onClick={() => { this.switchNightMode() }}>{this.settingValue.nigthMode ? "nightmode" : "daymode"}</div>
+                        <div onClick={() => { this.selectSetting(3) }}>appearence</div>
                     </div>
                 </div>
                 <div id='content'>

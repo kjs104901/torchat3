@@ -4,6 +4,7 @@ import FileDrop from 'react-file-drop';
 
 import userList from '../userList';
 import remoteControl from '../remoteControl';
+import langs from '../langs';
 
 import ChatMessage from './ChatMessage';
 
@@ -123,6 +124,12 @@ export default class ChatPage extends Component {
             }
         }
     }
+    
+    handleKeyPress = (event) => {
+        if (event.key == 'Enter' && !event.ctrlKey) {
+            this.sendMessage()
+        }
+    }
 
     render() {
         return (
@@ -141,7 +148,7 @@ export default class ChatPage extends Component {
                             <input type="text"
                                 value={this.state.inputUserAddress}
                                 onChange={(e) => { this.setState({ inputUserAddress: e.target.value }) }} />
-                            <div onClick={() => { this.addFriendInput() }}>새 유저 추가</div>
+                            <div onClick={() => { this.addFriendInput() }}>{langs.trans("Add a friend")}</div>
                         </div>
                         <div id='user-list'>
                             {this.renderUserList()}
@@ -149,13 +156,14 @@ export default class ChatPage extends Component {
                     </div>
                 </div>
                 <div id='content'>
-                    <FileDrop onDrop={this.handleDrop}>
-                        <div id='message-list'>
+                    <div id='message-list'>
+                        <FileDrop onDrop={this.handleDrop}>
                             {this.renderMessages()}
-                        </div>
-                    </FileDrop>
+                        </FileDrop>
+                    </div>
                     <div id='message-input'>
-                        <input type="text"
+                        <textarea cols="40" rows="1"
+                            onKeyPress={this.handleKeyPress}
                             value={this.state.inputMessage}
                             onChange={(e) => { this.setState({ inputMessage: e.target.value }) }} />
                         <span onClick={() => { this.sendMessage() }}>>전송</span>

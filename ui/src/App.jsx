@@ -8,6 +8,9 @@ import SettingPage from './components/SettingPage';
 import remoteControl from './remoteControl';
 
 import './App.css'
+
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
 import './themes/day.css'
 import './themes/night.css'
 

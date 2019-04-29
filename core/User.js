@@ -449,6 +449,7 @@ class User extends EventEmitter {
             if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
             if (!fileHandler.isFile(file)) { reject(new Error("Not a File")); return; }
             if (fileHandler.getSize(file) <= 0) { reject(new Error("File size zero")); return; }
+            if (fileHandler.getSize(file) > config.system.FileMaximumSize) { reject(new Error("File size too big")); return; }
 
             const fileID = crypto.randomBytes(20).toString('hex');
             const fileName = path.basename(file);

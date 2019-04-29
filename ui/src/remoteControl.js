@@ -30,6 +30,7 @@ exports.removeFriend = (address) => {
 }
 
 exports.isBlack = (address) => { return contact.isBlack(address); }
+exports.getBlackList = () => { return contact.getBlackList(); }
 exports.addBlack = (address) => {
     contact.addBlack(address);
     contact.saveContact();
