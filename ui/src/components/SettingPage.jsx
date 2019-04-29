@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 
-import setting from '../setting';
 import userList from '../userList';
+
+import remoteControl from '../remoteControl';
 
 export default class SettingPage extends Component {
     constructor(props) {
         super(props);
-
-        this.settingValue = setting.getValue();
+        
+        this.settingValue = remoteControl.getSetting();
         //test
-        console.log("settingValue", this.settingValue);
+        console.log("settingValue1", remoteControl.getSetting());
         this.state = {
             selectedSetting: 1, // 1: user profile // 2: connection // 3: blackList // 4: appearence
 
@@ -28,11 +29,11 @@ export default class SettingPage extends Component {
     };
 
     componentDidMount() {
-        userList.event.on('updateUI', this.updateUI);
+        remoteControl.event.on('contactUpdate', this.updateUI);
     }
 
     componentWillUnmount() {
-        userList.event.removeListener('updateUI', this.updateUI);
+        remoteControl.event.removeListener('contactUpdate', this.updateUI);
     }
 
     updateUI = () => {
@@ -44,33 +45,23 @@ export default class SettingPage extends Component {
     }
 
     saveProfile = () => {
-        this.settingValue.profileName = this.state.inputProfileName;
-        this.settingValue.profileInfo = this.state.inputProfileInfo;
-        setting.setValue(this.settingValue);
-        setting.save();
+        remoteControl.saveProfile(this.state.inputProfileName, this.state.inputProfileInfo);
     }
 
     saveConnection = () => {
-        this.settingValue.torrcExpand = this.state.inputTorrcExpand;
-        this.settingValue.bridge = this.state.inputBridge;
-        setting.setValue(this.settingValue);
-        setting.save();
-    }
+        remoteControl.saveConnection(this.state.inputTorrcExpand, this.state.inputBridge);
+    };
 
     addBlack = () => {
-        userList.addBlack(this.state.inputBlackAddress);
+        remoteControl.addBlack(this.state.inputBlackAddress);
     }
 
     removeBlack = (targetAddress) => {
-        userList.removeBlack(targetAddress);
+        remoteControl.removeBlack(this.state.inputBlackAddress);
     }
 
     switchNightMode = () => {
-        this.settingValue.nigthMode = !this.settingValue.nigthMode;
-        //test
-        console.log(this.settingValue.nigthMode)
-        setting.setValue(this.settingValue);
-        setting.save();
+        remoteControl.switchNightMode();
     }
 
     renderSetting = () => {

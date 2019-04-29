@@ -281,12 +281,13 @@ class User extends EventEmitter {
 
                     case 'alive':
                         status = dataList[1];
-                        this.status = status * 1;
 
                         //test
                         console.log("recv Alive", this.hostname);
-
-                        this.emit('alive', status);
+                        if (this.status != status * 1) {
+                            this.status = status * 1;
+                            this.emit('status', status);
+                        }
                         break;
 
                     case 'profile':

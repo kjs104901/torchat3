@@ -4,6 +4,10 @@ const net = require('net');
 const child_process = require('child_process');
 const config = require('../config');
 
+const EventEmitter = require('events');
+let eventEmitter = new EventEmitter();
+exports.event = eventEmitter;
+
 const torDir = __dirname + "/bin";
 
 // ############################ torrc ############################ //
@@ -26,7 +30,7 @@ HiddenServiceVersion ${config.system.HiddenServiceVersion}
 HiddenServicePort ${config.system.ServiceInsidePort} 127.0.0.1:${config.getServicePort()}
 LongLivedPorts ${config.system.ServiceInsidePort}
 
-UseBridges ${config.getSetting().useBridge?'1':'0'}
+UseBridges ${config.getSetting().useBridge ? '1' : '0'}
 ${bridgeLine}
 
 DataDirectory ./data
@@ -38,6 +42,7 @@ DataDirectory ./data
 let torProcess = null;
 
 let bootstrap = 0;
+let bootSuccess = false;
 let bootError = false;
 let bootLogs = [];
 
@@ -46,87 +51,86 @@ let hostname = "";
 let socksPort;
 
 exports.start = () => {
-    return new Promise((resolve, reject) => {
-        const execString = child_process.execFileSync(torDir + '/tor.exe', ['--hash-password', controlPassword], { cwd: torDir, encoding: 'utf8' });
-        if (execString.length <= 0) { reject(new Error("Control Hashing failed")); return; }
-        const execList = execString.split('\n');
-        execList.forEach(line => {
-            if (line.indexOf('16:') == 0) {
-                controlPasswordHashed = line.replace('\r', '');
-            }
-        });
-        if (!controlPasswordHashed) { reject(new Error("Control Hashing failed")); return; }
-
-        makeTorrc();
-        torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', __dirname + '/torrc'], { cwd: torDir });
-
-        torProcess.stdout.on('data', (data) => {
-            const line = data.toString();
-            bootLogs.push(line);
-            let s = line.indexOf('Bootstrapped ');
-            if (s > -1) {
-                s += 'Bootstrapped '.length;
-                let e = line.indexOf('%', s);
-                if (e > -1) {
-                    const percent = line.substring(s, e) * 1;
-                    if (0 < percent) { bootstrap = percent }
-                }
-            }
-        });
-        torProcess.stderr.on('data', (data) => { bootLogs.push(data.toString()); });
-
-        torProcess.on('exit', (code) => {
-            torProcess = null;
-            bootstrap = 0;
-            bootError = false;
-
-            controlDisconnect(true);
-        });
-
-        if (fs.existsSync(controlPortFile)) { fs.unlinkSync(controlPortFile); }
-        const controlPortFileIntv = setInterval(() => {
-            if (fs.existsSync(controlPortFile)) {
-                controlConnect();
-                clearInterval(controlPortFileIntv);
-            }
-        }, 100);
-
-        const bootIntv = setInterval(() => {
-            controlCheckBootstrap();
-            if (bootError) {
-                clearInterval(bootIntv);
-                reject(new Error("Boot failed"));
-            }
-            else if (bootstrap >= 100 && socksPort) {
-                clearInterval(bootIntv);
-
-                const hostnameArr = fs.readFileSync(torDir + "/hidden_service/hostname").toString().split("\n");
-                if (hostnameArr && hostnameArr[0]) {
-                    hostname = hostnameArr[0].replace('\r', '').replace(".onion", '');
-                }
-
-                config.system.proxyPort = socksPort;
-
-                controlDisconnect(false);
-
-                resolve(true);
-            }
-        }, 100);
-    });
-}
-
-exports.getStatus = () => {
-    if (torProcess) {
-        return {
-            pid: torProcess.pid,
-            connected: torProcess.connected,
-            killed: torProcess.killed,
+    const execString = child_process.execFileSync(torDir + '/tor.exe', ['--hash-password', controlPassword], { cwd: torDir, encoding: 'utf8' });
+    if (execString.length <= 0) { eventEmitter.emit("fail"); return; }
+    const execList = execString.split('\n');
+    execList.forEach(line => {
+        if (line.indexOf('16:') == 0) {
+            controlPasswordHashed = line.replace('\r', '');
         }
-    }
+    });
+    if (!controlPasswordHashed) { eventEmitter.emit("fail"); return; }
+
+    makeTorrc();
+    torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', __dirname + '/torrc'], { cwd: torDir });
+
+    torProcess.stdout.on('data', (data) => {
+        const line = data.toString();
+        bootLogs.push(line);
+        eventEmitter.emit("update");
+        let s = line.indexOf('Bootstrapped ');
+        if (s > -1) {
+            s += 'Bootstrapped '.length;
+            let e = line.indexOf('%', s);
+            if (e > -1) {
+                const percent = line.substring(s, e) * 1;
+                if (0 < percent && bootstrap != percent) {
+                    bootstrap = percent;
+                    eventEmitter.emit("update");
+                }
+            }
+        }
+    });
+    torProcess.stderr.on('data', (data) => {
+        bootLogs.push(data.toString());
+        eventEmitter.emit("update");
+    });
+
+    torProcess.on('exit', (code) => {
+        torProcess = null;
+        bootstrap = 0;
+        bootError = false;
+
+        controlDisconnect(true);
+    });
+
+    if (fs.existsSync(controlPortFile)) { fs.unlinkSync(controlPortFile); }
+    const controlPortFileIntv = setInterval(() => {
+        if (fs.existsSync(controlPortFile)) {
+            controlConnect();
+            clearInterval(controlPortFileIntv);
+        }
+    }, 100);
+
+    const bootIntv = setInterval(() => {
+        controlCheckBootstrap();
+        if (bootError) {
+            clearInterval(bootIntv);
+            eventEmitter.emit("fail");
+        }
+        else if (bootstrap >= 100 && socksPort) {
+            clearInterval(bootIntv);
+
+            const hostnameArr = fs.readFileSync(torDir + "/hidden_service/hostname").toString().split("\n");
+            if (hostnameArr && hostnameArr[0]) {
+                hostname = hostnameArr[0].replace('\r', '').replace(".onion", '');
+            }
+
+            config.system.proxyPort = socksPort;
+
+            controlDisconnect(false);
+
+            bootSuccess = true;
+            eventEmitter.emit("success")
+        }
+    }, 100);
 }
 
-exports.getBootstrap = () => { return bootstrap; }
+exports.getProgress = () => { return bootstrap; }
 exports.getBootLogs = () => { return bootLogs; }
+
+exports.getSuccess = () => { return bootSuccess; }
+exports.getFail = () => { return bootError; }
 
 exports.getHostname = () => { return hostname; }
 
@@ -167,7 +171,11 @@ function controlConnect() {
                 const s = data.indexOf("PROGRESS=") + "PROGRESS=".length;
                 const e = data.indexOf(" ", s);
 
-                bootstrap = data.substring(s, e) * 1;
+                const percent = data.substring(s, e) * 1;
+                if (bootstrap != percent) {
+                    bootstrap = percent;
+                    eventEmitter.emit("update");
+                }
             }
             if (-1 < data.indexOf("net/listeners/socks")) {
                 const s = data.indexOf(":") + ":".length;

@@ -37,7 +37,7 @@ let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
 /**
  * newUser [hostname]
- * contactUpdate [friendlist] [blacklist] [whitelist]
+ * contactUpdate
  */
 
 let eventEmitterUser = new EventEmitter();
@@ -45,7 +45,7 @@ exports.eventUser = eventEmitterUser;
 /**
  * userConnect [hostname]
  * userDisconnect [hostname]
- * userAlive [hostname] [status]
+ * userStatus [hostname] [status]
  * userProfile [hostname] [name] [info]
  * userClient [hostname] [name] [version]
  * userMessage [hostname] [message] [options]
@@ -81,7 +81,7 @@ function addUser(hostname) {
     eventEmitter.emit('newUser', hostname);
     targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
     targetUser.on('disconnect', () => { eventEmitterUser.emit('userDisconnect', hostname); })
-    targetUser.on('alive', (status) => { eventEmitterUser.emit('userAlive', hostname, status); })
+    targetUser.on('status', (status) => { eventEmitterUser.emit('userStatus', hostname, status); })
     targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
     targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })
     targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
@@ -104,6 +104,18 @@ function removeUser(hostname) {
         removeDestroyedUser();
     }
 }
+
+function addUserFromFriendList() {
+    friendList.forEach(address => {
+        let hostname = normalizeHostname(address);
+        if (!checkHostname(hostname)) { return; }
+        addUser(hostname);
+
+        //test
+        console.log("wtf", hostname);
+    });
+}
+exports.addUserFromFriendList = addUserFromFriendList;
 
 function addIncomingUser(hostname, randomStrPong) {
     hostname = normalizeHostname(hostname);
@@ -143,8 +155,6 @@ function saveContact() {
     contactDB.set('friend', friendList).write();
     contactDB.set('black', blackList).write();
     contactDB.set('white', whiteList).write();
-
-    eventEmitter.emit('contactUpdate', friendList, blackList, whiteList);
 }
 exports.saveContact = saveContact;
 /** */
@@ -155,11 +165,23 @@ exports.getFriendList = () => { return friendList; }
 exports.setFriendList = (newFriendList) => { friendList = newFriendList }
 exports.isFriend = (hostname) => {
     hostname = normalizeHostname(hostname);
-
-    if (friendList.indexOf(hostname) == -1) {
-        return false;
-    }
+    if (friendList.indexOf(hostname) == -1) { return false; }
     return true;
+}
+exports.addFriend = (address) => {
+    const hostname = normalizeHostname(address);
+    if (!checkHostname(hostname)) { return; }
+    if (friendList.indexOf(hostname) > -1) { return; }
+
+    friendList.push(hostname);
+    eventEmitter.emit('contactUpdate')
+}
+exports.removeFriend = (address) => {
+    const hostname = normalizeHostname(address);
+    if (friendList.indexOf(hostname) == -1) { return; }
+    
+    friendList = friendList.splice(friendList.indexOf(hostname), 1);
+    eventEmitter.emit('contactUpdate')
 }
 
 // ############################ Black List ############################ //
@@ -168,13 +190,25 @@ exports.getBlackList = () => { return blackList; }
 exports.setBlackList = (newBlackList) => { blackList = newBlackList }
 function isBlack(hostname) {
     hostname = normalizeHostname(hostname);
-
-    if (blackList.indexOf(hostname) == -1) {
-        return false;
-    }
+    if (blackList.indexOf(hostname) == -1) { return false; }
     return true;
 }
 exports.isBlack = isBlack;
+exports.addBlack = (address) => {
+    const hostname = normalizeHostname(address);
+    if (!checkHostname(hostname)) { return; }
+    if (blackList.indexOf(hostname) > -1) { return; }
+
+    blackList.push(hostname);
+    eventEmitter.emit('contactUpdate')
+}
+exports.removeBlack = (address) => {
+    const hostname = normalizeHostname(address);
+    if (blackList.indexOf(hostname) == -1) { return; }
+    
+    blackList = blackList.splice(blackList.indexOf(hostname), 1);
+    eventEmitter.emit('contactUpdate')
+}
 
 // ############################ White List ############################ //
 let whiteList = contactDB.get('white').value();
@@ -182,10 +216,22 @@ exports.getWhiteList = () => { return whiteList; }
 exports.setWhiteList = (newWhiteList) => { whiteList = newWhiteList }
 function isWhite(hostname) {
     hostname = normalizeHostname(hostname);
-
-    if (whiteList.indexOf(hostname) == -1) {
-        return false;
-    }
+    if (whiteList.indexOf(hostname) == -1) { return false; }
     return true;
 }
 exports.isWhite = isWhite;
+exports.addWhite = (address) => {
+    const hostname = normalizeHostname(address);
+    if (!checkHostname(hostname)) { return; }
+    if (whiteList.indexOf(hostname) > -1) { return; }
+
+    whiteList.push(hostname);
+    eventEmitter.emit('contactUpdate')
+}
+exports.removeWhite = (address) => {
+    const hostname = normalizeHostname(address);
+    if (whiteList.indexOf(hostname) == -1) { return; }
+    
+    whiteList = whiteList.splice(whiteList.indexOf(hostname), 1);
+    eventEmitter.emit('contactUpdate')
+}

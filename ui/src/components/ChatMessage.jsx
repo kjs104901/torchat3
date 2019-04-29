@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 
-import { remote, ipcRenderer } from 'electron';
-
 import userList from '../userList';
+import remoteControl from '../remoteControl';
 
 export default class ChatMessage extends Component {
     constructor(props) {
@@ -22,17 +21,11 @@ export default class ChatMessage extends Component {
     };
 
     acceptFile = (fileID) => {
-        ipcRenderer.send('acceptFile', {
-            address: this.props.selectedUser.address,
-            fileID
-        })
+        remoteControl.acceptFile(this.props.selectedUser.address, fileID);
     }
 
     cancelFile = (fileID) => {
-        ipcRenderer.send('cancelFile', {
-            address: this.props.selectedUser.address,
-            fileID
-        })
+        remoteControl.cancelFile(this.props.selectedUser.address, fileID);
     }
 
     render() {
@@ -63,14 +56,3 @@ ChatMessage.propTypes = {
     selectedUser: PropTypes.object,
     message: PropTypes.object,
 }
-
-//test
-//options.fromMe = false;
-//options.fileID = "";
-//options.fileSize = 0;
-//options.accepted = false;
-//options.finished = false;
-//options.error = false;
-//options.canceled = false;
-//options.accumSize = 0;
-//options.speed = 0;

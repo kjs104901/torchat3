@@ -31,6 +31,12 @@ exports.getServicePort = () => { return system.servicePort; }
 exports.setServicePort = (newPort) => { system.servicePort = newPort; }
 
 /**
+ * Emitter
+ */
+const EventEmitter = require('events');
+let eventEmitter = new EventEmitter();
+exports.event = eventEmitter;
+/**
  * low db
  */
 const low = require('lowdb');
@@ -61,5 +67,19 @@ settingDB.get('setting')
 let setting = settingDB.get('setting').value();
 
 exports.getSetting = () => { return setting; }
-exports.setSetting = (newSetting) => { setting = newSetting; }
 exports.saveSetting = () => { settingDB.set('setting', setting).write() };
+
+exports.setTorrcExpand = (data) => { setting.torrcExpand = data; eventEmitter.emit('settingUpdate'); }
+
+exports.setUseBridge = (data) => { setting.useBridge = data; eventEmitter.emit('settingUpdate'); }
+exports.setBridge = (data) => { setting.bridge = data; eventEmitter.emit('settingUpdate'); }
+
+exports.setUserStatus = (data) => { setting.userStatus = data; eventEmitter.emit('settingUpdate'); }
+
+exports.setProfileName = (data) => { setting.profileName = data; eventEmitter.emit('settingUpdate'); }
+exports.setProfileInfo = (data) => { setting.profileInfo = data; eventEmitter.emit('settingUpdate'); }
+
+exports.setBlackList = (data) => { setting.blackList = data; eventEmitter.emit('settingUpdate'); }
+exports.setWhiteList = (data) => { setting.whiteList = data; eventEmitter.emit('settingUpdate'); }
+
+exports.setNigthMode = (data) => { setting.nigthMode = data; eventEmitter.emit('settingUpdate'); }

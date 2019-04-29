@@ -5,8 +5,7 @@ import BootPage from './components/BootPage';
 import ChatPage from './components/ChatPage';
 import SettingPage from './components/SettingPage';
 
-import setting from './setting';
-import boot from './boot';
+import remoteControl from './remoteControl';
 
 import './App.css'
 import './themes/day.css'
@@ -22,13 +21,19 @@ export default class App extends Component {
     };
 
     componentDidMount() {
-        setting.event.on('updateUI', this.updateUI);
-        boot.event.on('finished', this.updateUI);
+        remoteControl.event.on('settingUpdate', this.updateUI);
+        
+        remoteControl.event.on('torUpdate', this.updateUI);
+        remoteControl.event.on('torSuccess', this.updateUI);
+        remoteControl.event.on('torFail', this.updateUI);
     }
 
     componentWillUnmount() {
-        setting.event.removeListener('updateUI', this.updateUI);
-        boot.event.removeListener('finished', this.updateUI);
+        remoteControl.event.removeListener('settingUpdate', this.updateUI);
+        
+        remoteControl.event.removeListener('torUpdate', this.updateUI);
+        remoteControl.event.removeListener('torSuccess', this.updateUI);
+        remoteControl.event.removeListener('torFail', this.updateUI);
     }
 
     updateUI = () => {
@@ -38,8 +43,7 @@ export default class App extends Component {
     selectPage = (num) => { this.setState({ selectedPage: num }) }
 
     renderPage() {
-        let bootInfo = boot.getBootInformation();
-        if (bootInfo.success == false || bootInfo.failed == true) {
+        if (remoteControl.getSuccess() == false || remoteControl.getFail() == true) {
             //test
             console.log("bootrender");
             return (
@@ -61,10 +65,8 @@ export default class App extends Component {
     }
 
     render() {
-        let settingValue = setting.getValue();
-
         return (
-            <div id='page' className={setting.getValue().nigthMode ? 'night-mode' : 'day-mode'}>
+            <div id='page' className={remoteControl.getSetting().nigthMode ? 'night-mode' : 'day-mode'}>
                 {this.renderPage()}
             </div>
         )

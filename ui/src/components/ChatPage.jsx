@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import FileDrop from 'react-file-drop';
 
-import { remote, ipcRenderer } from 'electron';
 import userList from '../userList';
-import { use } from 'builder-util';
+import remoteControl from '../remoteControl';
 
 import ChatMessage from './ChatMessage';
 
@@ -20,11 +19,13 @@ export default class ChatPage extends Component {
     };
 
     componentDidMount() {
-        userList.event.on('updateUI', this.updateUI);
+        userList.event.on('updated', this.updateUI);
+        remoteControl.event.on('contactUpdate', this.updateUI);
     }
 
     componentWillUnmount() {
-        userList.event.removeListener('updateUI', this.updateUI);
+        userList.event.removeListener('updated', this.updateUI);
+        remoteControl.event.removeListener('contactUpdate', this.updateUI);
     }
 
     updateUI = () => {
@@ -32,37 +33,31 @@ export default class ChatPage extends Component {
     }
 
     addFriend = () => {
-        userList.addFriend(this.state.inputUserAddress);
+        remoteControl.addFriend(this.state.inputUserAddress);
     }
 
     removeFriend = (targetAddress) => {
-        userList.removeFriend(targetAddress);
+        remoteControl.removeFriend(targetAddress);
     }
 
     sendMessage = () => {
         if (this.state.selectedUser && this.state.inputMessage.length > 0) {
-            ipcRenderer.send('sendMessage', {
-                address: this.state.selectedUser.address,
-                message: this.state.inputMessage
-            })
+            remoteControl.sendMessage(this.state.selectedUser.address, this.state.inputMessage);
             this.setState({
                 inputMessage: ""
             })
         }
     }
 
-    sendFile = () => {
+    sendFileDialog = () => {
         if (this.state.selectedUser) {
-            ipcRenderer.send('sendFile', { address: this.state.selectedUser.address })
+            remoteControl.sendFileDialog(this.state.selectedUser.address);
         }
     }
 
-    sendFilePath = (path) => {
+    sendFile = (path) => {
         if (this.state.selectedUser) {
-            ipcRenderer.send('sendFilePath', {
-                address: this.state.selectedUser.address,
-                path: path
-            })
+            remoteControl.sendFile(this.state.selectedUser.address, path)
         }
     }
 
@@ -106,7 +101,7 @@ export default class ChatPage extends Component {
         else {
             for (let index = 0; index < files.length; index++) {
                 const file = files[index];
-                this.sendFilePath(file.path);
+                this.sendFile(file.path);
             }
         }
     }
@@ -146,7 +141,7 @@ export default class ChatPage extends Component {
                             value={this.state.inputMessage}
                             onChange={(e) => { this.setState({ inputMessage: e.target.value }) }} />
                         <span onClick={() => { this.sendMessage() }}>>전송</span>
-                        <span onClick={() => { this.sendFile() }}>>파일</span>
+                        <span onClick={() => { this.sendFileDialog() }}>>파일</span>
                     </div>
                 </div>
             </React.Fragment>
