@@ -45,10 +45,10 @@ userFileSpeed { address, fileID, speed }
 
 ## Actions
 
-addFriend { address }
 sendMessage { address, message }
 sendFile { address }
 acceptFile { address, fileID }
 cancelFile { address, fileID }
 
 saveSetting { settings... }
+saveContact { friendList, blackList, whiteList }

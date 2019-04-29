@@ -109,8 +109,8 @@ function addIncomingUser(hostname, randomStrPong) {
     hostname = normalizeHostname(hostname);
     if (!checkHostname(hostname)) { return; }
 
-    if (config.setting.blackList && isBlack(hostname)) { return; }
-    if (!config.setting.whiteList || (config.setting.whiteList && isWhite(hostname))) {
+    if (config.getSetting().blackList && isBlack(hostname)) { return; }
+    if (!config.getSetting().whiteList || (config.getSetting().whiteList && isWhite(hostname))) {
         let targetUser = addUser(hostname);
 
         targetUser.hasIncome(randomStrPong);
@@ -138,7 +138,7 @@ const adapter = new FileSync(config.system.ContactFile);
 const contactDB = low(adapter);
 contactDB.defaults({ friend: [], black: [], white: [] })
     .write()
-    
+
 function saveContact() {
     contactDB.set('friend', friendList).write();
     contactDB.set('black', blackList).write();
@@ -146,14 +146,13 @@ function saveContact() {
 
     eventEmitter.emit('contactUpdate', friendList, blackList, whiteList);
 }
+exports.saveContact = saveContact;
 /** */
 
 // ############################ friend List ############################ //
 let friendList = contactDB.get('friend').value();
-exports.getFriendList = () => {
-    return friendList;
-}
-
+exports.getFriendList = () => { return friendList; }
+exports.setFriendList = (newFriendList) => { friendList = newFriendList }
 exports.isFriend = (hostname) => {
     hostname = normalizeHostname(hostname);
 
@@ -163,34 +162,10 @@ exports.isFriend = (hostname) => {
     return true;
 }
 
-function addFriend(hostname) {
-    hostname = normalizeHostname(hostname);
-
-    if (checkHostname(hostname) && friendList.indexOf(hostname) == -1) {
-        friendList.push(hostname);
-        addUser(hostname);
-        saveContact();
-        return true;
-    }
-    return false;
-}
-exports.addFriend = addFriend;
-
-exports.removeFriend = (hostname) => {
-    hostname = normalizeHostname(hostname);
-
-    if (friendList.indexOf(hostname) > -1) {
-        friendList.splice(friendList.indexOf(hostname), 1);
-        saveContact();
-    }
-}
-
 // ############################ Black List ############################ //
 let blackList = contactDB.get('black').value();
-exports.getBlackList = () => {
-    return blackList;
-}
-
+exports.getBlackList = () => { return blackList; }
+exports.setBlackList = (newBlackList) => { blackList = newBlackList }
 function isBlack(hostname) {
     hostname = normalizeHostname(hostname);
 
@@ -201,32 +176,10 @@ function isBlack(hostname) {
 }
 exports.isBlack = isBlack;
 
-exports.addBlack = (hostname) => {
-    hostname = normalizeHostname(hostname);
-
-    if (checkHostname(hostname) && blackList.indexOf(hostname) == -1) {
-        blackList.push(hostname);
-        saveContact();
-        return true;
-    }
-    return false;
-}
-
-exports.removeBlack = (hostname) => {
-    hostname = normalizeHostname(hostname);
-
-    if (blackList.indexOf(hostname) > -1) {
-        blackList.splice(blackList.indexOf(hostname), 1);
-        saveContact();
-    }
-}
-
 // ############################ White List ############################ //
 let whiteList = contactDB.get('white').value();
-exports.getWhiteList = () => {
-    return whiteList;
-}
-
+exports.getWhiteList = () => { return whiteList; }
+exports.setWhiteList = (newWhiteList) => { whiteList = newWhiteList }
 function isWhite(hostname) {
     hostname = normalizeHostname(hostname);
 
@@ -236,23 +189,3 @@ function isWhite(hostname) {
     return true;
 }
 exports.isWhite = isWhite;
-
-exports.addWhite = (hostname) => {
-    hostname = normalizeHostname(hostname);
-
-    if (checkHostname(hostname) && whiteList.indexOf(hostname) == -1) {
-        whiteList.push(hostname);
-        saveContact();
-        return true;
-    }
-    return false;
-}
-
-exports.removeWhite = (hostname) => {
-    hostname = normalizeHostname(hostname);
-
-    if (whiteList.indexOf(hostname) > -1) {
-        whiteList.splice(whiteList.indexOf(hostname), 1);
-        saveContact();
-    }
-}

@@ -31,7 +31,11 @@ export default class ChatPage extends Component {
     }
 
     addFriend = () => {
-        ipcRenderer.send('addFriend', { address: this.state.inputUserAddress })
+        userList.addFriend(this.state.inputUserAddress);
+    }
+
+    removeFriend = (targetAddress) => {
+        userList.removeFriend(targetAddress);
     }
 
     sendMessage = () => {

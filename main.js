@@ -45,7 +45,7 @@ async function boot() {
     tor.start()
         .then(() => {
             ipcSendToWindow(mainWindow, 'bootSucc');
-            addUserFromFriend();
+            addUserFromFriendList();
         })
         .catch((err) => {
             console.log(err);
@@ -53,10 +53,14 @@ async function boot() {
         })
 }
 
-function addUserFromFriend() {
+function addUserFromFriendList() {
     const friendList = contact.getFriendList();
     friendList.forEach(address => {
-        contact.addUser(address);
+        let hostname = contact.normalizeHostname(address);
+        if (contact.checkHostname(hostname)) {
+            contact.addUser(address);
+        }
+
         //test
         console.log("wtf", address);
     });
@@ -70,6 +74,7 @@ ipcMain.on('bootInfoReq', (event, message) => {
     });
 });
 
+
 ipcMain.on('contactReq', (event, message) => {
     event.sender.send("contactRes", {
         friendList: contact.getFriendList(),
@@ -78,19 +83,29 @@ ipcMain.on('contactReq', (event, message) => {
     })
 })
 
+ipcMain.on('saveContact', (event, message) => {
+    contact.setFriendList(message.friendList);
+    contact.setBlackList(message.blackList);
+    contact.setWhiteList(message.whiteList);
+
+    addUserFromFriendList();
+
+    contact.saveContact();
+})
+
+
+
 ipcMain.on('settingReq', (event, message) => {
-    event.sender.send("settingRes", config.setting);
+    event.sender.send("settingRes", config.getSetting());
 })
 
 ipcMain.on('saveSetting', (event, message) => {
-    config.setting = message;
+    config.setSetting(message);
     config.saveSetting();
-    event.sender.send("settingRes", config.setting);
+    event.sender.send("settingRes", config.getSetting());
 })
 
-ipcMain.on('addFriend', (event, message) => {
-    contact.addFriend(message.address);
-});
+
 
 ipcMain.on('sendMessage', (event, message) => {
     const address = message.address;
@@ -132,7 +147,7 @@ ipcMain.on('acceptFile', (event, message) => {
 ipcMain.on('cancelFile', (event, message) => {
     const address = message.address;
     const fileID = message.fileID;
-    
+
     const targetUser = contact.findUser(address);
     if (targetUser) {
         targetUser.fileCancel(fileID);

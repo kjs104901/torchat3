@@ -1,0 +1,23 @@
+.night-mode {
+    color: #FFF;
+}
+
+.night-mode #side-content {
+    background-color: #111;
+}
+
+.night-mode #side-menu {
+    background-color: #222;
+}
+
+.night-mode #content {
+    background-color: #333;
+}
+
+.night-mode #message-list {
+    background-color: #444;
+}
+
+.night-mode #message-input {
+    background-color: #555;
+}

@@ -1,4 +1,4 @@
-html, body, #app {
+html, body, #app, #page {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -11,20 +11,17 @@ html, body, #app {
 #side-bar {
     width: 200px;
     height: 100%;
-    background-color: #999;
     float: left;
 }
 
 #side-menu {
     width: 100%;
     height: 70px;
-    background-color: #888;
 }
 
 #side-content {
     width: 100%;
     height: calc(100% - 70px);
-    background-color: #aaa;
     overflow: auto;
 }
 
@@ -33,19 +30,62 @@ html, body, #app {
 #content {
     width: calc(100% - 200px);
     height: 100%;
-    background-color: #eee;
     float: left;
 }
 
 #message-list {
     width: 100%;
     height: calc(100% - 60px);
-    background-color: #eee;
     overflow: auto;
 }
 
 #message-input {
     width: 100%;
     height: 60px;
+}
+.day-mode {
+    color: #000;
+}
+
+.day-mode #side-content {
+    background-color: #aaa;
+}
+
+.day-mode #side-menu {
     background-color: #888;
+}
+
+.day-mode #content {
+    background-color: #eee;
+}
+
+.day-mode #message-list {
+    background-color: #eee;
+}
+
+.day-mode #message-input {
+    background-color: #888;
+}
+.night-mode {
+    color: #FFF;
+}
+
+.night-mode #side-content {
+    background-color: #111;
+}
+
+.night-mode #side-menu {
+    background-color: #222;
+}
+
+.night-mode #content {
+    background-color: #333;
+}
+
+.night-mode #message-list {
+    background-color: #444;
+}
+
+.night-mode #message-input {
+    background-color: #555;
 }

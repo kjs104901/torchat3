@@ -12,7 +12,7 @@ let controlPasswordHashed;
 
 function makeTorrc() {
     let bridgeLine = '';
-    if (config.setting.bridge == 1) { bridgeLine = "Bridge " + config.setting.bridge; }
+    if (config.getSetting().bridge == 1) { bridgeLine = "Bridge " + config.getSetting().bridge; }
 
     fs.writeFileSync(__dirname + '/torrc',
         `
@@ -23,14 +23,14 @@ HashedControlPassword ${controlPasswordHashed}
 
 HiddenServiceDir ./hidden_service
 HiddenServiceVersion ${config.system.HiddenServiceVersion}
-HiddenServicePort ${config.system.ServiceInsidePort} 127.0.0.1:${config.system.servicePort}
+HiddenServicePort ${config.system.ServiceInsidePort} 127.0.0.1:${config.getServicePort()}
 LongLivedPorts ${config.system.ServiceInsidePort}
 
-UseBridges ${config.setting.useBridge}
+UseBridges ${config.getSetting().useBridge}
 ${bridgeLine}
 
 DataDirectory ./data
-    ` + config.setting.torrcExpand
+    ` + config.getSetting().torrcExpand
     );
 }
 

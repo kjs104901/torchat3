@@ -84,7 +84,7 @@ exports.start = () => {
         });
 
         server.listen(0, () => {
-            config.system.servicePort = server.address().port;
+            config.setServicePort(server.address().port);
             resolve();
         });
     });

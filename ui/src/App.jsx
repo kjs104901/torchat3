@@ -5,7 +5,12 @@ import BootPage from './components/BootPage';
 import ChatPage from './components/ChatPage';
 import SettingPage from './components/SettingPage';
 
+import setting from './setting';
+import boot from './boot';
+
 import './App.css'
+import './themes/day.css'
+import './themes/night.css'
 
 export default class App extends Component {
     constructor(props) {
@@ -13,32 +18,56 @@ export default class App extends Component {
 
         this.state = {
             selectedPage: 1, // 1:Chatting // 2:Setting
-
-            bootProgress: 0,
-            bootSuccess: false,
-            bootFailed: false,
-            bootLogs: [],
         };
     };
 
-    updateBootProgress = (progress) => { this.setState({ bootProgress: progress }) }
-    updateBootLogs = (logs) => { this.setState({ bootLogs: logs }) }
+    componentDidMount() {
+        setting.event.on('updateUI', this.updateUI);
+        boot.event.on('finished', this.updateUI);
+    }
 
-    bootFailed = () => { this.setState({ bootFailed: true }) }
-    bootSuccess = () => { this.setState({ bootSuccess: true }) }
+    componentWillUnmount() {
+        setting.event.removeListener('updateUI', this.updateUI);
+        boot.event.removeListener('finished', this.updateUI);
+    }
+
+    updateUI = () => {
+        this.forceUpdate();
+    }
 
     selectPage = (num) => { this.setState({ selectedPage: num }) }
 
-    render() {
-        if (this.state.bootSuccess == false || this.state.bootFailed == true) {
-            return ( <BootPage progress={this.state.bootProgress}></BootPage> )
+    renderPage() {
+        let bootInfo = boot.getBootInformation();
+        if (bootInfo.success == false || bootInfo.failed == true) {
+            //test
+            console.log("bootrender");
+            return (
+                <BootPage />
+            )
         }
         else if (this.state.selectedPage == 1) {
-            return ( <ChatPage selectPage={this.selectPage}/> )
+            return (
+                <ChatPage
+                    selectPage={this.selectPage} />
+            )
         }
         else if (this.state.selectedPage == 2) {
-            return ( <SettingPage selectPage={this.selectPage}/> )
+            return (
+                <SettingPage
+                    selectPage={this.selectPage} />
+            )
         }
+    }
+
+    render() {
+        let settingValue = setting.getValue();
+
+        return (
+            <div id='page' className={setting.getValue().nigthMode ? 'night-mode' : 'day-mode'}>
+                {this.renderPage()}
+            </div>
+        )
     }
 }
 

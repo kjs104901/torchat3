@@ -23,28 +23,12 @@ let system = {
     SettingFile: './setting',
 
     ChatListSize: 5000,
-
-    // Variables
-    servicePort: 0,
 }
 exports.system = system;
 
-let setting = {
-    torrcExpand: "",
-
-    useBridge: 0,
-    bridge: "",
-
-    userStatus: 1,
-    profileName: "",
-    profileInfo: "",
-
-    blackList: true,
-    whiteList: false,
-
-    nigthMode: false,
-}
-exports.setting = setting;
+servicePort = 0;
+exports.getServicePort = () => { return system.servicePort;}
+exports.setServicePort = (newPort) => { system.servicePort = newPort;}
 
 /**
  * low db
@@ -53,8 +37,26 @@ const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync(system.SettingFile);
 const settingDB = low(adapter);
-settingDB.defaults(setting).write()
+settingDB.defaults({
+    setting: {
+        torrcExpand: "",
 
-function saveSetting() { settingDB.set(setting).write() }
-exports.saveSetting = saveSetting;
-/** */
+        useBridge: 0,
+        bridge: "",
+
+        userStatus: 1,
+        profileName: "",
+        profileInfo: "",
+
+        blackList: true,
+        whiteList: false,
+
+        nigthMode: false,
+    }
+}).write();
+
+let setting = settingDB.get('setting').value();
+
+exports.getSetting = () => { return setting; }
+exports.setSetting = (newSetting) => { setting = newSetting; }
+exports.saveSetting = () => { settingDB.set('setting', setting).write() };

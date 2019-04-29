@@ -408,13 +408,13 @@ class User extends EventEmitter {
 
         //test
         console.log("send Alive", this.hostname);
-        protocol.alive(this.socketOut, config.setting.userStatus);
+        protocol.alive(this.socketOut, config.getSetting().userStatus);
     }
 
     sendProfile() {
         if (!this.isValid()) { return; }
 
-        protocol.profile(this.socketOut, config.setting.profileName, config.setting.profileInfo);
+        protocol.profile(this.socketOut, config.getSetting().profileName, config.getSetting().profileInfo);
     }
 
     sendMessage(message) { //interface

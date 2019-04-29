@@ -1,0 +1,23 @@
+.day-mode {
+    color: #000;
+}
+
+.day-mode #side-content {
+    background-color: #aaa;
+}
+
+.day-mode #side-menu {
+    background-color: #888;
+}
+
+.day-mode #content {
+    background-color: #eee;
+}
+
+.day-mode #message-list {
+    background-color: #eee;
+}
+
+.day-mode #message-input {
+    background-color: #888;
+}
