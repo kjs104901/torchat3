@@ -27,8 +27,8 @@ let system = {
 exports.system = system;
 
 servicePort = 0;
-exports.getServicePort = () => { return system.servicePort;}
-exports.setServicePort = (newPort) => { system.servicePort = newPort;}
+exports.getServicePort = () => { return system.servicePort; }
+exports.setServicePort = (newPort) => { system.servicePort = newPort; }
 
 /**
  * low db
@@ -38,10 +38,14 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync(system.SettingFile);
 const settingDB = low(adapter);
 settingDB.defaults({
-    setting: {
+    setting: {}
+}).write();
+
+settingDB.get('setting')
+    .defaults({
         torrcExpand: "",
 
-        useBridge: 0,
+        useBridge: false,
         bridge: "",
 
         userStatus: 1,
@@ -52,8 +56,7 @@ settingDB.defaults({
         whiteList: false,
 
         nigthMode: false,
-    }
-}).write();
+    }).write();
 
 let setting = settingDB.get('setting').value();
 

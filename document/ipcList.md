@@ -47,6 +47,7 @@ userFileSpeed { address, fileID, speed }
 
 sendMessage { address, message }
 sendFile { address }
+sendFilePath { address, path }
 acceptFile { address, fileID }
 cancelFile { address, fileID }
 

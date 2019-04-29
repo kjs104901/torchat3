@@ -133,6 +133,14 @@ ipcMain.on('sendFile', (event, message) => {
     }
 });
 
+ipcMain.on('sendFilePath', (event, message) => {
+    const targetUser = contact.findUser(message.address);
+    if (targetUser) {
+        targetUser.sendFileSend(message.path)
+            .catch((err) => { console.log(err); })
+    }
+})
+
 ipcMain.on('acceptFile', (event, message) => {
     const address = message.address;
     const fileID = message.fileID;

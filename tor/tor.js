@@ -26,7 +26,7 @@ HiddenServiceVersion ${config.system.HiddenServiceVersion}
 HiddenServicePort ${config.system.ServiceInsidePort} 127.0.0.1:${config.getServicePort()}
 LongLivedPorts ${config.system.ServiceInsidePort}
 
-UseBridges ${config.getSetting().useBridge}
+UseBridges ${config.getSetting().useBridge?'1':'0'}
 ${bridgeLine}
 
 DataDirectory ./data

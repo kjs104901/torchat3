@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
+import FileDrop from 'react-file-drop';
 
 import { remote, ipcRenderer } from 'electron';
 import userList from '../userList';
@@ -56,6 +57,15 @@ export default class ChatPage extends Component {
         }
     }
 
+    sendFilePath = (path) => {
+        if (this.state.selectedUser) {
+            ipcRenderer.send('sendFilePath', {
+                address: this.state.selectedUser.address,
+                path: path
+            })
+        }
+    }
+
     renderUserList = () => {
         let row = [];
         userList.getList().forEach((user, index) => {
@@ -88,6 +98,19 @@ export default class ChatPage extends Component {
         return row;
     }
 
+    handleDrop = (files, event) => {
+        console.log()
+        if (files.length > 10) {
+            //TODO 10개 이상 안된다는 메시지 띄우기
+        }
+        else {
+            for (let index = 0; index < files.length; index++) {
+                const file = files[index];
+                this.sendFilePath(file.path);
+            }
+        }
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -114,7 +137,9 @@ export default class ChatPage extends Component {
                 </div>
                 <div id='content'>
                     <div id='message-list'>
-                        {this.renderMessages()}
+                        <FileDrop onDrop={this.handleDrop}>
+                            {this.renderMessages()}
+                        </FileDrop>
                     </div>
                     <div id='message-input'>
                         <input type="text"

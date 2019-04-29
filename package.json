@@ -45,6 +45,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-file-drop": "^0.2.8",
     "socks": "^2.3.2"
   },
   "build": {
