@@ -12,7 +12,7 @@ let mainWindowSetting = {
     minWidth: 600, minHeight: 400,
     resizable: true,
     webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
     }
 };
 app.on('ready', () => {
