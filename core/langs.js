@@ -23,7 +23,7 @@ exports.trans = (str) => {
             resultStr = typeStr;
         }
         else {
-            resultStr = (records[str])["Default"];
+            resultStr = (records[str])["English"];
         }
     }
     return resultStr;

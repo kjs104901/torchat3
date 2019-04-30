@@ -6,7 +6,7 @@ const tor = require('./tor/tor');
 const contact = require('./core/contact');
 
 //Security: force sandbox mode
-if (process.argv.indexOf('--enable-sandbox') == -1) {
+if (process.argv.indexOf('--enable-sandbox') == -1 || process.argv.indexOf('--no-sandbox') > -1) {
     console.log("[Error] Not in sandbox mode!");
     app.quit();
     return;

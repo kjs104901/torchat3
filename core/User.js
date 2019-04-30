@@ -41,6 +41,7 @@ class User extends EventEmitter {
         this.hostname = hostname;
         this.valid = false;
         this.destroyed = false;
+        this.halfConnected = false;
         this.status = 0;
 
         this.income = false;
@@ -101,7 +102,20 @@ class User extends EventEmitter {
         if (!this.socketOut || !this.socketIn || !this.valid) {
             if (this.status != 0) {
                 this.status = 0;
+                this.halfConnected = false;
                 this.emit('disconnect');
+            }
+        }
+
+        if (!this.socketOut && !this.socketIn) {
+            if (this.halfConnected) {
+                this.halfConnected = false;
+            }
+        }
+        else if (!this.socketOut || !this.socketIn) {
+            if (!this.halfConnected) {
+                this.halfConnected = true;
+                this.emit('halfconnect');
             }
         }
 
@@ -154,6 +168,8 @@ class User extends EventEmitter {
     destroy() {
         this.closeSocketOut();
         this.closeSocketIn();
+        this.status = 0;
+        this.valid = false;
         this.destroyed = true;
         this.emit('disconnect');
     }
@@ -174,11 +190,11 @@ class User extends EventEmitter {
 
     validate(randomStr) {
         if (this.randomStr != randomStr) {
-            this.valid = false;
             this.destroy();
         }
         else {
             this.valid = true;
+            this.halfConnected = false;
             this.emit('connect');
 
             //test

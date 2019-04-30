@@ -1,4 +1,4 @@
-# torchat3
+# torchat3 [Developing]
 Electron-based torchat
 
 ## Requirements

@@ -53,7 +53,9 @@
     "react-dom": "^16.8.6",
     "react-file-drop": "^0.2.8",
     "react-perfect-scrollbar": "^1.5.0",
-    "socks": "^2.3.2"
+    "socks": "^2.3.2",
+    "sweetalert2": "^8.9.0",
+    "sweetalert2-react-content": "^1.1.0"
   },
   "build": {
     "appId": "com.kjs104901.torchat3",

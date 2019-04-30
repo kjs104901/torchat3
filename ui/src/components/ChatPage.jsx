@@ -6,6 +6,10 @@ const remoteControl = window.remoteControl;
 const userList = window.userList;
 const langs = window.langs;
 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+const MySwal = withReactContent(Swal)
+
 import ChatMessage from './ChatMessage';
 
 export default class ChatPage extends Component {
@@ -116,6 +120,27 @@ export default class ChatPage extends Component {
         console.log()
         if (files.length > 10) {
             //TODO 10개 이상 안된다는 메시지 띄우기
+
+            MySwal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'okay',
+                cancelButtonText: 'cancel',
+                heightAuto: false,
+                width: 400,
+                
+            }).then((result) => {
+                if (result.value) {
+                    MySwal.fire({
+                        title: 'Deleted!',
+                        text: 'Your file has been deleted.',
+                        heightAuto: false,
+                    })
+                }
+            })
         }
         else {
             for (let index = 0; index < files.length; index++) {
@@ -124,10 +149,15 @@ export default class ChatPage extends Component {
             }
         }
     }
-    
+
     handleKeyPress = (event) => {
-        if (event.key == 'Enter' && !event.ctrlKey) {
-            this.sendMessage()
+        if ((event.keyCode == 10 || event.keyCode == 13)) {
+            if (event.ctrlKey) {
+                this.setState({ inputMessage: this.state.inputMessage + "\n" })
+            }
+            else {
+                this.sendMessage();
+            }
         }
     }
 
@@ -164,7 +194,7 @@ export default class ChatPage extends Component {
                     </div>
                     <div id='message-input'>
                         <textarea cols="40" rows="1"
-                            onKeyPress={this.handleKeyPress}
+                            onKeyDown={this.handleKeyPress}
                             value={this.state.inputMessage}
                             onChange={(e) => { this.setState({ inputMessage: e.target.value }) }} />
                         <span onClick={() => { this.sendMessage() }}>>전송</span>

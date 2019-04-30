@@ -138,6 +138,7 @@ class User {
 
         this.address = address;
         this.connected = false;
+        this.halfConnected = false;
         this.status = 0;
         this.profile = {
             name: "", info: "",
@@ -208,6 +209,17 @@ window.userList = {
         }
     },
 
+    halfConnect: (address) => {
+        const targetUser = findUser(address);
+        if (targetUser) {
+            if (targetUser.halfConnected != true) {
+                targetUser.halfConnected = true;
+                eventUserEmitter.emit('updated');
+            }
+            return targetUser;
+        }
+    },
+
     connect: (address) => {
         const targetUser = findUser(address);
         if (targetUser) {
@@ -223,6 +235,7 @@ window.userList = {
         const targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.connected != false) {
+                targetUser.halfConnected = false;
                 targetUser.connected = false;
                 eventUserEmitter.emit('updated');
             }
@@ -367,6 +380,7 @@ contact.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
 // user
 contact.event.on('newUser', (address) => { window.userList.addUser(address); });
 
+contact.eventUser.on('userHalfConnect', (address) => { window.userList.halfConnect(address); });
 contact.eventUser.on('userConnect', (address) => { window.userList.connect(address); });
 contact.eventUser.on('userDisconnect', (address) => { window.userList.disconnect(address); });
 contact.eventUser.on('userStatus', (address, status) => { window.userList.status(address, status); });

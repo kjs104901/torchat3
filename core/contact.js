@@ -43,6 +43,7 @@ exports.event = eventEmitter;
 let eventEmitterUser = new EventEmitter();
 exports.eventUser = eventEmitterUser;
 /**
+ * userHalfConnect [hostname]
  * userConnect [hostname]
  * userDisconnect [hostname]
  * userStatus [hostname] [status]
@@ -76,6 +77,7 @@ function addUser(hostname) {
     userList.push(targetUser);
 
     eventEmitter.emit('newUser', hostname);
+    targetUser.on('halfconnect', () => { eventEmitterUser.emit('userHalfConnect', hostname); })
     targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
     targetUser.on('disconnect', () => { eventEmitterUser.emit('userDisconnect', hostname); })
     targetUser.on('status', (status) => { eventEmitterUser.emit('userStatus', hostname, status); })
