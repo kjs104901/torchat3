@@ -13,6 +13,7 @@ let mainWindowSetting = {
     resizable: true,
     webPreferences: {
         nodeIntegration: true,
+        sandbox: true
     }
 };
 app.on('ready', () => {
