@@ -147,11 +147,12 @@ const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync(config.system.ContactFile);
 const contactDB = low(adapter);
-contactDB.defaults({ friend: [], black: [], white: [] })
+contactDB.defaults({ friend: [], nickname: {}, black: [], white: [] })
     .write()
 
 function saveContact() {
     contactDB.set('friend', friendList).write();
+    contactDB.set('nickname', nicknameList).write();
     contactDB.set('black', blackList).write();
     contactDB.set('white', whiteList).write();
 }
@@ -183,6 +184,27 @@ exports.removeFriend = (address) => {
     eventEmitter.emit('contactUpdate')
 }
 
+// ############################ nickname List ############################ //
+//test
+let nicknameList = contactDB.get('nickname').value();
+exports.getNickname = (address) => {
+    const hostname = normalizeHostname(address);
+    if (!checkHostname(hostname)) { return ""; }
+
+    if (nicknameList[hostname] && nicknameList[hostname].length > 0) {
+        return nicknameList[hostname];
+    }
+    return "";
+}
+exports.setNickname = (address, nickname) => {
+    const hostname = normalizeHostname(address);
+    if (!checkHostname(hostname)) { return; }
+    if (nickname.length <= 0) { return; }
+
+    nicknameList[hostname] = nickname;
+    eventEmitter.emit('contactUpdate');
+}
+
 // ############################ Black List ############################ //
 let blackList = contactDB.get('black').value();
 exports.getBlackList = () => { return blackList; }
@@ -199,14 +221,14 @@ exports.addBlack = (address) => {
     if (blackList.indexOf(hostname) > -1) { return; }
 
     blackList.push(hostname);
-    eventEmitter.emit('contactUpdate')
+    eventEmitter.emit('contactUpdate');
 }
 exports.removeBlack = (address) => {
     const hostname = normalizeHostname(address);
     if (blackList.indexOf(hostname) == -1) { return; }
 
     blackList.splice(blackList.indexOf(hostname), 1);
-    eventEmitter.emit('contactUpdate')
+    eventEmitter.emit('contactUpdate');
 }
 
 // ############################ White List ############################ //
@@ -225,12 +247,12 @@ exports.addWhite = (address) => {
     if (whiteList.indexOf(hostname) > -1) { return; }
 
     whiteList.push(hostname);
-    eventEmitter.emit('contactUpdate')
+    eventEmitter.emit('contactUpdate');
 }
 exports.removeWhite = (address) => {
     const hostname = normalizeHostname(address);
     if (whiteList.indexOf(hostname) == -1) { return; }
 
     whiteList.splice(whiteList.indexOf(hostname), 1);
-    eventEmitter.emit('contactUpdate')
+    eventEmitter.emit('contactUpdate');
 }

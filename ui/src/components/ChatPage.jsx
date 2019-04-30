@@ -41,6 +41,28 @@ export default class ChatPage extends Component {
 
     addFriend = (targetAddress) => { remoteControl.addFriend(targetAddress); }
     removeFriend = (targetAddress) => { remoteControl.removeFriend(targetAddress); }
+    setNicknameDialog = (targetAddress) => {
+        let inputValue = remoteControl.getNickname(targetAddress);
+
+        MySwal.fire({
+            title: 'Add nickname test',
+            input: 'text',
+            inputValue: inputValue,
+            showCancelButton: true,
+            heightAuto: false,
+            width: 400,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write something!'
+                }
+            }
+        }).then((result) => {
+            let nickname = result.value;
+            if (nickname) {
+                remoteControl.setNickname(targetAddress, nickname);
+            }
+        })
+    }
     addBlack = (targetAddress) => { remoteControl.addBlack(targetAddress); }
     removeBlack = (targetAddress) => { remoteControl.removeBlack(targetAddress); }
 
@@ -65,6 +87,21 @@ export default class ChatPage extends Component {
         }
     }
 
+    renderAlert = () => {
+        if (this.state.selectedUser) {
+            const targetUser = this.state.selectedUser;
+            if (!remoteControl.isFriend(targetUser.address)) {
+                return (
+                    <div className="inchat-alert">
+                        this is not a friend
+                        <div onClick={() => { this.addFriend(targetUser.address) }}>add friend</div>
+                        <div onClick={() => { this.addBlack(targetUser.address) }}>add black</div>
+                    </div>
+                )
+            }
+        }
+    }
+
     renderUserList = () => {
         let row = [];
 
@@ -73,9 +110,8 @@ export default class ChatPage extends Component {
 
         targetUserList.forEach((user, index) => {
             let color = 'red';
-            if (user.connected) {
-                color = 'green';
-            }
+            if (user.halfConnected) { color = 'orange'; }
+            if (user.connected) { color = 'green'; }
 
             let friendButton = (<span onClick={() => { this.addFriend(user.address); }}>친추</span>);
             if (remoteControl.isFriend(user.address)) {
@@ -86,11 +122,19 @@ export default class ChatPage extends Component {
             if (remoteControl.isBlack(user.address)) {
                 blackButton = (<span onClick={() => { this.removeBlack(user.address); }}>해제</span>);
             }
+
+            let nickname = remoteControl.getNickname(user.address);
+
             row.push(
                 <div className="user" key={index} style={{ color }}>
                     <img src={"data:image/svg+xml;base64," + user.profile.image} />
                     {friendButton}
                     {blackButton}
+                    nick: {nickname}
+                    <span
+                        onClick={() => { this.setNicknameDialog(user.address) }}>
+                        nickset
+                    </span>
                     <span
                         onClick={() => { this.setState({ selectedUser: user }) }}>
                         {user.address}
@@ -131,13 +175,13 @@ export default class ChatPage extends Component {
                 cancelButtonText: 'cancel',
                 heightAuto: false,
                 width: 400,
-                
             }).then((result) => {
                 if (result.value) {
                     MySwal.fire({
                         title: 'Deleted!',
                         text: 'Your file has been deleted.',
                         heightAuto: false,
+                        width: 400,
                     })
                 }
             })
@@ -179,6 +223,9 @@ export default class ChatPage extends Component {
                             <input type="text"
                                 value={this.state.inputUserAddress}
                                 onChange={(e) => { this.setState({ inputUserAddress: e.target.value }) }} />
+                            <div onClick={() => {
+                                this.setState({ inputUserAddress: remoteControl.getClipboard() })
+                            }}>cilp</div>
                             <div onClick={() => { this.addFriendInput() }}>{langs.trans("Add a friend")}</div>
                         </div>
                         <div id='user-list'>
@@ -188,6 +235,7 @@ export default class ChatPage extends Component {
                 </div>
                 <div id='content'>
                     <div id='message-list'>
+                        {this.renderAlert()}
                         <FileDrop onDrop={this.handleDrop}>
                             {this.renderMessages()}
                         </FileDrop>

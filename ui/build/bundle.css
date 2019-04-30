@@ -32,8 +32,7 @@ input[type=text], textarea {
     padding: 3px 0px 3px 3px;
     margin: 5px 1px 3px 0px;
     border: 1px solid #DDDDDD;
-
-    overflow:hidden;
+    overflow: hidden;
     resize: none;
 }
 
@@ -80,6 +79,14 @@ input[type=text]:focus, textarea:focus {
 #message-input {
     width: 100%;
     height: 60px;
+}
+
+.inchat-alert {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+    height: 0px;
 }
 /*
  * Container style

@@ -24,7 +24,7 @@ let mainWindowSetting = {
 };
 
 //Security: set a fake proxy to prevent the app from connecting to internet
-const fakeProxy = 'null://255.255.255.244:65535'
+const fakeProxy = 'null://255.255.255.0:65535'
 app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); // map every hostname to local host
 app.commandLine.appendSwitch('proxy-server', fakeProxy);
 

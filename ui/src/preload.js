@@ -1,12 +1,13 @@
 // node require
 const { remote } = require('electron');
 //Security: disable node require after this point
-require = null; 
+require = null;
 
 // remote require
 const EventEmitter = remote.require('events');
 const Identicon = remote.require('identicon.js');
 const crypto = remote.require('crypto');
+const { clipboard } = remote.require('electron');
 
 const contact = remote.require('./core/contact');
 const config = remote.require('./config');
@@ -20,6 +21,11 @@ const langs = remote.require('./core/langs')
 let eventEmitter = new EventEmitter();
 window.remoteControl = {
     event: eventEmitter,
+
+    // electron
+    getClipboard: () => { return clipboard.readText() },
+    setClipboard: (text) => { clipboard.writeText(text) },
+
     // tor
     getProgress: () => { return tor.getProgress(); },
     getBootLogs: () => { return tor.getBootLogs(); },
@@ -35,6 +41,14 @@ window.remoteControl = {
     },
     removeFriend: (address) => {
         contact.removeFriend(address);
+        contact.saveContact();
+    },
+
+    getNickname: (address) => {
+        return contact.getNickname(address);
+    },
+    setNickname: (address, nickname) => {
+        contact.setNickname(address, nickname);
         contact.saveContact();
     },
 
@@ -183,17 +197,26 @@ window.userList = {
 
     compareUser: (userA, userB) => {
         if (userA.connected && !userB.connected) { return -1; }
+        else if (userA.halfConnected && !userB.halfConnected) { return -1; }
+
         else if (!userA.connected && userB.connected) { return 1; }
-        else if (userA.connected && userB.connected) {
+        else if (!userA.halfConnected && userB.halfConnected) { return 1; }
+
+        else if ((userA.connected && userB.connected) || (userA.halfConnected && userB.halfConnected)) {
+
             if (userA.lastMessageDate > userB.lastMessageDate) { return -1; }
             else if (userA.lastMessageDate < userB.lastMessageDate) { return 1; }
+
             else { return 0; }
         }
-        else if (!userA.connected && !userB.connected) {
+        else if ((!userA.connected && !userB.connected) || (!userA.halfConnected && !userB.halfConnected)) {
+
             if (!contact.isBlack(userA.address) && contact.isBlack(userB.address)) { return -1; }
             else if (contact.isBlack(userA.address) && !contact.isBlack(userB.address)) { return 1; }
+
             else if (contact.isFriend(userA.address) && !contact.isFriend(userB.address)) { return -1; }
             else if (!contact.isFriend(userA.address) && contact.isFriend(userB.address)) { return 1; }
+
             else { return 0; }
         }
     },
