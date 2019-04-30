@@ -12,14 +12,20 @@ let mainWindowSetting = {
     minWidth: 600, minHeight: 400,
     resizable: true,
     webPreferences: {
-        nodeIntegration: true,
-        sandbox: true
+        nodeIntegration: true
     }
 };
 app.on('ready', () => {
     mainWindow = new BrowserWindow(mainWindowSetting);
 
-    mainWindow.loadURL(`file://${__dirname}/ui/index.html`)
+    //Security: set fake proxy to prevent connection to internet
+    mainWindow.webContents.session.setProxy({ proxyRules: "null://255.255.255.244:65535" }, () => {
+        mainWindow.loadURL(`file://${__dirname}/ui/index.html`);
+    });
+
+    //Security: prevent navigate to web pages.
+    mainWindow.webContents.on('will-navigate', (event, url) => { event.preventDefault(); })
+    mainWindow.webContents.on('will-redirect', (event, url) => { event.preventDefault(); })
 
     mainWindow.once('ready-to-show', () => { });
     mainWindow.once('close', () => { mainWindow = null; });

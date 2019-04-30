@@ -138,6 +138,7 @@ export default class ChatPage extends Component {
                     <div id='side-menu'>
                         <div id='my-name'>my name</div>
                         <div id='my-address'>my address</div>
+                        <a href="http://naver.com">Naver</a>
                         <div id='button-setting'
                             onClick={() => { this.props.selectPage(2) }}>
                             setting
