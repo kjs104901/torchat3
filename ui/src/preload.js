@@ -96,7 +96,12 @@ window.remoteControl = {
         const targetUser = contact.findUser(address);
         if (targetUser) {
             targetUser.sendMessage(message)
-                .catch((err) => { console.log(err); })
+                .catch((err) => {
+                    eventEmitter.emit('chatError', err);
+                })
+        }
+        else {
+            eventEmitter.emit('chatError', new Error("failed to find user"));
         }
     },
 
@@ -109,7 +114,10 @@ window.remoteControl = {
                     const targetUser = contact.findUser(address);
                     if (targetUser) {
                         targetUser.sendFileSend(file)
-                            .catch((err) => { console.log(err); })
+                            .catch((err) => { eventEmitter.emit('chatError', err); })
+                    }
+                    else {
+                        eventEmitter.emit('chatError', new Error("failed to find user"));
                     }
                 }
             });
@@ -120,7 +128,10 @@ window.remoteControl = {
         const targetUser = contact.findUser(address);
         if (targetUser) {
             targetUser.sendFileSend(file)
-                .catch((err) => { console.log(err); })
+                .catch((err) => { eventEmitter.emit('chatError', err); })
+        }
+        else {
+            eventEmitter.emit('chatError', new Error("failed to find user"));
         }
     },
 
@@ -128,14 +139,21 @@ window.remoteControl = {
         const targetUser = contact.findUser(address);
         if (targetUser) {
             targetUser.sendFileAccept(fileID)
-                .catch((err) => { console.log(err); })
+                .catch((err) => { eventEmitter.emit('chatError', err); })
+        }
+        else {
+            eventEmitter.emit('chatError', new Error("failed to find user"));
         }
     },
 
     cancelFile: (address, fileID) => {
         const targetUser = contact.findUser(address);
         if (targetUser) {
-            targetUser.fileCancel(fileID);
+            targetUser.fileCancel(fileID)
+                .catch((err) => { eventEmitter.emit('chatError', err); })
+        }
+        else {
+            eventEmitter.emit('chatError', new Error("failed to find user"));
         }
     }
 }

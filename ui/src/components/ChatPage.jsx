@@ -12,6 +12,31 @@ const MySwal = withReactContent(Swal)
 
 import ChatMessage from './ChatMessage';
 
+//test temp example
+/**
+MySwal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'okay',
+    cancelButtonText: 'cancel',
+    heightAuto: false,
+    width: 400,
+}).then((result) => {
+    if (result.value) {
+        MySwal.fire({
+            title: 'Deleted!',
+            text: 'Your file has been deleted.',
+            heightAuto: false,
+            width: 400,
+        })
+    }
+})
+*/
+
+
 export default class ChatPage extends Component {
     constructor(props) {
         super(props);
@@ -26,15 +51,30 @@ export default class ChatPage extends Component {
     componentDidMount() {
         userList.event.on('updated', this.updateUI);
         remoteControl.event.on('contactUpdate', this.updateUI);
+        remoteControl.event.on('chatError', this.showError);
     }
 
     componentWillUnmount() {
         userList.event.removeListener('updated', this.updateUI);
         remoteControl.event.removeListener('contactUpdate', this.updateUI);
+        remoteControl.event.removeListener('chatError', this.showError);
     }
 
     updateUI = () => {
         this.forceUpdate();
+    }
+
+    showError = (err) => {
+        console.log(err);
+        let errStr = err.message;
+        if (errStr) {
+            MySwal.fire({
+                title: 'Error',
+                text: errStr,
+                heightAuto: false,
+                width: 400,
+            })
+        }
     }
 
     addFriendInput = () => { remoteControl.addFriend(this.state.inputUserAddress); }
@@ -43,7 +83,6 @@ export default class ChatPage extends Component {
     removeFriend = (targetAddress) => { remoteControl.removeFriend(targetAddress); }
     setNicknameDialog = (targetAddress) => {
         let inputValue = remoteControl.getNickname(targetAddress);
-
         MySwal.fire({
             title: 'Add nickname test',
             input: 'text',
@@ -164,27 +203,7 @@ export default class ChatPage extends Component {
         console.log()
         if (files.length > 10) {
             //TODO 10개 이상 안된다는 메시지 띄우기
-
-            MySwal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'okay',
-                cancelButtonText: 'cancel',
-                heightAuto: false,
-                width: 400,
-            }).then((result) => {
-                if (result.value) {
-                    MySwal.fire({
-                        title: 'Deleted!',
-                        text: 'Your file has been deleted.',
-                        heightAuto: false,
-                        width: 400,
-                    })
-                }
-            })
+            this.showError(new Error("more than 10 files"))
         }
         else {
             for (let index = 0; index < files.length; index++) {

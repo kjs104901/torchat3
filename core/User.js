@@ -598,21 +598,29 @@ class User extends EventEmitter {
     }
 
     fileCancel(fileID) { //interface
-        this.fileSendList = this.fileSendList.filter((filesend) => {
-            if (filesend.fileID == fileID) {
-                this.emit('filecancel', filesend.fileID);
-                this.sendFileCancel(fileID);
-                return false;
-            }
-            return true;
-        })
-        this.fileRecvList = this.fileRecvList.filter((filerecv) => {
-            if (filerecv.fileID == fileID) {
-                this.emit('filecancel', filerecv.fileID);
-                return false;
-            }
-            return true;
-        })
+        return new Promise((resolve, reject) => {
+            let changed = false;
+            this.fileSendList = this.fileSendList.filter((filesend) => {
+                if (filesend.fileID == fileID) {
+                    this.emit('filecancel', filesend.fileID);
+                    this.sendFileCancel(fileID);
+                    changed = true;
+                    return false;
+                }
+                return true;
+            })
+            this.fileRecvList = this.fileRecvList.filter((filerecv) => {
+                if (filerecv.fileID == fileID) {
+                    this.emit('filecancel', filerecv.fileID);
+                    changed = true;
+                    return false;
+                }
+                return true;
+            })
+
+            if (changed) { resolve(); }
+            else { reject(new Error("no such file")); }
+        });
     }
 
     fileSlowFree(fileID) {
