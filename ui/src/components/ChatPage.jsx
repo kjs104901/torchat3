@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import FileDrop from 'react-file-drop';
 
-import userList from '../userList';
-import remoteControl from '../remoteControl';
-import langs from '../langs';
+const remoteControl = window.remoteControl;
+const userList = window.userList;
+const langs = window.langs;
 
 import ChatMessage from './ChatMessage';
 

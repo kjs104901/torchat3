@@ -5,7 +5,7 @@ import BootPage from './components/BootPage';
 import ChatPage from './components/ChatPage';
 import SettingPage from './components/SettingPage';
 
-import remoteControl from './remoteControl';
+const remoteControl = window.remoteControl;
 
 import './App.css'
 

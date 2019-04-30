@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 
-import userList from '../userList';
-
-import remoteControl from '../remoteControl';
+const remoteControl = window.remoteControl;
 
 export default class SettingPage extends Component {
     constructor(props) {
@@ -140,7 +138,7 @@ export default class SettingPage extends Component {
                         <div onClick={() => { this.selectSetting(1) }}>user profile</div>
                         <div onClick={() => { this.selectSetting(2) }}>connection</div>
                         <div onClick={() => { this.selectSetting(3) }}>blackList</div>
-                        <div onClick={() => { this.selectSetting(3) }}>appearence</div>
+                        <div onClick={() => { this.selectSetting(4) }}>appearence</div>
                     </div>
                 </div>
                 <div id='content'>

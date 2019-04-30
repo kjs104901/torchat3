@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 
-import userList from '../userList';
-import remoteControl from '../remoteControl';
+const remoteControl = window.remoteControl;
+const userList = window.userList;
 
 export default class ChatMessage extends Component {
     constructor(props) {

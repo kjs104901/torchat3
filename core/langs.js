@@ -1,8 +1,6 @@
-const { remote } = require('electron');
+const config = require('../config');
 
-const remoteControl = require('./remoteControl');
-
-const fs = remote.require('fs');
+const fs = require('fs');
 const parse = require('csv-parse/lib/sync')
 const input = fs.readFileSync('./languages.csv');
 const tempRecords = parse(input, { columns: true })
@@ -17,7 +15,7 @@ const types = ["English", "Korean"];
 exports.types = types;
 
 exports.trans = (str) => {
-    const type = remoteControl.getSetting().language;
+    const type = config.getSetting().language;
     let resultStr = "";
     if (records[str]) {
         const typeStr = (records[str])[type];

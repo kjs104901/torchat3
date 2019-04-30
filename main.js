@@ -1,10 +1,16 @@
 const { app, BrowserWindow, dialog } = require('electron');
+const path = require('path');
 
 const server = require('./core/server');
 const tor = require('./tor/tor');
-const User = require('./core/User');
 const contact = require('./core/contact');
-const config = require('./config');
+
+//Security: force sandbox mode
+if (process.argv.indexOf('--enable-sandbox') == -1) {
+    console.log("[Error] Not in sandbox mode!");
+    app.quit();
+    return;
+}
 
 let mainWindow
 let mainWindowSetting = {
@@ -12,18 +18,25 @@ let mainWindowSetting = {
     minWidth: 600, minHeight: 400,
     resizable: true,
     webPreferences: {
-        nodeIntegration: true
+        sandbox: true,
+        preload: path.join(__dirname, 'ui/src/preload.js')
     }
 };
+
+//Security: set a fake proxy to prevent the app from connecting to internet
+const fakeProxy = 'null://255.255.255.244:65535'
+app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); // map every hostname to local host
+app.commandLine.appendSwitch('proxy-server', fakeProxy);
+
 app.on('ready', () => {
     mainWindow = new BrowserWindow(mainWindowSetting);
 
-    //Security: set fake proxy to prevent connection to internet
-    mainWindow.webContents.session.setProxy({ proxyRules: "null://255.255.255.244:65535" }, () => {
+    //Security: set a fake proxy to prevent the app from connecting to internet
+    mainWindow.webContents.session.setProxy({ proxyRules: fakeProxy }, () => {
         mainWindow.loadURL(`file://${__dirname}/ui/index.html`);
     });
 
-    //Security: prevent navigate to web pages.
+    //Security: prevent the page from navigating to another web page.
     mainWindow.webContents.on('will-navigate', (event, url) => { event.preventDefault(); })
     mainWindow.webContents.on('will-redirect', (event, url) => { event.preventDefault(); })
 

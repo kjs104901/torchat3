@@ -8,8 +8,8 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import Switch from 'rc-switch';
 
 // modules
-import remoteControl from '../remoteControl';
-import langs from '../langs';
+const remoteControl = window.remoteControl;
+const langs = window.langs;
 
 // files
 import logo from '../assets/logo.png'
