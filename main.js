@@ -3,6 +3,7 @@ const path = require('path');
 
 const server = require('./core/server');
 const tor = require('./tor/tor');
+const torControl = require('./tor/torControl');
 const contact = require('./core/contact');
 
 //Security: force sandbox mode
@@ -60,10 +61,10 @@ async function boot() {
     await server.start();
     tor.start();
 
-    tor.event.once('success', () => { setInterval(autuAddUser, 1000 * 0.1); });
+    tor.event.once('success', () => {setInterval(autoAddUser, 1000 * 0.1);});
     tor.event.once('fail', () => { console.log("failed"); });
 }
 
-function autuAddUser() {
+function autoAddUser() {
     contact.addUserFromFriendList();
 }

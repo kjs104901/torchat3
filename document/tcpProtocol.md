@@ -12,7 +12,8 @@ The fisrt word of message indicates the type of message.
 
 Last of the message are arguments.
 
-If arguments have new line(0x0A) or space(0x20), they must be escaped.
+If arguments have posiblity of having new line(0x0A) or space(0x20),
+they must be escaped.
 
 ```
 (0x5C) -> (0x5C)(0x2F): \/
@@ -27,7 +28,7 @@ Client must unescape the arguments properly.
 
 ```
 ping [publicKeyStr(base64)] [randomStr] [signedStr(base64)]
-- signedStr is signed "publicKeyStr"+"randomStr" by secretKey
+- signedStr is signed "publicKeyStr"+"randomStr" by secretKey(ed25519-v3)
 pong [randomStr] [clientName] [clientVersion] 
 
 alive [userStatus] 

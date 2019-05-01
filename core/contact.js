@@ -81,6 +81,7 @@ function addUser(hostname) {
     targetUser.on('halfconnect', () => { eventEmitterUser.emit('userHalfConnect', hostname); })
     targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
     targetUser.on('disconnect', () => { eventEmitterUser.emit('userDisconnect', hostname); })
+    targetUser.on('destroy', () => { eventEmitterUser.emit('userDestroy', hostname); })
     targetUser.on('status', (status) => { eventEmitterUser.emit('userStatus', hostname, status); })
     targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
     targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })

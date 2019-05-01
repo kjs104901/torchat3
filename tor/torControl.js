@@ -78,6 +78,8 @@ exports.start = (controlPassword, keyPair) => {
                             `Flags=DiscardPK,Detach ` +
                             `Port=${constant.ServiceInsidePort},127.0.0.1:${config.getServicePort()} \r\n`
                         );
+
+                        controlHiddenServiceDestroy = false;
                     }
                 }
                 else if (!controlHiddenService) {
@@ -132,7 +134,7 @@ exports.controlCheckBootstrap = () => {
 exports.newHiddenService = () => {
     if (controlAuth && controlHiddenService) {
         controlHiddenServiceDestroy = true;
-        controlConnection.write(`DEL_ONION ${controlHiddenService} \r\n`);
         controlHiddenService = null;
+        controlConnection.write(`DEL_ONION ${controlHiddenService} \r\n`);
     }
 }

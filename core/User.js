@@ -173,6 +173,7 @@ class User extends EventEmitter {
         this.valid = false;
         this.destroyed = true;
         this.emit('disconnect');
+        this.emit('destroy')
     }
 
     isConnected() {

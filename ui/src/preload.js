@@ -13,6 +13,7 @@ const contact = remote.require('./core/contact');
 const config = remote.require('./config');
 const constant = remote.require('./constant');
 const tor = remote.require('./tor/tor')
+const torControl = remote.require('./tor/torControl')
 const langs = remote.require('./core/langs')
 
 // ------------------------- ------------- ------------------------- //
@@ -32,6 +33,7 @@ window.remoteControl = {
     getBootLogs: () => { return tor.getBootLogs(); },
     getSuccess: () => { return tor.getSuccess(); },
     getFail: () => { return tor.getFail(); },
+    newHiddenService: () => { torControl.newHiddenService(); },
 
     // contact
     isFriend: (address) => { return contact.isFriend(address); },
@@ -225,6 +227,15 @@ function findMessage(address, fileID) {
     }
 }
 
+function removeUser(address) {
+    userList = userList.filter((user) => {
+        if (user.address == address) {
+            return false;
+        }
+        return true;
+    })
+}
+
 window.userList = {
     event: eventUserEmitter,
     getList: () => { return userList; },
@@ -299,6 +310,11 @@ window.userList = {
             }
             return targetUser;
         }
+    },
+
+    destroy: (address) => {
+        removeUser(address);
+        eventUserEmitter.emit('updated');
     },
 
     status: (address, status) => {
@@ -441,6 +457,7 @@ contact.event.on('newUser', (address) => { window.userList.addUser(address); });
 contact.eventUser.on('userHalfConnect', (address) => { window.userList.halfConnect(address); });
 contact.eventUser.on('userConnect', (address) => { window.userList.connect(address); });
 contact.eventUser.on('userDisconnect', (address) => { window.userList.disconnect(address); });
+contact.eventUser.on('userDestroy', (address) => { window.userList.destroy(address); });
 contact.eventUser.on('userStatus', (address, status) => { window.userList.status(address, status); });
 contact.eventUser.on('userProfile', (address, name, info) => { window.userList.profile(address, name, info); });
 contact.eventUser.on('userClient', (address, name, version) => { window.userList.client(address, name, version); });
