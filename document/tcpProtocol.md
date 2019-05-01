@@ -26,8 +26,8 @@ Client must unescape the arguments properly.
 # list of message
 
 ```
-ping [hostname] [randomStr] 
 ping [publicKeyStr(base64)] [randomStr] [signedStr(base64)]
+- signedStr is signed "publicKeyStr"+"randomStr" by secretKey
 pong [randomStr] [clientName] [clientVersion] 
 
 alive [userStatus] 

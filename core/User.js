@@ -224,7 +224,8 @@ class User extends EventEmitter {
 
         const keyPair = tor.getKeyPair();
         const publicKeyStr = keyPair.public.toString('base64');
-        const signedStr = torUtil.sign(publicKeyStr + this.randomStr, keyPair.public, keyPair.secret);
+        const signed = torUtil.sign(publicKeyStr + this.randomStr, keyPair.public, keyPair.secret);
+        const signedStr = signed.toString('base64');
         protocol.ping(this.socketOut, publicKeyStr, this.randomStr, signedStr);
 
         this.socketOut.on('data', (data) => {
@@ -282,7 +283,7 @@ class User extends EventEmitter {
                 if (!protocol.validate(dataList)) { continue; }
                 switch (dataList[0]) {
                     case 'ping':
-                        publicKeyStr = Buffer.from(dataList[1]);
+                        publicKeyStr = dataList[1];
                         publicKey = Buffer.from(publicKeyStr, 'base64');
                         randomStrPong = dataList[2];
                         signedStr = dataList[3];

@@ -8,12 +8,16 @@ const child_process = require('child_process');
 const config = require('../config');
 
 const torDir = __dirname + "/bin";
-
-const secretKeyDir = torDir + "/hidden_service/secretKey";
-const publicKeyDir = torDir + "/hidden_service/publicKey";
+const hiddenServiceDir = torDir + "/hidden_service";
 
 exports.generateKeyPair = () => {
     let secret, public;
+
+    const secretKeyDir = hiddenServiceDir + "/secretKey";
+    const publicKeyDir = hiddenServiceDir + "/publicKey";
+
+    if (!fs.existsSync(hiddenServiceDir)) { fs.mkdirSync(hiddenServiceDir) }
+
     if (fs.existsSync(secretKeyDir) && fs.existsSync(publicKeyDir)) { // already exists
         secret = fs.readFileSync(secretKeyDir);
         public = fs.readFileSync(publicKeyDir);

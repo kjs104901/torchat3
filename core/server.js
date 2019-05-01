@@ -39,8 +39,11 @@ let server = net.createServer((client) => {
                     if (!protocol.validate(dataList)) { continue; }
                     switch (dataList[0]) {
                         case 'ping':
-                            publicKeyStr = Buffer.from(dataList[1]);
+                            publicKeyStr = dataList[1];
+                            //test
+                            console.log("publicKeyStr", publicKeyStr)
                             publicKey = Buffer.from(publicKeyStr, 'base64');
+                            console.log("publicKey.length", publicKey.length);
                             randomStrPong = dataList[2];
                             signedStr = dataList[3];
                             signed = Buffer.from(signedStr, 'base64');
@@ -58,7 +61,9 @@ let server = net.createServer((client) => {
                                     }
                                 }
                             }
-
+                            else {
+                                //TODO 소켓 삭제
+                            }
                             onStop = true;
                             break;
 
