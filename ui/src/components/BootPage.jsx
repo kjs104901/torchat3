@@ -19,9 +19,6 @@ export default class BootPage extends Component {
         super(props);
 
         let settingValue = remoteControl.getSetting();
-        //test
-        console.log("getVa1", remoteControl.getSetting());
-
         this.state = {
             inputTorrcExpand: settingValue.torrcExpand,
             inputUseBridge: settingValue.useBridge,

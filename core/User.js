@@ -28,6 +28,8 @@ const protocol = require('./protocol');
 const fileHandler = require('./fileHandler');
 const contact = require('./contact');
 
+const debug = require('./debug');
+
 class User extends EventEmitter {
     constructor(hostname) {
         super();
@@ -80,16 +82,16 @@ class User extends EventEmitter {
         if (!this.socketOut && this.socketOutConnecting == false && this.socketOutRetryWait == false) {
             if (contact.isFriend(this.hostname) || this.income || this.socketIn) {
                 this.income = false;
-                console.log("Try connecting to server");
+                debug.log("Try connecting to server");
                 this.socketOutConnecting = true;
                 this.connect()
                     .then((socket) => {
                         this.setSocketOut(socket);
-                        console.log("Connect success", this.hostname);
+                        debug.log("Connect success", this.hostname);
                         this.socketOutConnecting = false;
                     })
                     .catch((err) => {
-                        console.log("Connect failed: ", err);
+                        debug.log("Connect failed: ", err);
                         this.socketOutConnecting = false;
                         this.closeSocketOut();
                     })
@@ -104,10 +106,11 @@ class User extends EventEmitter {
             this.sendPong();
         }
 
-        if (!this.socketOut || !this.socketIn || !this.valid) {
+        if (!this.isValid()) {
             if (this.status != 0) {
                 this.status = 0;
                 this.emit('disconnect');
+                debug.log("emit disconnect");
             }
         }
 
@@ -119,6 +122,7 @@ class User extends EventEmitter {
             if (!this.halfConnected) {
                 this.halfConnected = true;
                 this.emit('halfconnect');
+                debug.log("emit halfconnect");
             }
         }
 
@@ -135,8 +139,7 @@ class User extends EventEmitter {
             timeout: constant.ProxyTimeOut
         };
 
-        //test
-        console.log("options", options);
+        debug.log("options", options);
 
         return new Promise((resolve, reject) => {
             this.socksClient = new SocksClient(options);
@@ -153,6 +156,8 @@ class User extends EventEmitter {
     closeSocketOut() {
         if (this.socketOut && !this.socketOut.destroyed) { this.socketOut.destroy(); }
 
+        debug.log("socketout close");
+
         this.socketOut = null;
         this.socketOutConnecting = false;
         this.socketOutRetryWait = true;
@@ -164,11 +169,15 @@ class User extends EventEmitter {
     closeSocketIn() {
         if (this.socketIn && !this.socketIn.destroyed) { this.socketIn.destroy(); }
 
+        debug.log("socketin close");
+
         this.socketIn = null;
         this.bufferIn = "";
     }
 
     destroy() {
+        debug.log("destroy");
+
         this.closeSocketOut();
         this.closeSocketIn();
         this.status = 0;
@@ -194,6 +203,7 @@ class User extends EventEmitter {
 
     validate(randomStr) {
         if (this.randomStr != randomStr) {
+            debug.log("validate fail");
             this.destroy();
         }
         else {
@@ -202,8 +212,7 @@ class User extends EventEmitter {
 
             this.incomeDestroyWait = false;
 
-            //test
-            console.log("valid")
+            debug.log("validate success")
 
             this.sendAlive();
             this.sendProfile();
@@ -213,15 +222,15 @@ class User extends EventEmitter {
     setSocketOut(socket) {
         this.socketOut = socket;
         this.socketOut.on('close', () => {
-            console.log('disconnected from server');
+            debug.log('disconnected from server');
             this.closeSocketOut();
         });
         this.socketOut.on('timeout', () => {
-            console.log('disconnected from server [timeout]');
+            debug.log('disconnected from server [timeout]');
             this.closeSocketOut();
         })
         this.socketOut.on('error', (err) => {
-            console.log('error from server');
+            debug.log('error from server');
             this.closeSocketOut();
         });
 
@@ -241,15 +250,15 @@ class User extends EventEmitter {
 
         this.socketIn = socket;
         this.socketIn.on('close', () => {
-            console.log('disconnected from client');
+            debug.log('disconnected from client');
             this.closeSocketIn();
         });
         this.socketIn.on('timeout', () => {
-            console.log('disconnected from client [timeout]');
+            debug.log('disconnected from client [timeout]');
             this.closeSocketIn();
         })
         this.socketIn.on('error', (err) => {
-            console.log('error from client');
+            debug.log('error from client');
             this.closeSocketIn();
         });
         this.socketIn.on('data', (data) => {
@@ -258,7 +267,7 @@ class User extends EventEmitter {
         this.socketIn.on('drain', () => {
             this.socketInDrain = true;
             //test
-            console.log("drain")
+            debug.log("drain")
         })
     }
 
@@ -273,8 +282,7 @@ class User extends EventEmitter {
 
         setTimeout(() => {
             if (this.incomeDestroyWait) {
-                //test
-                console.log("incomeDestroyWait")
+                debug.log("income Destroy Wait")
                 this.destroy();
             }
         }, constant.incomeUserWaitingTime);
@@ -309,12 +317,12 @@ class User extends EventEmitter {
                                 this.sendPongReq = true;
                             }
                             else {
-                                console.log("something wrong");
+                                debug.log("something wrong");
                                 this.destroy();
                             }
                         }
                         else {
-                            console.log("something wrong");
+                            debug.log("something wrong");
                             this.destroy();
                         }
                         break;
@@ -335,7 +343,7 @@ class User extends EventEmitter {
                         status = dataList[1] * 1;
 
                         //test
-                        console.log("recv Alive", this.hostname);
+                        debug.log("recv Alive", this.hostname);
                         if (this.status != status && status > 0) {
                             if (this.isValid()) {
                                 this.status = status;
@@ -393,7 +401,7 @@ class User extends EventEmitter {
                         fileID = dataList[1];
 
                         //test
-                        console.log('fileaccept', fileID);
+                        debug.log('fileaccept', fileID);
                         this.acceptFileSend(fileID);
                         break;
 
@@ -418,7 +426,7 @@ class User extends EventEmitter {
                         break;
 
                     default:
-                        console.log("Unknown instruction[in]: ", dataList);
+                        debug.log("Unknown instruction[in]: ", dataList);
                         break;
                 }
             }
@@ -464,7 +472,7 @@ class User extends EventEmitter {
                         break;
 
                     default:
-                        console.log("Unknown instruction[out]: ", dataList);
+                        debug.log("Unknown instruction[out]: ", dataList);
                         break;
                 }
             }
@@ -481,11 +489,11 @@ class User extends EventEmitter {
     sendAlive() {
         //test
         if (this.socketOut) {
-            console.log("send Alive", this.hostname);
+            debug.log("send Alive", this.hostname);
             protocol.alive(this.socketOut, config.getSetting().userStatus);
         }
         if (this.socketIn) {
-            console.log("send Alive", this.hostname);
+            debug.log("send Alive", this.hostname);
             protocol.alive(this.socketIn, config.getSetting().userStatus);
         }
     }
@@ -637,7 +645,7 @@ class User extends EventEmitter {
                     this.emit('filefinished', filesend.fileID);
 
                     //test
-                    console.log("filefinished1");
+                    debug.log("filefinished1");
                 }
             }
         });
@@ -648,7 +656,7 @@ class User extends EventEmitter {
             if (filesend.fileID == fileID) {
                 if (blockIndex < filesend.sendBlock) {
                     //test
-                    console.log("fileError", blockIndex)
+                    debug.log("fileError", blockIndex)
                     filesend.sendBlock = blockIndex;
                 }
             }
@@ -703,7 +711,7 @@ class User extends EventEmitter {
                     while (filesend.accepted && filesend.sendBlock < blockNum && filesend.sendBlock < filesend.okayBlock + constant.FileBlockWindow
                         && filesend.bufferSize < constant.FileBufferSize && this.socketInDrain) {
                         //test
-                        console.log("file read: ", path.basename(filesend.file));
+                        debug.log("file read: ", path.basename(filesend.file));
                         filesend.bufferSize += constant.FileBlockSize;
                         fileHandler.readFileBlock(filesend.file, constant.FileBlockSize, filesend.sendBlock)
                             .then((data) => {
@@ -719,7 +727,7 @@ class User extends EventEmitter {
                                 }
                             })
                             .catch((err) => {
-                                console.log(err);
+                                debug.log(err);
                                 filesend.bufferSize -= constant.FileBlockSize;
                                 filesend.accepted = false;
                                 this.emit('fileerror', filesend.fileID);
@@ -757,7 +765,7 @@ class User extends EventEmitter {
                                 filerecv.blockWriting = false;
                             })
                             .catch((err) => {
-                                console.log(err);
+                                debug.log(err);
                                 filerecv.blockWriting = false;
                                 filerecv.accepted = false;
                                 this.emit('fileerror', filerecv.fileID);
@@ -801,12 +809,12 @@ class User extends EventEmitter {
         if (this.isValid()) {
             this.fileSendList.forEach(filesend => {
                 //test
-                //console.log("WTF", filesend.accepted, filesend.finished, filesend.speedSize);
+                //debug.log("WTF", filesend.accepted, filesend.finished, filesend.speedSize);
                 if ((filesend.accepted || filesend.finished) && filesend.speedSize > 0) {
                     const speed = filesend.speedSize;
                     this.emit('filespeed', filesend.fileID, speed);
                     //test
-                    console.log("filespeed", speed);
+                    debug.log("filespeed", speed);
 
                     filesend.speedSize = 0;
                 }
@@ -817,7 +825,7 @@ class User extends EventEmitter {
                     const speed = filerecv.speedSize;
                     this.emit('filespeed', filerecv.fileID, speed);
                     //test
-                    console.log("filespeed", speed);
+                    debug.log("filespeed", speed);
 
                     filerecv.speedSize = 0;
                 }

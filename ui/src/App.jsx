@@ -47,8 +47,6 @@ export default class App extends Component {
 
     renderPage() {
         if (remoteControl.getSuccess() == false || remoteControl.getFail() == true) {
-            //test
-            console.log("bootrender");
             return (
                 <BootPage />
             )

@@ -5,6 +5,8 @@ const parser = require('../core/parser');
 const torUtils = require('./torUtils');
 const torControl = require('./torControl');
 
+const debug = require('../core/debug');
+
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
@@ -30,7 +32,7 @@ exports.start = () => {
     if (!keyPair) { eventEmitter.emit("fail"); return; }
 
     hostname = torUtils.generateHostname(keyPair.public);
-    console.log("hostname: ", hostname);
+    debug.log("hostname: ", hostname);
     if (!controlPassword) { eventEmitter.emit("fail"); return; }
     if (!hostname) { eventEmitter.emit("fail"); return; }
 
@@ -41,7 +43,7 @@ exports.start = () => {
         .then(() => {
             torControl.start(controlPassword, keyPair)
                 .catch((err) => {
-                    console.log(err);
+                    debug.log(err);
                     bootError = true;
                 })
         })

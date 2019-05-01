@@ -4,6 +4,7 @@ const constant = require('../constant');
 const contact = require('./contact');
 const protocol = require('./protocol');
 const parser = require('./parser');
+const debug = require('./debug');
 
 const torUtil = require('../tor/torUtils')
 
@@ -12,7 +13,7 @@ let server = net.createServer((client) => {
     let onStop = false;
     let arrivedPong;
 
-    console.log('Client connection in');
+    debug.log('Client connection in');
     client.setTimeout(constant.ConnectionTimeOut);
 
     let publicKeyStr, publicKey, signedStr, signed,
@@ -41,9 +42,9 @@ let server = net.createServer((client) => {
                         case 'ping':
                             publicKeyStr = dataList[1];
                             //test
-                            console.log("publicKeyStr", publicKeyStr)
+                            debug.log("publicKeyStr", publicKeyStr)
                             publicKey = Buffer.from(publicKeyStr, 'base64');
-                            console.log("publicKey.length", publicKey.length);
+                            debug.log("publicKey.length", publicKey.length);
                             randomStrPong = dataList[2];
                             signedStr = dataList[3];
                             signed = Buffer.from(signedStr, 'base64');
@@ -63,6 +64,8 @@ let server = net.createServer((client) => {
                             }
                             else {
                                 //TODO 소켓 삭제
+                                //test
+                                debug.log("key varify failed");
                             }
                             onStop = true;
                             break;
@@ -75,11 +78,11 @@ let server = net.createServer((client) => {
                             arrivedPong = {
                                 randomStrPong, clientName, clientVersion
                             }
-                            console.log("pong arrived before ping");
+                            debug.log("pong arrived before ping");
                             break;
 
                         default:
-                            console.log("Unknown instruction: ", dataList);
+                            debug.log("Unknown instruction: ", dataList);
                             break;
                     }
                 }

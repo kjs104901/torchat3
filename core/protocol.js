@@ -1,10 +1,11 @@
 const parser = require('./parser');
+const debug = require('./debug');
 
 function isSocketOkay(socket) {
     if (socket && !socket.destroyed) {
         return true;
     }
-    console.log("Socket Error");
+    debug.log("Socket Error");
     return false;
 }
 
@@ -91,6 +92,6 @@ exports.validate = (dataList) => {
         case 'filedata': isValid = (dataList.length == 5); break;
         default: isValid = true;  break;
     }
-    if (!isValid) { console.log("Invalid dataList", dataList); }
+    if (!isValid) { debug.log("Invalid dataList", dataList); }
     return isValid;
 }

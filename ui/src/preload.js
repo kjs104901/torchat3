@@ -369,8 +369,6 @@ window.userList = {
     },
 
     fileAccept: (address, fileID) => {
-        //test
-        console.log("accepted", address, fileID);
         const targetMessage = findMessage(address, fileID)
         if (targetMessage) {
             targetMessage.options.accepted = true;

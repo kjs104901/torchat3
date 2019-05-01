@@ -10,9 +10,7 @@ export default class ChatMessage extends Component {
 
         userList.event.on('updateFile', (address) => {
             if (address == this.props.selectedUser.address) {
-                //if file
                 this.forceUpdate();
-                console.log(this.props.selectedUser.messageList)
             }
         })
 

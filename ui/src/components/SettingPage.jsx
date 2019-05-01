@@ -12,8 +12,6 @@ export default class SettingPage extends Component {
         super(props);
 
         this.settingValue = remoteControl.getSetting();
-        //test
-        console.log("settingValue1", remoteControl.getSetting());
         this.state = {
             selectedSetting: 1, // 1: user profile // 2: connection // 3: blackList // 4: appearence
 

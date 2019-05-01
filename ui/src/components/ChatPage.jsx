@@ -94,11 +94,6 @@ export default class ChatPage extends Component {
             showCancelButton: true,
             heightAuto: false,
             width: 400,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to write something!'
-                }
-            }
         }).then((result) => {
             if (result) {
                 let nickname = result.value;
@@ -117,7 +112,7 @@ export default class ChatPage extends Component {
     sendMessage = () => {
         if (this.state.selectedUser && this.state.inputMessage.length > 0) {
             if (this.state.inputMessage.length > remoteControl.MaxLenChatMessage) {
-                this.showError("can't send over char: " + remoteControl.MaxLenChatMessage);
+                this.showError(new Error("can't send over char: " + remoteControl.MaxLenChatMessage));
             }
             else {
                 remoteControl.sendMessage(this.state.selectedUser.address, this.state.inputMessage);
@@ -214,9 +209,7 @@ export default class ChatPage extends Component {
     }
 
     handleDrop = (files, event) => {
-        console.log()
         if (files.length > 10) {
-            //TODO 10개 이상 안된다는 메시지 띄우기
             this.showError(new Error("more than 10 files"))
         }
         else {
