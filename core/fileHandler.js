@@ -50,7 +50,10 @@ function getMD5(targetStr) {
 exports.getMD5 = getMD5;
 
 function writeFileClear(file) {
-    fs.writeFileSync(file, '');
+    try {
+        fs.writeFileSync(file, '');
+        
+    } catch (error) {}
 }
 exports.writeFileClear = writeFileClear;
 

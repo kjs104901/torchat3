@@ -27,11 +27,11 @@ let socksPort;
 exports.start = () => {
     const controlPassword = torUtils.generateControlPassword();
     keyPair = torUtils.generateKeyPair();
+    if (!keyPair) { eventEmitter.emit("fail"); return; }
+
     hostname = torUtils.generateHostname(keyPair.public);
     console.log("hostname: ", hostname);
-
     if (!controlPassword) { eventEmitter.emit("fail"); return; }
-    if (!keyPair) { eventEmitter.emit("fail"); return; }
     if (!hostname) { eventEmitter.emit("fail"); return; }
 
     torUtils.makeTorrc(controlPassword);

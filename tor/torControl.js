@@ -37,7 +37,14 @@ exports.checkControlFile = () => {
 exports.start = (controlPassword, keyPair) => {
     return new Promise((resolve, reject) => {
         let controlPort;
-        const constrolPortStr = fs.readFileSync(controlPortFile, { encoding: 'utf8' });
+        const constrolPortStr;
+        try {
+            constrolPortStr = fs.readFileSync(controlPortFile, { encoding: 'utf8' });
+        } catch (error) {
+            reject(new Error("no control port file"));
+            return;
+        }
+
         if (constrolPortStr && constrolPortStr.split) {
             controlPort = ((constrolPortStr.split('\n'))[0]).replace('\r', '').substr(constrolPortStr.indexOf(':') + 1) * 1;
         }

@@ -19,17 +19,25 @@ exports.generateKeyPair = () => {
     if (!fs.existsSync(hiddenServiceDir)) { fs.mkdirSync(hiddenServiceDir) }
 
     if (fs.existsSync(secretKeyDir) && fs.existsSync(publicKeyDir)) { // already exists
-        secret = fs.readFileSync(secretKeyDir);
-        public = fs.readFileSync(publicKeyDir);
-        return { secret, public }
+        try {
+            secret = fs.readFileSync(secretKeyDir);
+            public = fs.readFileSync(publicKeyDir);
+            return { secret, public }
+        } catch (error) {
+            return;
+        }
     }
     else {
         const keyPair = ed.createKeyPair(Buffer.alloc(32, crypto.randomBytes(32)));
         secret = keyPair.secretKey;
         public = keyPair.publicKey;
-        fs.writeFileSync(secretKeyDir, secret);
-        fs.writeFileSync(publicKeyDir, public);
-        return { secret, public }
+        try {
+            fs.writeFileSync(secretKeyDir, secret);
+            fs.writeFileSync(publicKeyDir, public);
+            return { secret, public }
+        } catch (error) {
+            return;
+        }
     }
 }
 
@@ -80,9 +88,10 @@ exports.generateControlPassword = () => {
 exports.makeTorrc = (controlPassword) => {
     let bridgeLine = '';
     if (config.getSetting().bridge == 1) { bridgeLine = "Bridge " + config.getSetting().bridge; }
+    try {
 
-    fs.writeFileSync(__dirname + '/torrc',
-        `
+        fs.writeFileSync(__dirname + '/torrc',
+            `
 SocksPort auto
 ControlPort auto
 ControlPortWriteToFile ${torDir}/data/controlPort
@@ -95,4 +104,5 @@ DataDirectory ${torDir}/data
 GeoIPFile ${torDir}/data/geoip
 GeoIPv6File ${torDir}/data/geoipv6
     ` + config.getSetting().torrcExpand);
+    } catch (error) { }
 }
