@@ -1,23 +1,13 @@
+.day-mode{
+    --font-color: #000;
+
+    --background-color-1: #AAA;
+    --background-color-2: #888;
+    --background-color-3: #EEE;
+    --background-color-4: #EEE;
+    --background-color-5: #888;
+}
+
 .day-mode {
-    color: #000;
-}
-
-.day-mode #side-content {
-    background-color: #aaa;
-}
-
-.day-mode #side-menu {
-    background-color: #888;
-}
-
-.day-mode #content {
-    background-color: #eee;
-}
-
-.day-mode #message-list {
-    background-color: #eee;
-}
-
-.day-mode #message-input {
-    background-color: #888;
+    color: var(--font-color);
 }

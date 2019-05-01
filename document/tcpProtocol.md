@@ -24,7 +24,7 @@ they must be escaped.
 Client must unescape the arguments properly.
 
 
-# list of message
+# protocol of message
 
 ```
 ping [publicKeyStr(base64)] [randomStr] [signedStr(base64)]

@@ -37,7 +37,7 @@ exports.checkControlFile = () => {
 exports.start = (controlPassword, keyPair) => {
     return new Promise((resolve, reject) => {
         let controlPort;
-        const constrolPortStr;
+        let constrolPortStr;
         try {
             constrolPortStr = fs.readFileSync(controlPortFile, { encoding: 'utf8' });
         } catch (error) {

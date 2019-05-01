@@ -8,11 +8,11 @@ import SettingPage from './components/SettingPage';
 const remoteControl = window.remoteControl;
 
 import './assets/global.css'
+import './assets/themes/night.css'
+import './assets/themes/day.css'
 
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
-import './assets/themes/day.css'
-import './assets/themes/night.css'
 
 export default class App extends Component {
     constructor(props) {

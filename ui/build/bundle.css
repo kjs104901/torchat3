@@ -88,6 +88,56 @@ input[type=text]:focus, textarea:focus {
     left: 0px;
     height: 0px;
 }
+
+
+
+#side-content {
+    background-color: var(--background-color-1);
+}
+
+#side-menu {
+    background-color: var(--background-color-2);
+}
+
+#content {
+    background-color: var(--background-color-3);
+}
+
+#message-list {
+    background-color: var(--background-color-4);
+}
+
+#message-input {
+    background-color: var(--background-color-5);
+}
+.night-mode{
+    --font-color: #FFF;
+
+    --background-color-1: #111;
+    --background-color-2: #222;
+    --background-color-3: #333;
+    --background-color-4: #444;
+    --background-color-5: #555;
+}
+
+.night-mode {
+    color: var(--font-color);
+}
+
+.day-mode{
+    --font-color: #000;
+
+    --background-color-1: #AAA;
+    --background-color-2: #888;
+    --background-color-3: #EEE;
+    --background-color-4: #EEE;
+    --background-color-5: #888;
+}
+
+.day-mode {
+    color: var(--font-color);
+}
+
 /*
  * Container style
  */
@@ -207,49 +257,3 @@ input[type=text]:focus, textarea:focus {
 .scrollbar-container {
   position: relative;
   height: 100%; }
-.day-mode {
-    color: #000;
-}
-
-.day-mode #side-content {
-    background-color: #aaa;
-}
-
-.day-mode #side-menu {
-    background-color: #888;
-}
-
-.day-mode #content {
-    background-color: #eee;
-}
-
-.day-mode #message-list {
-    background-color: #eee;
-}
-
-.day-mode #message-input {
-    background-color: #888;
-}
-.night-mode {
-    color: #FFF;
-}
-
-.night-mode #side-content {
-    background-color: #111;
-}
-
-.night-mode #side-menu {
-    background-color: #222;
-}
-
-.night-mode #content {
-    background-color: #333;
-}
-
-.night-mode #message-list {
-    background-color: #444;
-}
-
-.night-mode #message-input {
-    background-color: #555;
-}
