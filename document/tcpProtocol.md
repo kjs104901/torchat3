@@ -27,6 +27,7 @@ Client must unescape the arguments properly.
 
 ```
 ping [hostname] [randomStr] 
+ping [publicKeyStr(base64)] [randomStr] [signedStr(base64)]
 pong [randomStr] [clientName] [clientVersion] 
 
 alive [userStatus] 

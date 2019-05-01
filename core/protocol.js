@@ -8,9 +8,9 @@ function isSocketOkay(socket) {
     return false;
 }
 
-exports.ping = (socket, hostname, randomStr) => {
+exports.ping = (socket, publicKeyStr, randomStr, signedStr) => {
     if (isSocketOkay(socket)) {
-        socket.write("ping " + hostname + ' ' + randomStr + '\n');
+        socket.write("ping " + publicKeyStr + ' ' + randomStr + ' ' + signedStr + '\n');
     }
 }
 
@@ -78,7 +78,7 @@ exports.filedata = (socket, fileID, blockIndex, blockHash, blockData) => {
 exports.validate = (dataList) => {
     let isValid = false;
     switch (dataList[0]) {
-        case 'ping': isValid = (dataList.length == 3); break;
+        case 'ping': isValid = (dataList.length == 4); break;
         case 'pong': isValid = (dataList.length == 4); break;
         case 'alive': isValid = (dataList.length == 2); break;
         case 'profile': isValid = (dataList.length == 3); break;

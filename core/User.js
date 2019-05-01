@@ -19,6 +19,7 @@ const path = require('path');
 const EventEmitter = require('events');
 
 const tor = require('../tor/tor');
+const torUtil = require('../tor/torUtils')
 const config = require('../config');
 const constant = require('../constant');
 
@@ -221,7 +222,10 @@ class User extends EventEmitter {
             this.closeSocketOut();
         });
 
-        protocol.ping(this.socketOut, tor.getHostname(), this.randomStr);
+        const keyPair = tor.getKeyPair();
+        const publicKeyStr = keyPair.public.toString('base64');
+        const signedStr = torUtil.sign(publicKeyStr + this.randomStr, keyPair.public, keyPair.secret);
+        protocol.ping(this.socketOut, publicKeyStr, this.randomStr, signedStr);
 
         this.socketOut.on('data', (data) => {
             this.bufferOut += data.toString('binary');
@@ -264,6 +268,7 @@ class User extends EventEmitter {
 
     bufferCheck() {
         if (this.bufferIn && this.bufferIn.length > 0) {
+            let publicKeyStr, publicKey, signedStr, signed;
             let hostname, randomStrPong, clientName, clientVersion;
             let status, profileName, profileInfo;
             let message;
@@ -277,15 +282,27 @@ class User extends EventEmitter {
                 if (!protocol.validate(dataList)) { continue; }
                 switch (dataList[0]) {
                     case 'ping':
-                        hostname = dataList[1];
+                        publicKeyStr = Buffer.from(dataList[1]);
+                        publicKey = Buffer.from(publicKeyStr, 'base64');
                         randomStrPong = dataList[2];
-                        if (this.hostname != hostname) {
+                        signedStr = dataList[3];
+                        signed = Buffer.from(signedStr, 'base64');
+
+                        hostname = torUtil.generateHostname(publicKey);
+                        if (torUtil.verify(publicKeyStr + randomStrPong, signed, publicKey)) {
+                            if (this.hostname == hostname) {
+                                this.randomStrPong = randomStrPong;
+                                this.sendPongReq = true;
+                            }
+                            else {
+                                console.log("something wrong");
+                                this.destroy();
+                            }
+                        }
+                        else {
                             console.log("something wrong");
                             this.destroy();
                         }
-
-                        this.randomStrPong = randomStrPong;
-                        this.sendPongReq = true;
                         break;
 
                     case 'pong':

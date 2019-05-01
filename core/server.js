@@ -5,6 +5,8 @@ const contact = require('./contact');
 const protocol = require('./protocol');
 const parser = require('./parser');
 
+const torUtil = require('../tor/torUtils')
+
 let server = net.createServer((client) => {
     let dataBuffer = "";
     let onStop = false;
@@ -13,7 +15,8 @@ let server = net.createServer((client) => {
     console.log('Client connection in');
     client.setTimeout(constant.ConnectionTimeOut);
 
-    let hostname, randomStrPong, targetUser, clientName, clientVersion;
+    let publicKeyStr, publicKey, signedStr, signed,
+        hostname, randomStrPong, targetUser, clientName, clientVersion;
     client.on('data', (data) => {
         if (onStop) {
             dataBuffer = "";
@@ -36,19 +39,26 @@ let server = net.createServer((client) => {
                     if (!protocol.validate(dataList)) { continue; }
                     switch (dataList[0]) {
                         case 'ping':
-                            hostname = dataList[1];
+                            publicKeyStr = Buffer.from(dataList[1]);
+                            publicKey = Buffer.from(publicKeyStr, 'base64');
                             randomStrPong = dataList[2];
+                            signedStr = dataList[3];
+                            signed = Buffer.from(signedStr, 'base64');
 
-                            targetUser = contact.addIncomingUser(hostname, randomStrPong);
-                            if (targetUser) {
-                                client.removeAllListeners();
-                                targetUser.setSocketIn(client, dataBuffer);
-                                if (arrivedPong) {
-                                    targetUser.validate(arrivedPong.randomStrPong);
-                                    targetUser.clientName = arrivedPong.clientName;
-                                    targetUser.clientVersion = arrivedPong.clientVersion;
+                            hostname = torUtil.generateHostname(publicKey);
+                            if (torUtil.verify(publicKeyStr + randomStrPong, signed, publicKey)) {
+                                targetUser = contact.addIncomingUser(hostname, randomStrPong);
+                                if (targetUser) {
+                                    client.removeAllListeners();
+                                    targetUser.setSocketIn(client, dataBuffer);
+                                    if (arrivedPong) {
+                                        targetUser.validate(arrivedPong.randomStrPong);
+                                        targetUser.clientName = arrivedPong.clientName;
+                                        targetUser.clientVersion = arrivedPong.clientVersion;
+                                    }
                                 }
                             }
+
                             onStop = true;
                             break;
 

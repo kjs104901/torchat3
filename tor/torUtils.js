@@ -41,6 +41,14 @@ exports.generateHostname = (publicKey) => {
     return base32Encoder.write(Buffer.concat([publicKey, checksum, version])).finalize();
 }
 
+exports.sign = (content, publicKey, secretKey) => {
+    return ed.sign(content, publicKey, secretKey);
+}
+
+exports.verify = (content, signature, publicKey) => {
+    return ed.verify(signature, content, publicKey)
+}
+
 exports.generateControlPassword = () => {
     const controlPassword = crypto.randomBytes(20).toString('hex');
     let controlPasswordHashed;
