@@ -27,6 +27,9 @@ let mainWindowSetting = {
 const fakeProxy = 'null://255.255.255.0:65535'
 app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); // map every hostname to local host
 app.commandLine.appendSwitch('proxy-server', fakeProxy);
+app.commandLine.appendSwitch('disable-extensions');
+app.commandLine.appendSwitch('disable-plugins');
+app.commandLine.appendSwitch('disable-bundled-ppapi-flash');
 
 app.on('ready', () => {
     mainWindow = new BrowserWindow(mainWindowSetting);

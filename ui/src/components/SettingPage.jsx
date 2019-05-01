@@ -45,15 +45,17 @@ export default class SettingPage extends Component {
     }
 
     showError = (err) => {
-        console.log(err);
-        let errStr = err.message;
-        if (errStr) {
-            MySwal.fire({
-                title: 'Error',
-                text: errStr,
-                heightAuto: false,
-                width: 400,
-            })
+        if (err) {
+            console.log(err);
+            let errStr = err.message;
+            if (errStr) {
+                MySwal.fire({
+                    title: 'Error',
+                    text: errStr,
+                    heightAuto: false,
+                    width: 400,
+                })
+            }
         }
     }
 
@@ -64,6 +66,9 @@ export default class SettingPage extends Component {
     saveProfile = () => {
         if (this.state.inputProfileName > remoteControl.MaxLenProfileName) {
             this.showError(new Error("profile name too long"));
+        }
+        else if ((/^[\x00-\xFF]*$/).test(this.state.inputProfileName) == false) {
+            this.showError(new Error("profile name only ascii"));
         }
         else if (this.state.inputProfileInfo > remoteControl.MaxLenProfileInfo) {
             this.showError(new Error("profile info too long"));
@@ -143,7 +148,7 @@ export default class SettingPage extends Component {
                 <React.Fragment>
                     <div onClick={() => { this.switchNightMode() }}>
                         {this.settingValue.nigthMode ? "nightmode" : "daymode"}
-                    </div>  
+                    </div>
                 </React.Fragment>)
 
         }

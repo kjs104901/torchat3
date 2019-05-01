@@ -9,7 +9,8 @@ module.exports = {
 
     ConnectionTimeOut: 1000 * 60 * 3, // minuites
     ConnectionRetryTime: 1000 * 30, // seconds
-    ProxyTimeOut: 1000 * 60 * 3, // minuites
+    ProxyTimeOut: 1000 * 60 * 3, // minutes
+    incomeUserWaitingTime: 1000 * 60 * 2, // minutes
 
     ServiceInsidePort: 12009,
 

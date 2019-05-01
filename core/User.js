@@ -43,10 +43,11 @@ class User extends EventEmitter {
         this.hostname = hostname;
         this.valid = false;
         this.destroyed = false;
-        this.halfConnected = false;
+        this.halfConnected = false; // turn on: even one connection, turn off: both disconnected
         this.status = 0;
 
         this.income = false;
+        this.incomeDestroyWait = false;
 
         this.profileName = "";
         this.profileInfo = "";
@@ -104,17 +105,15 @@ class User extends EventEmitter {
         if (!this.socketOut || !this.socketIn || !this.valid) {
             if (this.status != 0) {
                 this.status = 0;
-                this.halfConnected = false;
                 this.emit('disconnect');
             }
         }
 
         if (!this.socketOut && !this.socketIn) {
-            if (this.halfConnected) {
-                this.halfConnected = false;
-            }
+            this.halfConnected = false;
         }
-        else if (!this.socketOut || !this.socketIn) {
+
+        if ((!this.socketOut && this.socketIn) || (this.socketOut && !this.socketIn)) {
             if (!this.halfConnected) {
                 this.halfConnected = true;
                 this.emit('halfconnect');
@@ -196,8 +195,9 @@ class User extends EventEmitter {
         }
         else {
             this.valid = true;
-            this.halfConnected = false;
             this.emit('connect');
+
+            this.incomeDestroyWait = false;
 
             //test
             console.log("valid")
@@ -261,10 +261,20 @@ class User extends EventEmitter {
 
     hasIncome(randomStrPong) {
         this.income = true;
+        this.incomeDestroyWait = true;
+
         this.socketOutRetryWait = false;
 
         this.randomStrPong = randomStrPong;
         this.sendPongReq = true;
+
+        setTimeout(() => {
+            if (this.incomeDestroyWait) {
+                //test
+                console.log("incomeDestroyWait")
+                this.destroy();
+            }
+        }, constant.incomeUserWaitingTime);
     }
 
     bufferCheck() {
@@ -319,13 +329,15 @@ class User extends EventEmitter {
                         break;
 
                     case 'alive':
-                        status = dataList[1];
+                        status = dataList[1] * 1;
 
                         //test
                         console.log("recv Alive", this.hostname);
-                        if (this.status != status * 1) {
-                            this.status = status * 1;
-                            this.emit('status', status);
+                        if (this.status != status && status > 0) {
+                            if (this.isValid()) {
+                                this.status = status;
+                                this.emit('status', status);
+                            }
                         }
                         break;
 
@@ -335,6 +347,7 @@ class User extends EventEmitter {
 
                         profileName = parser.removeNewline(parser.unescape(profileName));
                         profileName = parser.limitateLength(profileName, constant.MaxLenProfileName);
+                        profileName = parser.letOnlyAscii(profileName);
 
                         profileInfo = parser.unescape(profileInfo);
                         profileInfo = parser.limitateLength(profileInfo, constant.MaxLenProfileInfo);
@@ -440,6 +453,9 @@ class User extends EventEmitter {
 
                         break;
 
+                    case 'alive':
+                        break;
+
                     default:
                         console.log("Unknown instruction[out]: ", dataList);
                         break;
@@ -456,12 +472,15 @@ class User extends EventEmitter {
     }
 
     sendAlive() {
-        //if (!this.isValid()) { return; } // to send alive while waiting for other side come.
-        if (!this.socketOut) { return; }
-
         //test
-        console.log("send Alive", this.hostname);
-        protocol.alive(this.socketOut, config.getSetting().userStatus);
+        if (this.socketOut) {
+            console.log("send Alive", this.hostname);
+            protocol.alive(this.socketOut, config.getSetting().userStatus);
+        }
+        if (this.socketIn) {
+            console.log("send Alive", this.hostname);
+            protocol.alive(this.socketIn, config.getSetting().userStatus);
+        }
     }
 
     sendProfile() {

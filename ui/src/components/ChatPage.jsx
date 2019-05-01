@@ -67,15 +67,17 @@ export default class ChatPage extends Component {
     }
 
     showError = (err) => {
-        console.log(err);
-        let errStr = err.message;
-        if (errStr) {
-            MySwal.fire({
-                title: 'Error',
-                text: errStr,
-                heightAuto: false,
-                width: 400,
-            })
+        if (err) {
+            console.log(err);
+            let errStr = err.message;
+            if (errStr) {
+                MySwal.fire({
+                    title: 'Error',
+                    text: errStr,
+                    heightAuto: false,
+                    width: 400,
+                })
+            }
         }
     }
 
@@ -98,9 +100,14 @@ export default class ChatPage extends Component {
                 }
             }
         }).then((result) => {
-            let nickname = result.value;
-            if (nickname) {
-                remoteControl.setNickname(targetAddress, nickname);
+            if (result) {
+                let nickname = result.value;
+                if (nickname) {
+                    remoteControl.setNickname(targetAddress, nickname);
+                }
+                else {
+                    remoteControl.setNickname(targetAddress, "");
+                }
             }
         })
     }

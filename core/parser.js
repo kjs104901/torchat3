@@ -48,6 +48,16 @@ function limitateLength(targetStr, limit) {
 }
 exports.limitateLength = limitateLength
 
+function isOnlyAscii(targetStr) {
+    return (/^[\x00-\xFF]*$/).test(targetStr);
+}
+exports.isOnlyAscii = isOnlyAscii;
+
+function letOnlyAscii(targetStr) {
+    return targetStr.replace(/[^\x00-\xFF]/g, "");
+}
+exports.letOnlyAscii = letOnlyAscii;
+
 function findStringBetween(str, a, b) {
     if (temp = findStringAfter(str, a)) {
         if (temp = findStringBefore(temp, b)) {

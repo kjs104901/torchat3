@@ -268,7 +268,7 @@ window.userList = {
     },
 
     halfConnect: (address) => {
-        const targetUser = findUser(address);
+        let targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.halfConnected != true) {
                 targetUser.halfConnected = true;
@@ -279,7 +279,7 @@ window.userList = {
     },
 
     connect: (address) => {
-        const targetUser = findUser(address);
+        let targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.connected != true) {
                 targetUser.connected = true;
@@ -290,10 +290,10 @@ window.userList = {
     },
 
     disconnect: (address) => {
-        const targetUser = findUser(address);
+        let targetUser = findUser(address);
         if (targetUser) {
+            targetUser.halfConnected = false;
             if (targetUser.connected != false) {
-                targetUser.halfConnected = false;
                 targetUser.connected = false;
                 eventUserEmitter.emit('updated');
             }
@@ -302,7 +302,7 @@ window.userList = {
     },
 
     status: (address, status) => {
-        const targetUser = findUser(address);
+        let targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.status != status) {
                 targetUser.status = status;
