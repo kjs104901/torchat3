@@ -351,9 +351,11 @@ class User extends EventEmitter {
                         profileName = parser.removeNewline(parser.unescape(profileName));
                         profileName = parser.limitateLength(profileName, constant.MaxLenProfileName);
                         profileName = parser.letOnlyAscii(profileName);
+                        profileName = parser.preventXSS(profileName);
 
                         profileInfo = parser.unescape(profileInfo);
                         profileInfo = parser.limitateLength(profileInfo, constant.MaxLenProfileInfo);
+                        profileInfo = parser.preventXSS(profileInfo);
 
                         this.profileName = profileName;
                         this.profileInfo = parser.unescape(profileInfo);
@@ -365,6 +367,7 @@ class User extends EventEmitter {
                         message = dataList[1];
                         message = parser.unescape(message);
                         message = parser.limitateLength(message, constant.MaxLenChatMessage);
+                        message = parser.preventXSS(message);
 
                         this.pushMessage(message, { fromMe: false });
                         break;
@@ -377,6 +380,7 @@ class User extends EventEmitter {
                         fileName = parser.removeNewline(parser.unescape(fileName));
                         parsed = path.parse(fileName);
                         fileName = parser.limitateLength(parsed.name, constant.MaxLenFileName) + parsed.ext;
+                        fileName = parser.preventXSS(fileName);
 
                         this.pushMessage(fileName, {
                             fromMe: false,

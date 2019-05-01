@@ -1,3 +1,6 @@
+const xss = require("xss");
+const xssFilters = require('xss-filters');
+
 exports.buffer = (dataBuffer) => {
     const newLinePos = dataBuffer.indexOf('\n');
     const dataStr = dataBuffer.substring(0, newLinePos);
@@ -57,6 +60,12 @@ function letOnlyAscii(targetStr) {
     return targetStr.replace(/[^\x00-\xFF]/g, "");
 }
 exports.letOnlyAscii = letOnlyAscii;
+
+function preventXSS(str) {
+    str = str.toString('utf8');
+    return xssFilters.inHTMLData(xss(str));
+}
+exports.preventXSS = preventXSS;
 
 function findStringBetween(str, a, b) {
     if (temp = findStringAfter(str, a)) {
