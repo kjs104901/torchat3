@@ -52,12 +52,14 @@ export default class ChatPage extends Component {
         userList.event.on('updated', this.updateUI);
         remoteControl.event.on('contactUpdate', this.updateUI);
         remoteControl.event.on('chatError', this.showError);
+        remoteControl.event.on('contactError', this.showError);
     }
 
     componentWillUnmount() {
         userList.event.removeListener('updated', this.updateUI);
         remoteControl.event.removeListener('contactUpdate', this.updateUI);
         remoteControl.event.removeListener('chatError', this.showError);
+        remoteControl.event.removeListener('contactError', this.showError);
     }
 
     updateUI = () => {
@@ -107,10 +109,15 @@ export default class ChatPage extends Component {
 
     sendMessage = () => {
         if (this.state.selectedUser && this.state.inputMessage.length > 0) {
-            remoteControl.sendMessage(this.state.selectedUser.address, this.state.inputMessage);
-            this.setState({
-                inputMessage: ""
-            })
+            if (this.state.inputMessage.length > remoteControl.MaxLenChatMessage) {
+                this.showError("can't send over char: " + remoteControl.MaxLenChatMessage);
+            }
+            else {
+                remoteControl.sendMessage(this.state.selectedUser.address, this.state.inputMessage);
+                this.setState({
+                    inputMessage: ""
+                })
+            }
         }
     }
 
@@ -221,6 +228,8 @@ export default class ChatPage extends Component {
             else {
                 this.sendMessage();
             }
+            event.preventDefault();
+            event.stopPropagation();
         }
     }
 
@@ -231,7 +240,6 @@ export default class ChatPage extends Component {
                     <div id='side-menu'>
                         <div id='my-name'>my name</div>
                         <div id='my-address'>my address</div>
-                        <a href="http://naver.com">Naver</a>
                         <div id='button-setting'
                             onClick={() => { this.props.selectPage(2) }}>
                             setting
@@ -245,7 +253,7 @@ export default class ChatPage extends Component {
                             <div onClick={() => {
                                 this.setState({ inputUserAddress: remoteControl.getClipboard() })
                             }}>cilp</div>
-                            <div onClick={() => { this.addFriendInput() }}>{langs.trans("Add a friend")}</div>
+                            <div onClick={() => { this.addFriendInput() }}>{langs.get("ButtonAddFriend")}</div>
                         </div>
                         <div id='user-list'>
                             {this.renderUserList()}

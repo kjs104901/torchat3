@@ -14,17 +14,18 @@ tempRecords.forEach((record) => {
 const types = ["English", "Korean"];
 exports.types = types;
 
-exports.trans = (str) => {
+exports.get = (str) => {
     const type = config.getSetting().language;
-    let resultStr = "";
     if (records[str]) {
         const typeStr = (records[str])[type];
         if (typeStr && typeStr.length > 0) {
-            resultStr = typeStr;
+            return typeStr;
         }
         else {
-            resultStr = (records[str])["English"];
+            return (records[str])["English"];
         }
     }
-    return resultStr;
+    else {
+        return str;
+    }
 }

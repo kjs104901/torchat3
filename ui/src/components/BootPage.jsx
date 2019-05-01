@@ -55,7 +55,7 @@ export default class BootPage extends Component {
                     <h1>Torchat3</h1>
                     <Line percent={remoteControl.getProgress()} strokeWidth="2" strokeColor="#5C3E73" style={{ width: 400 }} /><br />
                     {remoteControl.getProgress()}%<br /><br />
-                    <Collapsible trigger={langs.trans("MenuTorConf")} transitionTime={100}>
+                    <Collapsible trigger={langs.get("ButtonTorConf")} transitionTime={100}>
                         <input type="text"
                             value={this.state.inputTorrcExpand}
                             onChange={(e) => { this.setState({ inputTorrcExpand: e.target.value }) }} />

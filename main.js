@@ -58,7 +58,7 @@ async function boot() {
     tor.start();
 
     tor.event.once('success', () => { setInterval(autuAddUser, 1000 * 0.1); });
-    tor.event.once('fail', () => { console.log(err); });
+    tor.event.once('fail', () => { console.log("failed"); });
 }
 
 function autuAddUser() {

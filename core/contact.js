@@ -1,4 +1,5 @@
 const config = require('../config');
+const constant = require('../constant');
 const User = require('./User');
 const EventEmitter = require('events');
 
@@ -12,10 +13,10 @@ exports.normalizeHostname = normalizeHostname;
 function checkHostname(hostname) {
     let valid = true;
     hostname = normalizeHostname(hostname);
-    if (config.system.HiddenServiceVersion == 3) {
+    if (constant.HiddenServiceVersion == 3) {
         if (hostname.length != 56) { return false; }
     }
-    else if (config.system.HiddenServiceVersion == 2) {
+    else if (constant.HiddenServiceVersion == 2) {
         if (hostname.length != 16) { return false; }
     }
     hostname.split('').forEach(char => {
@@ -145,7 +146,7 @@ function removeDestroyedUser() {
  */
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync(config.system.ContactFile);
+const adapter = new FileSync(constant.ContactFile);
 const contactDB = low(adapter);
 contactDB.defaults({ friend: [], nickname: {}, black: [], white: [] })
     .write()
@@ -169,19 +170,25 @@ exports.isFriend = (hostname) => {
     return true;
 }
 exports.addFriend = (address) => {
-    const hostname = normalizeHostname(address);
-    if (!checkHostname(hostname)) { return; }
-    if (friendList.indexOf(hostname) > -1) { return; }
+    return new Promise((resolve, reject) => {
+        const hostname = normalizeHostname(address);
+        if (!checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
+        if (friendList.indexOf(hostname) > -1) { reject(new Error('already friend')); return; }
 
-    friendList.push(hostname);
-    eventEmitter.emit('contactUpdate')
+        friendList.push(hostname);
+        eventEmitter.emit('contactUpdate')
+        resolve();
+    })
 }
 exports.removeFriend = (address) => {
-    const hostname = normalizeHostname(address);
-    if (friendList.indexOf(hostname) == -1) { return; }
+    return new Promise((resolve, reject) => {
+        const hostname = normalizeHostname(address);
+        if (friendList.indexOf(hostname) == -1) { reject(new Error('not friend')); return; }
 
-    friendList.splice(friendList.indexOf(hostname), 1);
-    eventEmitter.emit('contactUpdate')
+        friendList.splice(friendList.indexOf(hostname), 1);
+        eventEmitter.emit('contactUpdate')
+        resolve();
+    })
 }
 
 // ############################ nickname List ############################ //
@@ -216,19 +223,25 @@ function isBlack(hostname) {
 }
 exports.isBlack = isBlack;
 exports.addBlack = (address) => {
-    const hostname = normalizeHostname(address);
-    if (!checkHostname(hostname)) { return; }
-    if (blackList.indexOf(hostname) > -1) { return; }
+    return new Promise((resolve, reject) => {
+        const hostname = normalizeHostname(address);
+        if (!checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
+        if (blackList.indexOf(hostname) > -1) { reject(new Error('already black')); return; }
 
-    blackList.push(hostname);
-    eventEmitter.emit('contactUpdate');
+        blackList.push(hostname);
+        eventEmitter.emit('contactUpdate');
+        resolve();
+    })
 }
 exports.removeBlack = (address) => {
-    const hostname = normalizeHostname(address);
-    if (blackList.indexOf(hostname) == -1) { return; }
+    return new Promise((resolve, reject) => {
+        const hostname = normalizeHostname(address);
+        if (blackList.indexOf(hostname) == -1) { reject(new Error('not black')); return; }
 
-    blackList.splice(blackList.indexOf(hostname), 1);
-    eventEmitter.emit('contactUpdate');
+        blackList.splice(blackList.indexOf(hostname), 1);
+        eventEmitter.emit('contactUpdate');
+        resolve();
+    })
 }
 
 // ############################ White List ############################ //
@@ -242,17 +255,23 @@ function isWhite(hostname) {
 }
 exports.isWhite = isWhite;
 exports.addWhite = (address) => {
-    const hostname = normalizeHostname(address);
-    if (!checkHostname(hostname)) { return; }
-    if (whiteList.indexOf(hostname) > -1) { return; }
+    return new Promise((resolve, reject) => {
+        const hostname = normalizeHostname(address);
+        if (!checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
+        if (whiteList.indexOf(hostname) > -1) { reject(new Error('already white')); return; }
 
-    whiteList.push(hostname);
-    eventEmitter.emit('contactUpdate');
+        whiteList.push(hostname);
+        eventEmitter.emit('contactUpdate');
+        resolve();
+    })
 }
 exports.removeWhite = (address) => {
-    const hostname = normalizeHostname(address);
-    if (whiteList.indexOf(hostname) == -1) { return; }
+    return new Promise((resolve, reject) => {
+        const hostname = normalizeHostname(address);
+        if (whiteList.indexOf(hostname) == -1) { reject(new Error('not white')); return; }
 
-    whiteList.splice(whiteList.indexOf(hostname), 1);
-    eventEmitter.emit('contactUpdate');
+        whiteList.splice(whiteList.indexOf(hostname), 1);
+        eventEmitter.emit('contactUpdate');
+        resolve();
+    })
 }

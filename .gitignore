@@ -4,6 +4,7 @@ setting
 contact
 temp/
 dist/
+node_modulesOut
 
 ############### Tor ###############
 tor/bin/data

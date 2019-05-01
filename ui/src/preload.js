@@ -11,6 +11,7 @@ const { clipboard } = remote.require('electron');
 
 const contact = remote.require('./core/contact');
 const config = remote.require('./config');
+const constant = remote.require('./constant');
 const tor = remote.require('./tor/tor')
 const langs = remote.require('./core/langs')
 
@@ -35,13 +36,19 @@ window.remoteControl = {
     // contact
     isFriend: (address) => { return contact.isFriend(address); },
     addFriend: (address) => {
-        contact.addFriend(address);
-        contact.addUserFromFriendList();
-        contact.saveContact();
+        contact.addFriend(address)
+            .then(() => {
+                contact.addUserFromFriendList();
+                contact.saveContact();
+            })
+            .catch((err) => { eventEmitter.emit('contactError', err); })
     },
     removeFriend: (address) => {
-        contact.removeFriend(address);
-        contact.saveContact();
+        contact.removeFriend(address)
+            .then(() => {
+                contact.saveContact();
+            })
+            .then((err) => { eventEmitter.emit('contactError', err); })
     },
 
     getNickname: (address) => {
@@ -55,13 +62,19 @@ window.remoteControl = {
     isBlack: (address) => { return contact.isBlack(address); },
     getBlackList: () => { return contact.getBlackList(); },
     addBlack: (address) => {
-        contact.addBlack(address);
-        contact.saveContact();
+        contact.addBlack(address)
+            .then(() => {
+                contact.saveContact();
+            })
+            .catch((err) => { eventEmitter.emit('contactError', err); })
     },
 
     removeBlack: (address) => {
-        contact.removeBlack(address);
-        contact.saveContact();
+        contact.removeBlack(address)
+            .then(() => {
+                contact.saveContact();
+            })
+            .catch((err) => { eventEmitter.emit('contactError', err); })
     },
 
     // config
@@ -90,6 +103,10 @@ window.remoteControl = {
         config.setLanguage(lang);
         config.saveSetting();
     },
+
+    MaxLenChatMessage: constant.MaxLenChatMessage,
+    MaxLenProfileName: constant.MaxLenProfileName,
+    MaxLenProfileInfo: constant.MaxLenProfileInfo,
 
     // Chatting
     sendMessage: (address, message) => {

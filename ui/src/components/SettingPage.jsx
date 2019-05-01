@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 
 const remoteControl = window.remoteControl;
 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+const MySwal = withReactContent(Swal)
+
 export default class SettingPage extends Component {
     constructor(props) {
         super(props);
@@ -28,14 +32,29 @@ export default class SettingPage extends Component {
 
     componentDidMount() {
         remoteControl.event.on('contactUpdate', this.updateUI);
+        remoteControl.event.on('contactError', this.showError);
     }
 
     componentWillUnmount() {
         remoteControl.event.removeListener('contactUpdate', this.updateUI);
+        remoteControl.event.removeListener('contactError', this.showError);
     }
 
     updateUI = () => {
         this.forceUpdate();
+    }
+
+    showError = (err) => {
+        console.log(err);
+        let errStr = err.message;
+        if (errStr) {
+            MySwal.fire({
+                title: 'Error',
+                text: errStr,
+                heightAuto: false,
+                width: 400,
+            })
+        }
     }
 
     selectSetting = (num) => {
@@ -43,7 +62,15 @@ export default class SettingPage extends Component {
     }
 
     saveProfile = () => {
-        remoteControl.saveProfile(this.state.inputProfileName, this.state.inputProfileInfo);
+        if (this.state.inputProfileName > remoteControl.MaxLenProfileName) {
+            this.showError(new Error("profile name too long"));
+        }
+        else if (this.state.inputProfileInfo > remoteControl.MaxLenProfileInfo) {
+            this.showError(new Error("profile info too long"));
+        }
+        else {
+            remoteControl.saveProfile(this.state.inputProfileName, this.state.inputProfileInfo);
+        }
     }
 
     saveConnection = () => {
@@ -55,7 +82,7 @@ export default class SettingPage extends Component {
     }
 
     removeBlack = (targetAddress) => {
-        remoteControl.removeBlack(this.state.inputBlackAddress);
+        remoteControl.removeBlack(targetAddress);
     }
 
     switchNightMode = () => {

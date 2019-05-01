@@ -13,6 +13,8 @@ cd torchat3
 npm install
 ```
 
+electron rebuild
+
 ## Usage
 
 ```

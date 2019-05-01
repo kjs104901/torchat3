@@ -28,6 +28,21 @@ export default class ChatMessage extends Component {
         remoteControl.cancelFile(this.props.selectedUser.address, fileID);
     }
 
+    renderMessage(message) {
+        let lows = [];
+        const messageList = message.split('\n');
+
+        //test
+        messageList.forEach((message, index) => {
+            lows.push(
+                <React.Fragment key={index}>
+                    <span >{message}</span> <br />
+                </React.Fragment>
+            )
+        })
+        return lows;
+    }
+
     render() {
         const message = this.props.message.message;
         const options = this.props.message.options;
@@ -44,9 +59,12 @@ export default class ChatMessage extends Component {
         }
         else {
             return (
-                <div className='message'>
-                    {options.fromMe ? 'Me' : 'User'} : {message} <br />
-                </div>
+                <React.Fragment>
+                    <div className='message'>
+                        {options.fromMe ? 'Me' : 'User'} : {this.renderMessage(message)}
+                    </div>
+                    <br />
+                </React.Fragment>
             )
         }
     }

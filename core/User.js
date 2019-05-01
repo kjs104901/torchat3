@@ -8,7 +8,7 @@
  * 
  * sendFileSend(filename) return Promise
  * sendFileAccept(fileID) return Promise
- * fileCancel(fileID)
+ * fileCancel(fileID) return Promise
  * 
  */
 
@@ -20,6 +20,7 @@ const EventEmitter = require('events');
 
 const tor = require('../tor/tor');
 const config = require('../config');
+const constant = require('../constant');
 
 const parser = require('./parser');
 const protocol = require('./protocol');
@@ -119,17 +120,17 @@ class User extends EventEmitter {
             }
         }
 
-        if (this.bufferOut > config.system.BufferMaximum || this.bufferIn > config.system.BufferMaximum) {
+        if (this.bufferOut > constant.BufferMaximum || this.bufferIn > constant.BufferMaximum) {
             this.destroy();
         }
     }
 
     connect() {
         const options = {
-            proxy: { host: '127.0.0.1', port: config.system.proxyPort, type: 5 },
+            proxy: { host: '127.0.0.1', port: config.getProxyPort(), type: 5 },
             command: 'connect',
             destination: { host: this.hostname + ".onion", port: 12009 },
-            timeout: config.system.ProxyTimeOut
+            timeout: constant.ProxyTimeOut
         };
 
         //test
@@ -155,7 +156,7 @@ class User extends EventEmitter {
         this.socketOutRetryWait = true;
         this.bufferOut = "";
 
-        setTimeout(() => { this.socketOutRetryWait = false; }, config.system.ConnectionRetryTime);
+        setTimeout(() => { this.socketOutRetryWait = false; }, constant.ConnectionRetryTime);
     }
 
     closeSocketIn() {
@@ -266,7 +267,7 @@ class User extends EventEmitter {
             let hostname, randomStrPong, clientName, clientVersion;
             let status, profileName, profileInfo;
             let message;
-            let fileID, fileSize, fileName, blockIndex;
+            let fileID, fileSize, fileName, parsed, blockIndex;
 
             while (this.bufferIn.indexOf('\n') > -1) {
                 let parsed = parser.buffer(this.bufferIn);
@@ -314,7 +315,13 @@ class User extends EventEmitter {
                         profileName = dataList[1];
                         profileInfo = dataList[2];
 
-                        this.profileName = parser.unescape(profileName);
+                        profileName = parser.removeNewline(parser.unescape(profileName));
+                        profileName = parser.limitateLength(profileName, constant.MaxLenProfileName);
+
+                        profileInfo = parser.unescape(profileInfo);
+                        profileInfo = parser.limitateLength(profileInfo, constant.MaxLenProfileInfo);
+
+                        this.profileName = profileName;
                         this.profileInfo = parser.unescape(profileInfo);
 
                         this.emit('profile', profileName, profileInfo);
@@ -322,13 +329,20 @@ class User extends EventEmitter {
 
                     case 'message':
                         message = dataList[1];
-                        this.pushMessage(parser.unescape(message), { fromMe: false });
+                        message = parser.unescape(message);
+                        message = parser.limitateLength(message, constant.MaxLenChatMessage);
+
+                        this.pushMessage(message, { fromMe: false });
                         break;
 
                     case 'filesend':
                         fileID = dataList[1];
                         fileSize = dataList[2] * 1;
-                        fileName = parser.unescape(dataList[3]);
+                        fileName = dataList[3];
+
+                        fileName = parser.removeNewline(parser.unescape(fileName));
+                        parsed = path.parse(fileName);
+                        fileName = parser.limitateLength(parsed.name, constant.MaxLenFileName) + parsed.ext;
 
                         this.pushMessage(fileName, {
                             fromMe: false,
@@ -419,7 +433,7 @@ class User extends EventEmitter {
     sendPong() {
         if (!this.isConnected()) { return; }
 
-        protocol.pong(this.socketOut, this.randomStrPong, config.system.ClientName, config.system.ClientVersion);
+        protocol.pong(this.socketOut, this.randomStrPong, constant.ClientName, constant.ClientVersion);
         this.sendPongReq = false;
     }
 
@@ -454,7 +468,7 @@ class User extends EventEmitter {
 
         this.emit('message', message, options);
 
-        while (this.messageList.length > config.system.ChatListSize) {
+        while (this.messageList.length > constant.ChatListSize) {
             this.messageList.shift();
         }
     }
@@ -465,7 +479,7 @@ class User extends EventEmitter {
             if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
             if (!fileHandler.isFile(file)) { reject(new Error("Not a File")); return; }
             if (fileHandler.getSize(file) <= 0) { reject(new Error("File size zero")); return; }
-            if (fileHandler.getSize(file) > config.system.FileMaximumSize) { reject(new Error("File size too big")); return; }
+            if (fileHandler.getSize(file) > constant.FileMaximumSize) { reject(new Error("File size too big")); return; }
 
             const fileID = crypto.randomBytes(20).toString('hex');
             const fileName = path.basename(file);
@@ -558,11 +572,11 @@ class User extends EventEmitter {
                 if (!filesend.okayList[blockIndex]) {
                     filesend.okayList[blockIndex] = true;
 
-                    filesend.sendSize += config.system.FileBlockSize;
-                    filesend.tempSize += config.system.FileBlockSize;
+                    filesend.sendSize += constant.FileBlockSize;
+                    filesend.tempSize += constant.FileBlockSize;
                 }
 
-                const blockNum = fileHandler.getBlockNum(filesend.file, config.system.FileBlockSize);
+                const blockNum = fileHandler.getBlockNum(filesend.file, constant.FileBlockSize);
                 for (let index = 0; index <= blockNum; index++) {
                     if (filesend.okayList[index]) {
                         filesend.okayBlock = index;
@@ -641,19 +655,19 @@ class User extends EventEmitter {
             let sendFirstFile = false;
             this.fileSendList.forEach(filesend => {
                 if (filesend.accepted && !sendFirstFile) {
-                    const blockNum = fileHandler.getBlockNum(filesend.file, config.system.FileBlockSize);
-                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.sendBlock < filesend.okayBlock + config.system.FileBlockWindow
-                        && filesend.bufferSize < config.system.FileBufferSize && this.socketInDrain) {
+                    const blockNum = fileHandler.getBlockNum(filesend.file, constant.FileBlockSize);
+                    while (filesend.accepted && filesend.sendBlock < blockNum && filesend.sendBlock < filesend.okayBlock + constant.FileBlockWindow
+                        && filesend.bufferSize < constant.FileBufferSize && this.socketInDrain) {
                         //test
                         console.log("file read: ", path.basename(filesend.file));
-                        filesend.bufferSize += config.system.FileBlockSize;
-                        fileHandler.readFileBlock(filesend.file, config.system.FileBlockSize, filesend.sendBlock)
+                        filesend.bufferSize += constant.FileBlockSize;
+                        fileHandler.readFileBlock(filesend.file, constant.FileBlockSize, filesend.sendBlock)
                             .then((data) => {
                                 const blockIndex = data.index;
                                 const blockHash = fileHandler.getMD5(data.buffer);
                                 const blockData = data.buffer;
 
-                                filesend.bufferSize -= config.system.FileBlockSize;
+                                filesend.bufferSize -= constant.FileBlockSize;
 
                                 const sendRst = protocol.filedata(this.socketIn, filesend.fileID, blockIndex, blockHash, blockData);
                                 if (sendRst == false) {
@@ -662,7 +676,7 @@ class User extends EventEmitter {
                             })
                             .catch((err) => {
                                 console.log(err);
-                                filesend.bufferSize -= config.system.FileBlockSize;
+                                filesend.bufferSize -= constant.FileBlockSize;
                                 filesend.accepted = false;
                                 this.emit('fileerror', filesend.fileID);
                             })

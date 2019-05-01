@@ -1,16 +1,11 @@
 
 SocksPort auto
 ControlPort auto
-ControlPortWriteToFile ./data/controlPort
-HashedControlPassword 16:B013CD8924EFC01D60F491D5DEEAA7504BDD341524F1E85212A2CF7D41
-
-HiddenServiceDir ./hidden_service
-HiddenServiceVersion 2
-HiddenServicePort 12009 127.0.0.1:5684
-LongLivedPorts 12009
+ControlPortWriteToFile C:\Users\HAPPY\Desktop\torchat3\torchat3\tor/bin/data/controlPort
+HashedControlPassword 16:8F8B1ED0368F84E8602D38FE2D4FC4EBCB8B43C1E6E80A39E1C0E3D80F
 
 UseBridges 0
 
 
-DataDirectory ./data
+DataDirectory C:\Users\HAPPY\Desktop\torchat3\torchat3\tor/bin/data
     
