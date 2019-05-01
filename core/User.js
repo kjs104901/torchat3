@@ -28,13 +28,6 @@ const protocol = require('./protocol');
 const fileHandler = require('./fileHandler');
 const contact = require('./contact');
 
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.socketCheck(); }); }, 1); // milliseconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.bufferCheck(); }); }, 1); // milliseconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.sendAlive(); }); }, 1000 * 20); // seconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileTransCheck(); }); }, 100); // milliseconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileDataRecvCheck(); }); }, 1000 * 0.1); // seconds
-setInterval(() => { contact.getUserListRaw().forEach(user => { user.fileSpeedCheck(); }); }, 1000 * 1); // seconds
-
 class User extends EventEmitter {
     constructor(hostname) {
         super();
@@ -72,6 +65,15 @@ class User extends EventEmitter {
 
         this.fileSendList = [];
         this.fileRecvList = [];
+
+        setTimeout(() => {
+            setInterval(() => { this.socketCheck(); }, 1); // milliseconds
+            setInterval(() => { this.bufferCheck(); }, 1); // milliseconds
+            setInterval(() => { this.sendAlive(); }, 1000 * 20); // seconds
+            setInterval(() => { this.fileTransCheck(); }, 100); // milliseconds
+            setInterval(() => { this.fileDataRecvCheck(); }, 1000 * 0.1); // seconds
+            setInterval(() => { this.fileSpeedCheck(); }, 1000 * 1); // seconds   
+        }, Math.floor(Math.random() * (1000 - 10 + 1)) + 10); // 0.01s ~ 1s delay
     }
 
     socketCheck() {
