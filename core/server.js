@@ -1,7 +1,7 @@
 const net = require('net');
 const config = require('../config');
 const constant = require('../constant');
-const contact = require('./contact');
+const netUserList = require('./netUserList');
 const protocol = require('./protocol');
 const parser = require('./parser');
 const debug = require('./debug');
@@ -51,7 +51,7 @@ let server = net.createServer((client) => {
 
                             hostname = torUtil.generateHostname(publicKey);
                             if (torUtil.verify(publicKeyStr + randomStrPong, signed, publicKey)) {
-                                targetUser = contact.addIncomingUser(hostname, randomStrPong);
+                                targetUser = netUserList.addIncomingUser(hostname, randomStrPong);
                                 if (targetUser) {
                                     client.removeAllListeners();
                                     targetUser.setSocketIn(client, dataBuffer);

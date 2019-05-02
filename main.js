@@ -3,7 +3,7 @@ const path = require('path');
 
 const server = require('./core/server');
 const tor = require('./tor/tor');
-const contact = require('./core/contact');
+const netUserList = require('./core/netUserList');
 
 const debug = require('./core/debug');
 
@@ -67,5 +67,5 @@ async function boot() {
 }
 
 function autoAddUser() {
-    contact.addUserFromFriendList();
+    netUserList.addUserFromFriendList();
 }

@@ -1,8 +1,8 @@
 function log() {
-    var sum = "";
     for (let i = 0; i < arguments.length; i++) {
-        sum += (arguments[i]).toString();
+        process.stdout.write(arguments[i]);
+        process.stdout.write(" ");
     }
-    console.log(sum);
+    process.stdout.write("\n");
 }
 exports.log = log;

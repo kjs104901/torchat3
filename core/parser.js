@@ -1,5 +1,6 @@
 const xss = require("xss");
 const xssFilters = require('xss-filters');
+const constant = require('../constant');
 
 exports.buffer = (dataBuffer) => {
     const newLinePos = dataBuffer.indexOf('\n');

@@ -9,6 +9,7 @@ const Identicon = remote.require('identicon.js');
 const crypto = remote.require('crypto');
 const { clipboard } = remote.require('electron');
 
+const netUserList = remote.require('./core/netUserList');
 const contact = remote.require('./core/contact');
 const config = remote.require('./config');
 const constant = remote.require('./constant');
@@ -40,7 +41,7 @@ window.remoteControl = {
     addFriend: (address) => {
         contact.addFriend(address)
             .then(() => {
-                contact.addUserFromFriendList();
+                netUserList.addUserFromFriendList();
                 contact.saveContact();
             })
             .catch((err) => { eventEmitter.emit('contactError', err); })
@@ -112,7 +113,7 @@ window.remoteControl = {
 
     // Chatting
     sendMessage: (address, message) => {
-        const targetUser = contact.findUser(address);
+        const targetUser = netUserList.findUser(address);
         if (targetUser) {
             targetUser.sendMessage(message)
                 .catch((err) => {
@@ -130,7 +131,7 @@ window.remoteControl = {
             dialog.showOpenDialog(targetWindow, { properties: ['openFile'] }, (files) => {
                 if (files && files[0] && files[0].length > 0) {
                     const file = files[0];
-                    const targetUser = contact.findUser(address);
+                    const targetUser = netUserList.findUser(address);
                     if (targetUser) {
                         targetUser.sendFileSend(file)
                             .catch((err) => { eventEmitter.emit('chatError', err); })
@@ -144,7 +145,7 @@ window.remoteControl = {
     },
 
     sendFile: (address, file) => {
-        const targetUser = contact.findUser(address);
+        const targetUser = netUserList.findUser(address);
         if (targetUser) {
             targetUser.sendFileSend(file)
                 .catch((err) => { eventEmitter.emit('chatError', err); })
@@ -155,7 +156,7 @@ window.remoteControl = {
     },
 
     acceptFile: (address, fileID) => {
-        const targetUser = contact.findUser(address);
+        const targetUser = netUserList.findUser(address);
         if (targetUser) {
             targetUser.sendFileAccept(fileID)
                 .catch((err) => { eventEmitter.emit('chatError', err); })
@@ -166,7 +167,7 @@ window.remoteControl = {
     },
 
     cancelFile: (address, fileID) => {
-        const targetUser = contact.findUser(address);
+        const targetUser = netUserList.findUser(address);
         if (targetUser) {
             targetUser.fileCancel(fileID)
                 .catch((err) => { eventEmitter.emit('chatError', err); })
@@ -447,25 +448,25 @@ tor.event.on('fail', () => { eventEmitter.emit('torFail'); });
 config.event.on('settingUpdate', () => { eventEmitter.emit('settingUpdate'); });
 
 // contact
-contact.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
+netUserList.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
 
 // user
-contact.event.on('newUser', (address) => { window.userList.addUser(address); });
+netUserList.event.on('newUser', (address) => { window.userList.addUser(address); });
 
-contact.eventUser.on('userHalfConnect', (address) => { window.userList.halfConnect(address); });
-contact.eventUser.on('userConnect', (address) => { window.userList.connect(address); });
-contact.eventUser.on('userDisconnect', (address) => { window.userList.disconnect(address); });
-contact.eventUser.on('userDestroy', (address) => { window.userList.destroy(address); });
-contact.eventUser.on('userStatus', (address, status) => { window.userList.status(address, status); });
-contact.eventUser.on('userProfile', (address, name, info) => { window.userList.profile(address, name, info); });
-contact.eventUser.on('userClient', (address, name, version) => { window.userList.client(address, name, version); });
-contact.eventUser.on('userMessage', (address, message, options) => { window.userList.message(address, message, options); });
+netUserList.eventUser.on('userHalfConnect', (address) => { window.userList.halfConnect(address); });
+netUserList.eventUser.on('userConnect', (address) => { window.userList.connect(address); });
+netUserList.eventUser.on('userDisconnect', (address) => { window.userList.disconnect(address); });
+netUserList.eventUser.on('userDestroy', (address) => { window.userList.destroy(address); });
+netUserList.eventUser.on('userStatus', (address, status) => { window.userList.status(address, status); });
+netUserList.eventUser.on('userProfile', (address, name, info) => { window.userList.profile(address, name, info); });
+netUserList.eventUser.on('userClient', (address, name, version) => { window.userList.client(address, name, version); });
+netUserList.eventUser.on('userMessage', (address, message, options) => { window.userList.message(address, message, options); });
 
-contact.eventUser.on('userFileAccept', (address, fileID) => { window.userList.fileAccept(address, fileID); });
-contact.eventUser.on('userFileFinished', (address, fileID) => { window.userList.fileFinished(address, fileID); });
-contact.eventUser.on('userFileError', (address, fileID) => { window.userList.fileError(address, fileID); });
-contact.eventUser.on('userFileCancel', (address, fileID) => { window.userList.fileCancel(address, fileID); });
-contact.eventUser.on('userFileData', (address, fileID, accumSize) => { window.userList.fileData(address, fileID, accumSize); });
-contact.eventUser.on('userFileSpeed', (address, fileID, speed) => { window.userList.fileSpeed(address, fileID, speed); });
+netUserList.eventUser.on('userFileAccept', (address, fileID) => { window.userList.fileAccept(address, fileID); });
+netUserList.eventUser.on('userFileFinished', (address, fileID) => { window.userList.fileFinished(address, fileID); });
+netUserList.eventUser.on('userFileError', (address, fileID) => { window.userList.fileError(address, fileID); });
+netUserList.eventUser.on('userFileCancel', (address, fileID) => { window.userList.fileCancel(address, fileID); });
+netUserList.eventUser.on('userFileData', (address, fileID, accumSize) => { window.userList.fileData(address, fileID, accumSize); });
+netUserList.eventUser.on('userFileSpeed', (address, fileID, speed) => { window.userList.fileSpeed(address, fileID, speed); });
 
 /** */
