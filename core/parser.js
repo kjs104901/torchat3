@@ -92,3 +92,27 @@ function findStringBefore(str, b) {
     }
 }
 exports.findStringBefore = findStringBefore;
+
+
+function normalizeHostname(hostname) {
+    hostname = hostname.toLowerCase();
+    if (hostname.indexOf('tc3:') == 0) { return hostname.substr('tc3:'.length); }
+    return hostname;
+}
+exports.normalizeHostname = normalizeHostname;
+
+function checkHostname(hostname) {
+    let valid = true;
+    hostname = normalizeHostname(hostname);
+    if (constant.HiddenServiceVersion == 3) {
+        if (hostname.length != 56) { return false; }
+    }
+    else if (constant.HiddenServiceVersion == 2) {
+        if (hostname.length != 16) { return false; }
+    }
+    hostname.split('').forEach(char => {
+        if (!char.match(/[0-9]|[a-z]/)) { valid = false; }
+    });
+    return valid;
+}
+exports.checkHostname = checkHostname;
