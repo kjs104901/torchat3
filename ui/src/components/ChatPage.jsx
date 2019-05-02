@@ -100,7 +100,7 @@ export default class ChatPage extends Component {
                 if (nickname) {
                     remoteControl.setNickname(targetAddress, nickname);
                 }
-                else {
+                else if (!result.dismiss) {
                     remoteControl.setNickname(targetAddress, "");
                 }
             }
