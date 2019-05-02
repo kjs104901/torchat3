@@ -10,7 +10,7 @@ exports.buffer = (dataBuffer) => {
 
     return {
         dataList: dataList,
-        bufferAfter: dataBuffer
+        leftBuffer: dataBuffer
     }
 }
 

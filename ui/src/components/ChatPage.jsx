@@ -158,9 +158,9 @@ export default class ChatPage extends Component {
 
         targetUserList.forEach((user, index) => {
             let color = 'red';
-            if (user.halfConnected) { color = 'orange'; }
-            if (user.connected) { color = 'green'; }
-
+            if (user.socketOutConnected && user.socketInConnected) { color = 'green'; }
+            else if (user.socketOutConnected || user.socketInConnected) { color = 'orange'; }
+            
             let friendButton = (<span onClick={() => { this.addFriend(user.address); }}>친추</span>);
             if (remoteControl.isFriend(user.address)) {
                 friendButton = (<span onClick={() => { this.removeFriend(user.address); }}>친삭</span>);

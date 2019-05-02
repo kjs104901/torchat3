@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 
 const config = require('../config');
-const User = require('./User');
+const User = require('./NetUser');
 const parser = require('./parser');
 const contact = require('./contact');
 
@@ -53,14 +53,17 @@ function addUser(hostname) {
     userList.push(targetUser);
 
     eventEmitter.emit('newUser', hostname);
-    targetUser.on('halfconnect', () => { eventEmitterUser.emit('userHalfConnect', hostname); })
-    targetUser.on('connect', () => { eventEmitterUser.emit('userConnect', hostname); })
-    targetUser.on('disconnect', () => { eventEmitterUser.emit('userDisconnect', hostname); })
-    targetUser.on('destroy', () => { eventEmitterUser.emit('userDestroy', hostname); })
+    targetUser.on('socketOutConnected', () => { eventEmitterUser.emit('socketOutConnected', hostname); })
+    targetUser.on('socketOutDisconnected', () => { eventEmitterUser.emit('socketOutDisconnected', hostname); })
+    targetUser.on('socketInConnected', () => { eventEmitterUser.emit('socketInConnected', hostname); })
+    targetUser.on('socketInDisconnected', () => { eventEmitterUser.emit('socketInDisconnected', hostname); })
+
     targetUser.on('status', (status) => { eventEmitterUser.emit('userStatus', hostname, status); })
     targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
     targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })
     targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
+
+    targetUser.on('destroy', () => { eventEmitterUser.emit('userDestroy', hostname); })
 
     targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileID); })
     targetUser.on('filefinished', (fileID) => { eventEmitterUser.emit('userFileFinished', hostname, fileID); })
@@ -101,9 +104,7 @@ function addIncomingUser(hostname, randomStrPong) {
     if (config.getSetting().blackList && contact.isBlack(hostname)) { return; }
     if (!config.getSetting().whiteList || (config.getSetting().whiteList && contact.isWhite(hostname))) {
         let targetUser = addUser(hostname);
-
-        targetUser.hasIncome(randomStrPong);
-
+        targetUser.reserveSendPong(randomStrPong);
         return targetUser;
     }
 }

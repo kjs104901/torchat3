@@ -8,6 +8,15 @@ let proxyPort = 0;
 exports.getProxyPort = () => { return proxyPort; }
 exports.setProxyPort = (newPort) => { proxyPort = newPort; }
 
+exports.getProxyOptions = (hostname) => {
+    return {
+        proxy: { host: '127.0.0.1', port: proxyPort, type: 5 },
+        command: 'connect',
+        destination: { host: hostname + ".onion", port: 12009 },
+        timeout: constant.ProxyTimeOut
+    };
+}
+
 /**
  * Emitter
  */

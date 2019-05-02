@@ -1,7 +1,7 @@
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require('path');
 
-const server = require('./core/server');
+const netServer = require('./core/netServer');
 const tor = require('./tor/tor');
 const netUserList = require('./core/netUserList');
 
@@ -59,7 +59,7 @@ app.on('window-all-closed', () => {
 
 //// ------------ Core ------------ ////
 async function boot() {
-    await server.start();
+    await netServer.start();
     tor.start();
 
     tor.event.once('success', () => {setInterval(autoAddUser, 1000 * 0.1);});

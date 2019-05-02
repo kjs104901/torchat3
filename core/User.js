@@ -285,7 +285,7 @@ class User extends EventEmitter {
                 debug.log("income Destroy Wait")
                 this.destroy();
             }
-        }, constant.incomeUserWaitingTime);
+        }, constant.pongWaitingTime);
     }
 
     bufferCheck() {
@@ -299,7 +299,7 @@ class User extends EventEmitter {
             while (this.bufferIn.indexOf('\n') > -1) {
                 let parsed = parser.buffer(this.bufferIn);
                 const dataList = parsed.dataList;
-                this.bufferIn = parsed.bufferAfter;
+                this.bufferIn = parsed.leftBuffer;
 
                 if (!protocol.validate(dataList)) { continue; }
                 switch (dataList[0]) {
@@ -438,7 +438,7 @@ class User extends EventEmitter {
             while (this.bufferOut.indexOf('\n') > -1) {
                 let parsed = parser.buffer(this.bufferOut);
                 const dataList = parsed.dataList;
-                this.bufferOut = parsed.bufferAfter;
+                this.bufferOut = parsed.leftBuffer;
 
                 if (!protocol.validate(dataList)) { continue; }
                 switch (dataList[0]) {
@@ -808,8 +808,6 @@ class User extends EventEmitter {
     fileSpeedCheck() {
         if (this.isValid()) {
             this.fileSendList.forEach(filesend => {
-                //test
-                //debug.log("WTF", filesend.accepted, filesend.finished, filesend.speedSize);
                 if ((filesend.accepted || filesend.finished) && filesend.speedSize > 0) {
                     const speed = filesend.speedSize;
                     this.emit('filespeed', filesend.fileID, speed);

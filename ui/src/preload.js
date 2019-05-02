@@ -189,8 +189,8 @@ class User {
         const hash = crypto.createHash('md5').update(address).digest("hex").substr(0, 32);
 
         this.address = address;
-        this.connected = false;
-        this.halfConnected = false;
+        this.socketOutConnected = false;
+        this.socketInConnected = false;
         this.status = 0;
         this.profile = {
             name: "", info: "",
@@ -279,39 +279,54 @@ window.userList = {
         }
     },
 
-    halfConnect: (address) => {
+    socketOutConnected: (address) => {
+        console.log('socketOutconnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.halfConnected != true) {
-                targetUser.halfConnected = true;
+            if (targetUser.socketOutConnected == false) {
+                targetUser.socketOutConnected = true;
                 eventUserEmitter.emit('updated');
             }
             return targetUser;
         }
     },
 
-    connect: (address) => {
+    socketOutDisconnected: (address) => {
+        console.log('socketOutDisconnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.connected != true) {
-                targetUser.connected = true;
+            if (targetUser.socketOutDisconnected == true) {
+                targetUser.socketOutDisconnected = false;
                 eventUserEmitter.emit('updated');
             }
             return targetUser;
         }
     },
 
-    disconnect: (address) => {
+    socketInConnected: (address) => {
+        console.log('socketInConnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            targetUser.halfConnected = false;
-            if (targetUser.connected != false) {
-                targetUser.connected = false;
+            if (targetUser.socketInConnected == false) {
+                targetUser.socketInConnected = true;
                 eventUserEmitter.emit('updated');
             }
             return targetUser;
         }
     },
+
+    socketInDisconnected: (address) => {
+        console.log('socketInDisconnected');
+        let targetUser = findUser(address);
+        if (targetUser) {
+            if (targetUser.socketInDisconnected == true) {
+                targetUser.socketInDisconnected = false;
+                eventUserEmitter.emit('updated');
+            }
+            return targetUser;
+        }
+    },
+
 
     destroy: (address) => {
         removeUser(address);
@@ -453,14 +468,17 @@ netUserList.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate')
 // user
 netUserList.event.on('newUser', (address) => { window.userList.addUser(address); });
 
-netUserList.eventUser.on('userHalfConnect', (address) => { window.userList.halfConnect(address); });
-netUserList.eventUser.on('userConnect', (address) => { window.userList.connect(address); });
-netUserList.eventUser.on('userDisconnect', (address) => { window.userList.disconnect(address); });
-netUserList.eventUser.on('userDestroy', (address) => { window.userList.destroy(address); });
+
+netUserList.eventUser.on('socketOutConnected', (address) => { window.userList.socketOutConnected(address); });
+netUserList.eventUser.on('socketOutDisconnected', (address) => { window.userList.socketOutDisconnected(address); });
+netUserList.eventUser.on('socketInConnected', (address) => { window.userList.socketInConnected(address); });
+netUserList.eventUser.on('socketInDisconnected', (address) => { window.userList.socketInDisconnected(address); });
+
 netUserList.eventUser.on('userStatus', (address, status) => { window.userList.status(address, status); });
 netUserList.eventUser.on('userProfile', (address, name, info) => { window.userList.profile(address, name, info); });
 netUserList.eventUser.on('userClient', (address, name, version) => { window.userList.client(address, name, version); });
 netUserList.eventUser.on('userMessage', (address, message, options) => { window.userList.message(address, message, options); });
+netUserList.eventUser.on('userDestroy', (address) => { window.userList.destroy(address); });
 
 netUserList.eventUser.on('userFileAccept', (address, fileID) => { window.userList.fileAccept(address, fileID); });
 netUserList.eventUser.on('userFileFinished', (address, fileID) => { window.userList.fileFinished(address, fileID); });
