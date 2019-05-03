@@ -11,7 +11,6 @@ node.js: https://nodejs.org
 git clone https://github.com/kjs104901/torchat3.git torchat3
 cd torchat3
 npm install
-./node_modules/.bin/electron-rebuild
 ```
 
 ## Usage
