@@ -133,7 +133,7 @@ window.remoteControl = {
                     const file = files[0];
                     const targetUser = netUserList.findUser(address);
                     if (targetUser) {
-                        targetUser.sendFileSend(file)
+                        targetUser.sendFile(file)
                             .catch((err) => { eventEmitter.emit('chatError', err); })
                     }
                     else {
@@ -147,7 +147,7 @@ window.remoteControl = {
     sendFile: (address, file) => {
         const targetUser = netUserList.findUser(address);
         if (targetUser) {
-            targetUser.sendFileSend(file)
+            targetUser.sendFile(file)
                 .catch((err) => { eventEmitter.emit('chatError', err); })
         }
         else {
@@ -158,7 +158,7 @@ window.remoteControl = {
     acceptFile: (address, fileID) => {
         const targetUser = netUserList.findUser(address);
         if (targetUser) {
-            targetUser.sendFileAccept(fileID)
+            targetUser.acceptFile(fileID)
                 .catch((err) => { eventEmitter.emit('chatError', err); })
         }
         else {
@@ -169,7 +169,7 @@ window.remoteControl = {
     cancelFile: (address, fileID) => {
         const targetUser = netUserList.findUser(address);
         if (targetUser) {
-            targetUser.fileCancel(fileID)
+            targetUser.cancelFile(fileID)
                 .catch((err) => { eventEmitter.emit('chatError', err); })
         }
         else {
@@ -199,7 +199,7 @@ class User {
         this.client = { name: "", version: "" };
 
         this.messageList = [];
-        this.lastMessageDate = new Date();
+        this.lastActiveTime = new Date();
     }
 }
 
@@ -243,20 +243,25 @@ window.userList = {
     findUser: findUser,
 
     compareUser: (userA, userB) => {
-        if (userA.connected && !userB.connected) { return -1; }
-        else if (userA.halfConnected && !userB.halfConnected) { return -1; }
+        let connectCountA = 0; 
+        let connectCountB = 0;
 
-        else if (!userA.connected && userB.connected) { return 1; }
-        else if (!userA.halfConnected && userB.halfConnected) { return 1; }
+        connectCountA += (userA.socketOutConnected) ? 1 : 0;
+        connectCountA += (userA.socketInConnected) ? 1 : 0;
+        connectCountB += (userB.socketOutConnected) ? 1 : 0;
+        connectCountB += (userB.socketInConnected) ? 1 : 0;
 
-        else if ((userA.connected && userB.connected) || (userA.halfConnected && userB.halfConnected)) {
+        if (connectCountA > connectCountB) { return -1; }
+        else if (connectCountA < connectCountB) { return 1; }
 
-            if (userA.lastMessageDate > userB.lastMessageDate) { return -1; }
-            else if (userA.lastMessageDate < userB.lastMessageDate) { return 1; }
+        else if ((connectCountA == 2) && (connectCountA == 2)) {
+
+            if (userA.lastActiveTime > userB.lastActiveTime) { return -1; }
+            else if (userA.lastActiveTime < userB.lastActiveTime) { return 1; }
 
             else { return 0; }
         }
-        else if ((!userA.connected && !userB.connected) || (!userA.halfConnected && !userB.halfConnected)) {
+        else if ((connectCountA == 1) && (connectCountA == 1)) {
 
             if (!contact.isBlack(userA.address) && contact.isBlack(userB.address)) { return -1; }
             else if (contact.isBlack(userA.address) && !contact.isBlack(userB.address)) { return 1; }
@@ -295,8 +300,8 @@ window.userList = {
         console.log('socketOutDisconnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.socketOutDisconnected == true) {
-                targetUser.socketOutDisconnected = false;
+            if (targetUser.socketOutConnected == true) {
+                targetUser.socketOutConnected = false;
                 eventUserEmitter.emit('updated');
             }
             return targetUser;
@@ -319,8 +324,8 @@ window.userList = {
         console.log('socketInDisconnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.socketInDisconnected == true) {
-                targetUser.socketInDisconnected = false;
+            if (targetUser.socketInConnected == true) {
+                targetUser.socketInConnected = false;
                 eventUserEmitter.emit('updated');
             }
             return targetUser;
@@ -377,7 +382,7 @@ window.userList = {
             }
 
             targetUser.messageList.push({ message, options });
-            targetUser.lastMessageDate = new Date();
+            targetUser.lastActiveTime = new Date();
 
             eventUserEmitter.emit('updated');
             return targetUser;
@@ -463,7 +468,7 @@ tor.event.on('fail', () => { eventEmitter.emit('torFail'); });
 config.event.on('settingUpdate', () => { eventEmitter.emit('settingUpdate'); });
 
 // contact
-netUserList.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
+contact.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
 
 // user
 netUserList.event.on('newUser', (address) => { window.userList.addUser(address); });

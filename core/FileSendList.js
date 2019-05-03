@@ -82,6 +82,15 @@ class FileSendList extends EventEmitter {
         return changed;
     }
 
+    fileSlowFree(fileID) {
+        setTimeout(() => {
+            this.fileList = this.fileList.filter((file) => {
+                if (file.fileID == fileID) { return false; }
+                return true;
+            })
+        }, 1000 * 10)
+    }
+
     setSocketDrain(drain) { this.socketDrain = drain; }
 
     fileTransCheck() {
@@ -127,7 +136,7 @@ class FileSendList extends EventEmitter {
             }
         });
     }
-    
+
     fileSpeedCheck() {
         this.fileList.forEach(filesend => {
             if ((filesend.accepted || filesend.finished) && filesend.speedSize > 0) {

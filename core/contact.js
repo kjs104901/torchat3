@@ -1,3 +1,7 @@
+const EventEmitter = require('events');
+let eventEmitter = new EventEmitter();
+exports.event = eventEmitter;
+
 const constant = require('../constant');
 const parser = require('./parser');
 
@@ -33,6 +37,7 @@ exports.addFriend = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
         if (!parser.checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
+        if (parser.isMyHostname(hostname)) { reject(new Error('my hostname')); return; }
         if (friendList.indexOf(hostname) > -1) { reject(new Error('already friend')); return; }
 
         friendList.push(hostname);
@@ -86,6 +91,7 @@ exports.addBlack = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
         if (!parser.checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
+        if (parser.isMyHostname(hostname)) { reject(new Error('my hostname')); return; }
         if (blackList.indexOf(hostname) > -1) { reject(new Error('already black')); return; }
 
         blackList.push(hostname);
@@ -118,6 +124,7 @@ exports.addWhite = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
         if (!parser.checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
+        if (parser.isMyHostname(hostname)) { reject(new Error('my hostname')); return; }
         if (whiteList.indexOf(hostname) > -1) { reject(new Error('already white')); return; }
 
         whiteList.push(hostname);

@@ -22,7 +22,6 @@ class SocketIn extends EventEmitter {
 
         this.socket = socket;
         this.buffer = buffer;
-        console.log("#startBuffer", this.buffer);
 
         this.socket.on('close', () => { debug.log('[socket IN] close'); this.close(); })
         this.socket.on('timeout', () => { debug.log('[socket IN] timeout'); this.close(); })
@@ -33,8 +32,6 @@ class SocketIn extends EventEmitter {
     }
 
     data(data) {
-        console.log("#buffer ", this.buffer)
-        console.log("#data ", data.toString())
         const dataStr = data.toString();
         if (dataStr.length <= 0) { return; }
         this.buffer += dataStr;
@@ -96,6 +93,7 @@ class SocketIn extends EventEmitter {
                         profileName = parser.preventXSS(profileName);
 
                         profileInfo = parser.unescape(profileInfo);
+                        profileInfo = parser.removeCarriageReturn(profileInfo);
                         profileInfo = parser.limitateLength(profileInfo, constant.MaxLenProfileInfo);
                         profileInfo = parser.preventXSS(profileInfo);
 
@@ -105,6 +103,7 @@ class SocketIn extends EventEmitter {
                     case 'message':
                         message = dataList[1];
                         message = parser.unescape(message);
+                        message = parser.removeCarriageReturn(message);
                         message = parser.limitateLength(message, constant.MaxLenChatMessage);
                         message = parser.preventXSS(message);
 
@@ -158,6 +157,7 @@ class SocketIn extends EventEmitter {
     }
 
     sendFiledata(fileID, blockIndex, blockHash, blockData) {
+        console.log("sendFiledata", fileID, blockIndex, blockHash)
         return protocol.filedata(this.socket, fileID, blockIndex, blockHash, blockData);
     }
 

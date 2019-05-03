@@ -95,11 +95,15 @@ class NetUser extends EventEmitter {
         this.fileSendList.on('speed', (fileID, speed) => { this.emit('filespeed', fileID, speed) });
 
         this.fileSendList.on('senddata', (fileID, blockIndex, blockHash, blockData) => {
+            console.log('senddata', fileID, blockIndex, blockHash)
             if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
                 const sendResult = this.socketIn.sendFiledata(fileID, blockIndex, blockHash, blockData);
                 if (sendResult == false) {
                     this.fileSendList.setSocketDrain(false);
                 }
+            }
+            else {
+                this.fileSendList.fileError(fileID, blockIndex)
             }
         })
     }
@@ -184,7 +188,7 @@ class NetUser extends EventEmitter {
                 this.socketOut = null;
             }
         })
-        this.socketOut.on('filedata', (fileID, blockIndex, blockHash, blockData) => {
+        this.socketOut.on('filedata', (fileID, blockIndex, blockData) => {
             if (this.fileRecvList.hasFile(fileID)) {
                 this.fileRecvList.filedata(fileID, blockIndex, blockData);
                 this.socketOut.sendFileOkay(fileID, blockIndex);
@@ -193,8 +197,8 @@ class NetUser extends EventEmitter {
                 this.socketOut.sendFileCancel(fileID);
             }
         })
-        this.socketOut.on('filedataerror', () => {
-            this.socketOut.sendFileError(fileID, blockIndex);
+        this.socketOut.on('filedataerror', (fileID) => {
+            this.socketOut.sendFileError(fileID);
         })
         console.log('<send ping>')
         this.socketOut.sendPing(this.cookie);
@@ -251,7 +255,7 @@ class NetUser extends EventEmitter {
             this.fileSendList.fileError(fileID, blockIndex);
         })
         this.socketIn.on('filecancel', (fileID) => {
-            this.fileCancel(fileID)
+            this.fileSendList.fileCancel(fileID)
                 .catch((err) => { debug.log(err) })
         })
     }

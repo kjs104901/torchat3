@@ -1,6 +1,7 @@
 const xss = require("xss");
 const xssFilters = require('xss-filters');
 const constant = require('../constant');
+const tor = require('../tor/tor');
 
 exports.buffer = (dataBuffer) => {
     const newLinePos = dataBuffer.indexOf('\n');
@@ -19,8 +20,6 @@ function replaceAll(str, searchStr, replaceStr) {
 }
 
 function escape(targetStr) {
-    targetStr = replaceAll(targetStr, '\r', '');
-
     targetStr = replaceAll(targetStr, '\\', '\\/');
     targetStr = replaceAll(targetStr, ' ', '\\s');
     targetStr = replaceAll(targetStr, '\n', '\\n');
@@ -32,17 +31,22 @@ function unescape(targetStr) {
     targetStr = replaceAll(targetStr, '\\n', '\n');
     targetStr = replaceAll(targetStr, '\\s', ' ');
     targetStr = replaceAll(targetStr, '\\/', '\\');
-
-    targetStr = replaceAll(targetStr, '\r', '');
     return targetStr;
 }
 exports.unescape = unescape;
 
 function removeNewline(targetStr) {
-    targetStr = replaceAll(targetStr, '\\n', '\n');
+    targetStr = replaceAll(targetStr, '\n', '');
+    targetStr = replaceAll(targetStr, '\r', '');
     return targetStr;
 }
 exports.removeNewline = removeNewline;
+
+function removeCarriageReturn(targetStr) {
+    targetStr = replaceAll(targetStr, '\r', '');
+    return targetStr;
+}
+exports.removeCarriageReturn = removeCarriageReturn;
 
 function limitateLength(targetStr, limit) {
     if (targetStr.length > limit) {
@@ -117,3 +121,11 @@ function checkHostname(hostname) {
     return valid;
 }
 exports.checkHostname = checkHostname;
+
+function isMyHostname(hostname) {
+    if (tor.getHostname() == hostname) {
+        return true;
+    }
+    return false;
+}
+exports.isMyHostname = isMyHostname;

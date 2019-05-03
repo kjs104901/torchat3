@@ -40,7 +40,7 @@ class SocksOut extends EventEmitter {
         if (this.buffer.length > 0) {
             let fileID, blockIndex, blockHash, blockData;
 
-            while (this.bufferOut.indexOf('\n') > -1) {
+            while (this.buffer.indexOf('\n') > -1) {
                 const parsedBuffer = parser.buffer(this.buffer);
                 const dataList = parsedBuffer.dataList;
                 this.buffer = parsedBuffer.leftBuffer;
@@ -53,11 +53,12 @@ class SocksOut extends EventEmitter {
                         blockHash = dataList[3];
                         blockData = parser.unescape(dataList[4]);
 
+                        console.log("hashComp", fileHandler.getMD5(blockData), blockHash);
                         if (fileHandler.getMD5(blockData) == blockHash) {
-                            this.emit('filedata', fileID, blockIndex, blockHash, blockData);
+                            this.emit('filedata', fileID, blockIndex, blockData);
                         }
                         else {
-                            this.emit('filedataerror', fileID, blockIndex, blockHash, blockData);
+                            this.emit('filedataerror', fileID);
                         }
 
                         break;

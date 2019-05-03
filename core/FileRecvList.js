@@ -56,6 +56,15 @@ class FileRecvList extends EventEmitter {
             }
         });
     }
+    
+    fileSlowFree(fileID) {
+        setTimeout(() => {
+            this.fileList = this.fileList.filter((file) => {
+                if (file.fileID == fileID) { return false; }
+                return true;
+            })
+        }, 1000 * 10)
+    }
 
     fileTransCheck() {
         this.fileList.forEach(filerecv => {
