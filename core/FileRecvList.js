@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 const fileHandler = require('./fileHandler');
 const debug = require('./debug');
+const fs = require('fs');
 
 class FileRecvList extends EventEmitter {
     constructor() {
@@ -25,6 +26,14 @@ class FileRecvList extends EventEmitter {
         });
         if (-1 < fileIndex) { return true; }
         return false;
+    }
+
+    isFinished(fileID) {
+        let finished = false;
+        this.fileList.forEach((aFile) => {
+            if (aFile.fileID == fileID && aFile.finished) { finished = true; }
+        });
+        return finished;
     }
 
     acceptFile(fileID) {
@@ -56,7 +65,25 @@ class FileRecvList extends EventEmitter {
             }
         });
     }
-    
+
+    saveFile(fileID, toFilePath) {
+        return new Promise((resolve, reject) => {
+            let fromFilePath = fileHandler.getTempDir() + '/' + fileID;
+            if (fs.existsSync(fromFilePath)) {
+                fileHandler.move(fromFilePath, toFilePath)
+                .then(() => {
+                    resolve();
+                })
+                .catch((err) => {
+                    reject(err);
+                })
+            }
+            else {
+                reject(new Error('no downloaded temp file'));
+            }
+        })
+    }
+
     fileSlowFree(fileID) {
         setTimeout(() => {
             this.fileList = this.fileList.filter((file) => {
@@ -70,7 +97,7 @@ class FileRecvList extends EventEmitter {
         this.fileList.forEach(filerecv => {
             if (filerecv.accepted && filerecv.blockWriting == false && Object.keys(filerecv.bufferList).length > 0) {
                 let bufferSum = "";
-                let fileName = './' + filerecv.fileID;
+                let filePath = fileHandler.getTempDir() + '/' + filerecv.fileID;
                 let createFile = false;
                 if (filerecv.blockIndex == 0) { createFile = true; }
 
@@ -86,8 +113,8 @@ class FileRecvList extends EventEmitter {
 
                 if (bufferSum.length > 0) {
                     filerecv.blockWriting = true;
-                    if (createFile) { fileHandler.writeFileClear(fileName); }
-                    fileHandler.writeFileAppend(fileName, bufferSum)
+                    if (createFile) { fileHandler.writeFileClear(filePath); }
+                    fileHandler.writeFileAppend(filePath, bufferSum)
                         .then((recvSize) => {
                             filerecv.blockWriting = false;
                         })

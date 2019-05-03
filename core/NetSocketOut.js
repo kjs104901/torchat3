@@ -31,7 +31,7 @@ class SocksOut extends EventEmitter {
     }
 
     data(data) {
-        const dataStr = data.toString();
+        const dataStr = data.toString('binary');
         if (dataStr.length <= 0) { return; }
         this.buffer += dataStr;
 
@@ -53,12 +53,11 @@ class SocksOut extends EventEmitter {
                         blockHash = dataList[3];
                         blockData = parser.unescape(dataList[4]);
 
-                        console.log("hashComp", fileHandler.getMD5(blockData), blockHash);
                         if (fileHandler.getMD5(blockData) == blockHash) {
                             this.emit('filedata', fileID, blockIndex, blockData);
                         }
                         else {
-                            this.emit('filedataerror', fileID);
+                            this.sendFileError(fileID, blockIndex);
                         }
 
                         break;

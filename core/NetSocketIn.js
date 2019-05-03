@@ -156,8 +156,8 @@ class SocketIn extends EventEmitter {
         }
     }
 
-    sendFiledata(fileID, blockIndex, blockHash, blockData) {
-        console.log("sendFiledata", fileID, blockIndex, blockHash)
+    sendFiledata(fileID, blockIndex, blockData) {
+        const blockHash = fileHandler.getMD5(blockData);
         return protocol.filedata(this.socket, fileID, blockIndex, blockHash, blockData);
     }
 

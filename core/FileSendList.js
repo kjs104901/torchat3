@@ -104,12 +104,11 @@ class FileSendList extends EventEmitter {
                     fileHandler.readFileBlock(filesend.file, constant.FileBlockSize, filesend.sendBlock)
                         .then((data) => {
                             const blockIndex = data.index;
-                            const blockHash = fileHandler.getMD5(data.buffer);
                             const blockData = data.buffer;
 
                             filesend.bufferSize -= constant.FileBlockSize;
 
-                            this.emit('senddata', filesend.fileID, blockIndex, blockHash, blockData);
+                            this.emit('senddata', filesend.fileID, blockIndex, blockData);
                         })
                         .catch((err) => {
                             debug.log(err);

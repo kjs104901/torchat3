@@ -8,6 +8,7 @@ const EventEmitter = remote.require('events');
 const Identicon = remote.require('identicon.js');
 const crypto = remote.require('crypto');
 const { clipboard } = remote.require('electron');
+const { BrowserWindow, dialog } = remote;
 
 const netUserList = remote.require('./core/netUserList');
 const contact = remote.require('./core/contact');
@@ -175,6 +176,29 @@ window.remoteControl = {
         else {
             eventEmitter.emit('chatError', new Error("failed to find user"));
         }
+    },
+
+    saveFile: (address, fileID, fileName) => {
+        const targetUser = netUserList.findUser(address);
+        if (targetUser) {
+            const targetWindow = BrowserWindow.getFocusedWindow();
+            if (targetWindow) {
+                dialog.showSaveDialog(targetWindow, {
+                    defaultPath: fileName
+                }, (filePath) => {
+                    if (filePath) {
+                        targetUser.saveFile(fileID, filePath)
+                            .catch((err) => {
+                                eventEmitter.emit('chatError', err);
+                            })
+
+                    }
+                })
+            }
+        }
+        else {
+            eventEmitter.emit('chatError', new Error("failed to find user"));
+        }
     }
 }
 
@@ -243,7 +267,7 @@ window.userList = {
     findUser: findUser,
 
     compareUser: (userA, userB) => {
-        let connectCountA = 0; 
+        let connectCountA = 0;
         let connectCountB = 0;
 
         connectCountA += (userA.socketOutConnected) ? 1 : 0;

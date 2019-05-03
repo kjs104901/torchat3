@@ -26,6 +26,10 @@ export default class ChatMessage extends Component {
         remoteControl.cancelFile(this.props.selectedUser.address, fileID);
     }
 
+    saveFile = (fileID, fileName) => {
+        remoteControl.saveFile(this.props.selectedUser.address, fileID, fileName);
+    }
+
     renderMessage(message) {
         let lows = [];
         const messageList = message.split('\n');
@@ -50,8 +54,9 @@ export default class ChatMessage extends Component {
                     {options.fromMe ? 'Me' : 'User'} : {message} <br />
                     file: size:{options.fileSize} accsize:{options.accumSize} acc:{options.accepted ? "true" : "false"}<br />
                     fin:{options.finished ? "true" : "false"} err:{options.error ? "true" : "false"} can:{options.canceled ? "true" : "false"} spd:{options.speed}<br />
-                    acceptFile: <span onClick={() => { this.acceptFile(options.fileID) }}>accept</span>
-                    cancelFile: <span onClick={() => { this.cancelFile(options.fileID) }}>cancel</span>
+                    acceptFile: <span onClick={() => { this.acceptFile(options.fileID) }}>accept</span><br />
+                    cancelFile: <span onClick={() => { this.cancelFile(options.fileID) }}>cancel</span><br />
+                    saveFile: <span onClick={() => { this.saveFile(options.fileID, message) }}>save</span><br />
                 </div>
             )
         }

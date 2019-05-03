@@ -1,3 +1,4 @@
+var os = require('os');
 const fs = require('fs');
 const crypto = require('crypto');
 
@@ -49,11 +50,26 @@ function getMD5(targetStr) {
 }
 exports.getMD5 = getMD5;
 
+// creating temp directory
+let tempDirBase = os.tmpdir() + "/torchat3";
+let tempDirCount = 0;
+while (fs.existsSync(tempDirBase + "_" + tempDirCount) && !fs.lstatSync(tempDirBase + "_" + tempDirCount).isDirectory()) {
+    tempDirCount += 1;
+}
+if (!fs.existsSync(tempDirBase + "_" + tempDirCount)) {
+    fs.mkdirSync(tempDirBase + "_" + tempDirCount);
+}
+
+function getTempDir() {
+    return tempDirBase + "_" + tempDirCount;
+}
+exports.getTempDir = getTempDir;
+
 function writeFileClear(file) {
     try {
         fs.writeFileSync(file, '');
-        
-    } catch (error) {}
+
+    } catch (error) { }
 }
 exports.writeFileClear = writeFileClear;
 
@@ -75,3 +91,33 @@ function writeFileAppend(file, block) {
     });
 }
 exports.writeFileAppend = writeFileAppend;
+
+function move(oldPath, newPath) {
+    return new Promise((resolve, reject) => {
+        fs.rename(oldPath, newPath, function (err) {
+            if (err) {
+                if (err.code === 'EXDEV') {
+                    const readStream = fs.createReadStream(oldPath);
+                    const writeStream = fs.createWriteStream(newPath);
+
+                    readStream.on('error', (err) => { reject(err) });
+                    writeStream.on('error', (err) => { reject(err) });
+
+                    readStream.on('close', () => {
+                        fs.unlink(oldPath, (err) => {
+                            if (err) { reject(err); }
+                            else { resolve(); }
+                        });
+                    });
+                    readStream.pipe(writeStream);
+                } else {
+                    reject(err);
+                }
+            }
+            else {
+                resolve();
+            }
+        });
+    })
+}
+exports.move = move;

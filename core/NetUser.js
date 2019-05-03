@@ -94,10 +94,9 @@ class NetUser extends EventEmitter {
         this.fileSendList.on('data', (fileID, sendSize) => { this.emit('filedata', fileID, sendSize) });
         this.fileSendList.on('speed', (fileID, speed) => { this.emit('filespeed', fileID, speed) });
 
-        this.fileSendList.on('senddata', (fileID, blockIndex, blockHash, blockData) => {
-            console.log('senddata', fileID, blockIndex, blockHash)
+        this.fileSendList.on('senddata', (fileID, blockIndex, blockData) => {
             if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
-                const sendResult = this.socketIn.sendFiledata(fileID, blockIndex, blockHash, blockData);
+                const sendResult = this.socketIn.sendFiledata(fileID, blockIndex, blockData);
                 if (sendResult == false) {
                     this.fileSendList.setSocketDrain(false);
                 }
@@ -196,9 +195,6 @@ class NetUser extends EventEmitter {
             else {
                 this.socketOut.sendFileCancel(fileID);
             }
-        })
-        this.socketOut.on('filedataerror', (fileID) => {
-            this.socketOut.sendFileError(fileID);
         })
         console.log('<send ping>')
         this.socketOut.sendPing(this.cookie);
@@ -303,7 +299,7 @@ class NetUser extends EventEmitter {
         }
     }
 
-    sendMessage(message) {
+    sendMessage(message) { //interface
         return new Promise((resolve, reject) => {
             if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
                 this.pushMessage(message, { fromMe: true });
@@ -316,7 +312,7 @@ class NetUser extends EventEmitter {
         });
     }
 
-    sendFile(file) {
+    sendFile(file) { //interface
         return new Promise((resolve, reject) => {
             if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
                 if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
@@ -341,7 +337,7 @@ class NetUser extends EventEmitter {
         });
     }
 
-    acceptFile(fileID) {
+    acceptFile(fileID) { //interface
         return new Promise((resolve, reject) => {
             if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
                 this.fileRecvList.acceptFile(fileID);
@@ -354,7 +350,7 @@ class NetUser extends EventEmitter {
         });
     }
 
-    cancelFile(fileID) {
+    cancelFile(fileID) { //interface
         return new Promise((resolve, reject) => {
             if (this.fileRecvList.fileCancel(fileID)) {
                 if (this.socketOut) {
@@ -369,6 +365,18 @@ class NetUser extends EventEmitter {
                 reject(new Error("no such file"));
             }
         });
+    }
+
+    saveFile(fileID, filePath) { //interface
+        return new Promise((resolve, reject) => {
+            this.fileRecvList.saveFile(fileID, filePath)
+                .then(() => {
+                    resolve();
+                })
+                .catch((err) => {
+                    reject(err);
+                })
+        })
     }
 
     destroy() {
