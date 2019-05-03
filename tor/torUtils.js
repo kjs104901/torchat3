@@ -1,9 +1,10 @@
 const fs = require('fs');
 const crypto = require("crypto");
-const ed = require('ed25519-supercop');
 const { SHA3 } = require('sha3');
 const base32 = require("base32.js");
 const child_process = require('child_process');
+
+const supercop = require('supercop.js')
 
 const config = require('../config');
 
@@ -28,7 +29,7 @@ exports.generateKeyPair = () => {
         }
     }
     else {
-        const keyPair = ed.createKeyPair(Buffer.alloc(32, crypto.randomBytes(32)));
+        const keyPair = supercop.createKeyPair(supercop.createSeed());
         secret = keyPair.secretKey;
         public = keyPair.publicKey;
         try {
@@ -54,11 +55,11 @@ exports.generateHostname = (publicKey) => {
 }
 
 exports.sign = (content, publicKey, secretKey) => {
-    return ed.sign(content, publicKey, secretKey);
+    return supercop.sign(Buffer.from(content), publicKey, secretKey);
 }
 
 exports.verify = (content, signature, publicKey) => {
-    return ed.verify(signature, content, publicKey)
+    return supercop.verify(signature, Buffer.from(content), publicKey);
 }
 
 exports.generateControlPassword = () => {
