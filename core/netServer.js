@@ -17,7 +17,7 @@ let server = net.createServer((client) => {
     client.setTimeout(constant.ConnectionTimeOut);
 
     let publicKeyStr, publicKey, signedStr, signed,
-        hostname, randomStrPong, targetUser, clientName, clientVersion;
+        hostname, cookieOppsite, targetUser, clientName, clientVersion;
     client.on('data', (data) => {
         if (onStop) {
             dataBuffer = "";
@@ -45,18 +45,18 @@ let server = net.createServer((client) => {
                             debug.log("publicKeyStr", publicKeyStr)
                             publicKey = Buffer.from(publicKeyStr, 'base64');
                             debug.log("publicKey.length", publicKey.length);
-                            randomStrPong = dataList[2];
+                            cookieOppsite = dataList[2];
                             signedStr = dataList[3];
                             signed = Buffer.from(signedStr, 'base64');
 
                             hostname = torUtil.generateHostname(publicKey);
-                            if (torUtil.verify(publicKeyStr + randomStrPong, signed, publicKey)) {
-                                targetUser = netUserList.addIncomingUser(hostname, randomStrPong);
+                            if (torUtil.verify(publicKeyStr + cookieOppsite, signed, publicKey)) {
+                                targetUser = netUserList.addIncomingUser(hostname, cookieOppsite);
                                 if (targetUser) {
                                     client.removeAllListeners();
                                     targetUser.setSocketIn(client, dataBuffer);
                                     if (arrivedPong) {
-                                        targetUser.validate(arrivedPong.randomStrPong);
+                                        targetUser.validate(arrivedPong.cookieOppsite);
                                         targetUser.clientName = arrivedPong.clientName;
                                         targetUser.clientVersion = arrivedPong.clientVersion;
                                     }
@@ -71,12 +71,12 @@ let server = net.createServer((client) => {
                             break;
 
                         case 'pong':
-                            randomStrPong = dataList[1];
+                            cookieOppsite = dataList[1];
                             clientName = dataList[2];
                             clientVersion = dataList[3];
 
                             arrivedPong = {
-                                randomStrPong, clientName, clientVersion
+                                cookieOppsite, clientName, clientVersion
                             }
                             debug.log("pong arrived before ping");
                             break;

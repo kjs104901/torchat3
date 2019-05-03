@@ -117,10 +117,14 @@ class NetUser extends EventEmitter {
                     this.socketOutConnecting = false;
                 });
                 this.socksClient.on('error', (err) => {
-                    debug.log("[Proxy] Connect failed: ", err);
+                    debug.log("[Proxy] Connect error: ", err);
                     this.socketOutConnecting = false;
                     this.socketOutWaiting = true;
                     setTimeout(() => { this.socketOutWaiting = false; }, constant.ConnectionRetryTime);
+                    if (this.socketOut) {
+                        this.emit('socketOutDisconnected');
+                        this.socketOut = null;
+                    }
                 });
                 this.socksClient.connect();
             }
@@ -159,8 +163,10 @@ class NetUser extends EventEmitter {
             this.socketOutConnected = false;
             this.socketOutWaiting = true;
             setTimeout(() => { this.socketOutWaiting = false; }, constant.ConnectionRetryTime);
-            this.emit('socketOutDisconnected');
-            this.socketOut = null;
+            if (this.socketOut) {
+                this.emit('socketOutDisconnected');
+                this.socketOut = null;
+            }
         })
         this.socketOut.on('filedata', (fileID, blockIndex, blockHash, blockData) => {
             if (this.fileRecvList.hasFile(fileID)) {
@@ -196,7 +202,7 @@ class NetUser extends EventEmitter {
             this.reserveSendPong(cookieOppsite);
         })
         this.socketIn.on('pong', (cookie, clientName, clientVersion) => {
-            if (this.cookie != cookie) {console.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
+            if (this.cookie != cookie) { console.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
 
             this.pongWait = false;
             this.socketInConnected = true;

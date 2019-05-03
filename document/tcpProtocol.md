@@ -27,9 +27,10 @@ Client must unescape the arguments properly.
 # protocol of message
 
 ```
-ping [publicKeyStr(base64)] [randomStr] [signedStr(base64)]
-- signedStr is signed "publicKeyStr"+"randomStr" by secretKey(ed25519-v3)
-pong [randomStr] [clientName] [clientVersion] 
+ping [publicKeyStr(base64)] [cookie] [signedStr(base64)]
+- signedStr is signed "publicKeyStr"+"cookie" by secretKey(ed25519-v3)
+pong [cookieOppsite] [clientName] [clientVersion]
+- cookieOppsite is the cookie came from the other side user.
 
 alive [userStatus] 
 profile [profileName] [profileInfo] 

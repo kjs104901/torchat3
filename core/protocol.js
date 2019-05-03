@@ -9,15 +9,15 @@ function isSocketOkay(socket) {
     return false;
 }
 
-exports.ping = (socket, publicKeyStr, randomStr, signedStr) => {
+exports.ping = (socket, publicKeyStr, cookie, signedStr) => {
     if (isSocketOkay(socket)) {
-        socket.write("ping " + publicKeyStr + ' ' + randomStr + ' ' + signedStr + '\n');
+        socket.write("ping " + publicKeyStr + ' ' + cookie + ' ' + signedStr + '\n');
     }
 }
 
-exports.pong = (socket, randomStr, clientName, clientVersion) => {
+exports.pong = (socket, cookieOppsite, clientName, clientVersion) => {
     if (isSocketOkay(socket)) {
-        socket.write("pong " + randomStr + ' ' + clientName + ' ' + clientVersion + '\n');
+        socket.write("pong " + cookieOppsite + ' ' + clientName + ' ' + clientVersion + '\n');
     }
 }
 

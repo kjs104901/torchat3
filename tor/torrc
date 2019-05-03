@@ -1,13 +1,13 @@
 
 SocksPort auto
 ControlPort auto
-ControlPortWriteToFile C:\Users\HAPPY\Desktop\torchat3\torchat3\tor/bin/data/controlPort
-HashedControlPassword 16:98796A35A862BC4A60FF308A4BE90774FD7F8676896EC4FAFDBB43057E
+ControlPortWriteToFile C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data/controlPort
+HashedControlPassword 16:F543F56F31B0610F6038116E2A267A27CAD9F8CE0DAADE3605F85A2A0A
 
 UseBridges 0
 
 
-DataDirectory C:\Users\HAPPY\Desktop\torchat3\torchat3\tor/bin/data
-GeoIPFile C:\Users\HAPPY\Desktop\torchat3\torchat3\tor/bin/data/geoip
-GeoIPv6File C:\Users\HAPPY\Desktop\torchat3\torchat3\tor/bin/data/geoipv6
+DataDirectory C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data
+GeoIPFile C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data/geoip
+GeoIPv6File C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data/geoipv6
     

@@ -76,7 +76,7 @@ function addUser(hostname) {
 }
 exports.addUser = addUser;
 
-function removeUser(hostname) {
+function destroyUser(hostname) {
     let targetUser = findUser(hostname);
     if (targetUser) {
         targetUser.destroy();
@@ -97,14 +97,14 @@ function addUserFromFriendList() {
 }
 exports.addUserFromFriendList = addUserFromFriendList;
 
-function addIncomingUser(hostname, randomStrPong) {
+function addIncomingUser(hostname, cookieOppsite) {
     hostname = parser.normalizeHostname(hostname);
     if (!parser.checkHostname(hostname)) { return; }
 
     if (config.getSetting().blackList && contact.isBlack(hostname)) { return; }
     if (!config.getSetting().whiteList || (config.getSetting().whiteList && contact.isWhite(hostname))) {
         let targetUser = addUser(hostname);
-        targetUser.reserveSendPong(randomStrPong);
+        targetUser.reserveSendPong(cookieOppsite);
         return targetUser;
     }
 }
