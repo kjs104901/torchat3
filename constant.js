@@ -8,9 +8,10 @@ module.exports = {
     BufferMaximum: 10000,
 
     ConnectionTimeOut: 1000 * 60 * 3, // minuites
+    KeepAliveTime: 1000 * 30, // seconds
     ConnectionRetryTime: 1000 * 20, // seconds
     ProxyTimeOut: 1000 * 60 * 3, // minutes
-    pongWaitingTime: 1000 * 60 * 2, // minutes
+    PongWaitingTime: 1000 * 60 * 2, // minutes
 
     ServiceInsidePort: 12009,
 

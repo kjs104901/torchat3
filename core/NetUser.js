@@ -34,6 +34,7 @@ class NetUser extends EventEmitter {
         this.socketOutWaiting = false;
 
         this.pongWait = false;
+        this.pongWaitTimer = 0;
         this.sendPongReq = false;
         this.sendProfileReq = false;
 
@@ -56,6 +57,7 @@ class NetUser extends EventEmitter {
 
         setTimeout(() => {
             setInterval(() => { this.checkSocketOut(); }, 10); // milliseconds
+            setInterval(() => { this.checkPongWait(); }, 1000 * 1); // second
             setInterval(() => { this.sendAlive(); }, 1000 * 20); // seconds
             setInterval(() => {
                 if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
@@ -123,6 +125,7 @@ class NetUser extends EventEmitter {
                     setTimeout(() => { this.socketOutWaiting = false; }, constant.ConnectionRetryTime);
                     if (this.socketOut) {
                         this.emit('socketOutDisconnected');
+                        if (this.socketOut) { this.socketOut.destroy(); }
                         this.socketOut = null;
                     }
                 });
@@ -135,9 +138,7 @@ class NetUser extends EventEmitter {
                 console.log('<send pong>', this.cookieOppsite)
                 this.socketOut.sendPong(this.cookieOppsite);
                 this.pongWait = true;
-                setTimeout(() => {
-                    if (this.pongWait) { console.log("pong wait die"); this.destroy(); }
-                }, constant.pongWaitingTime);
+                this.pongWaitTimer = constant.PongWaitingTime;
                 this.sendPongReq = false;
             }
             if (this.socketOutConnected && this.socketInConnected) {
@@ -154,7 +155,21 @@ class NetUser extends EventEmitter {
         }
     }
 
+    checkPongWait() {
+        if (this.pongWaitTimer > 0) {
+            this.pongWaitTimer -= 1000 * 1 //second;
+            if (this.pongWaitTimer <= 0) {
+                if (this.pongWait) {
+                    debug.log("Pong Wait die");
+                    this.destroy();
+                }
+                this.pongWaitTimer = 0;
+            }
+        }
+    }
+
     setSocketOut(socket) {
+        socket.setKeepAlive(true, constant.KeepAliveTime);
         this.socketOut = new SocketOut(socket, "");
         this.socketOutConnected = true;
         this.emit('socketOutConnected');
@@ -165,6 +180,7 @@ class NetUser extends EventEmitter {
             setTimeout(() => { this.socketOutWaiting = false; }, constant.ConnectionRetryTime);
             if (this.socketOut) {
                 this.emit('socketOutDisconnected');
+                if (this.socketOut) { this.socketOut.destroy(); }
                 this.socketOut = null;
             }
         })
@@ -190,6 +206,8 @@ class NetUser extends EventEmitter {
         this.socketIn.on('close', () => {
             this.socketInConnected = false;
             this.emit('socketInDisconnected');
+
+            if (this.socketIn) { this.socketIn.destroy(); }
             this.socketIn = null;
         })
         this.socketIn.on('invalid', () => { console.log('<invalid1>'); this.destroy(); })
@@ -202,17 +220,7 @@ class NetUser extends EventEmitter {
             this.reserveSendPong(cookieOppsite);
         })
         this.socketIn.on('pong', (cookie, clientName, clientVersion) => {
-            if (this.cookie != cookie) { console.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
-
-            this.pongWait = false;
-            this.socketInConnected = true;
-            this.emit('socketInConnected');
-            this.reserveSendProfile();
-
-            if (this.clientName != clientName || this.clientVersion != clientVersion) {
-                this.clientName = clientName; this.clientVersion = clientVersion;
-                this.emit('client', clientName, clientVersion);
-            }
+            this.pongValidate(cookie, clientName, clientVersion);
         })
         this.socketIn.on('alive', (status) => {
             if (this.status != status) {
@@ -257,6 +265,20 @@ class NetUser extends EventEmitter {
     reserveSendProfile() {
         console.log('<sendprofile reserve>')
         this.sendProfileReq = true;
+    }
+
+    pongValidate(cookie, clientName, clientVersion) {
+        if (this.cookie != cookie) { console.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
+
+        this.pongWait = false;
+        this.socketInConnected = true;
+        this.emit('socketInConnected');
+        this.reserveSendProfile();
+
+        if (this.clientName != clientName || this.clientVersion != clientVersion) {
+            this.clientName = clientName; this.clientVersion = clientVersion;
+            this.emit('client', clientName, clientVersion);
+        }
     }
 
     sendAlive() {
@@ -347,8 +369,12 @@ class NetUser extends EventEmitter {
 
     destroy() {
         console.log('<destroy>')
+        if (this.socketIn) { this.socketIn.destroy(); }
         this.socketIn = null;
+
+        if (this.socketOut) { this.socketOut.destroy(); }
         this.socketOut = null;
+
         this.destroyed = true;
         this.emit('destroy');
     }

@@ -114,7 +114,6 @@ class SocksOut extends EventEmitter {
         protocol.fileerror(this.socket, fileID, blockIndex);
     }
 
-
     close() {
         if (this.socket && !this.socket.destroyed) { this.socket.destroy(); }
         if (this.socket) {
@@ -125,6 +124,11 @@ class SocksOut extends EventEmitter {
 
             this.emit('close');
         }
+    }
+    
+    destroy() {
+        if (this.socket && !this.socket.destroyed) { this.socket.destroy(); }
+        this.socket = null;
     }
 }
 module.exports = SocksOut;

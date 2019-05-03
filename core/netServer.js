@@ -1,6 +1,7 @@
 const net = require('net');
 const config = require('../config');
 const constant = require('../constant');
+const contact = require('./contact');
 const netUserList = require('./netUserList');
 const protocol = require('./protocol');
 const parser = require('./parser');
@@ -15,9 +16,10 @@ let server = net.createServer((client) => {
 
     debug.log('Client connection in');
     client.setTimeout(constant.ConnectionTimeOut);
+    client.setKeepAlive(true, constant.KeepAliveTime);
 
     let publicKeyStr, publicKey, signedStr, signed,
-        hostname, cookieOppsite, targetUser, clientName, clientVersion;
+        hostname, cookieOppsite, clientName, clientVersion;
     client.on('data', (data) => {
         if (onStop) {
             dataBuffer = "";
@@ -41,24 +43,22 @@ let server = net.createServer((client) => {
                     switch (dataList[0]) {
                         case 'ping':
                             publicKeyStr = dataList[1];
-                            //test
-                            debug.log("publicKeyStr", publicKeyStr)
                             publicKey = Buffer.from(publicKeyStr, 'base64');
-                            debug.log("publicKey.length", publicKey.length);
                             cookieOppsite = dataList[2];
                             signedStr = dataList[3];
                             signed = Buffer.from(signedStr, 'base64');
 
                             hostname = torUtil.generateHostname(publicKey);
-                            if (torUtil.verify(publicKeyStr + cookieOppsite, signed, publicKey)) {
-                                targetUser = netUserList.addIncomingUser(hostname, cookieOppsite);
+                            if ((torUtil.verify(publicKeyStr + cookieOppsite, signed, publicKey)) &&
+                                (!config.getSetting().blackList || !contact.isBlack(hostname)) &&
+                                (!config.getSetting().whiteList || contact.isWhite(hostname))) {
+                                const targetUser = netUserList.addUser(hostname);
                                 if (targetUser) {
                                     client.removeAllListeners();
                                     targetUser.setSocketIn(client, dataBuffer);
+                                    targetUser.reserveSendPong(cookieOppsite);
                                     if (arrivedPong) {
-                                        targetUser.validate(arrivedPong.cookieOppsite);
-                                        targetUser.clientName = arrivedPong.clientName;
-                                        targetUser.clientVersion = arrivedPong.clientVersion;
+                                        targetUser.pongValidate(arrivedPong.cookieOppsite, arrivedPong.clientName, arrivedPong.clientVersion);
                                     }
                                 }
                             }
@@ -66,6 +66,9 @@ let server = net.createServer((client) => {
                                 //TODO 소켓 삭제
                                 //test
                                 debug.log("key varify failed");
+                                if (client && !client.destroyed) {
+                                    client.destroy(); client = null;
+                                }
                             }
                             onStop = true;
                             break;

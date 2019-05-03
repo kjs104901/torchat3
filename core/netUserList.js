@@ -45,7 +45,10 @@ function findUser(hostname) {
 }
 exports.findUser = findUser;
 
-function addUser(hostname) {
+function addUser(address) {
+    const hostname = parser.normalizeHostname(address);
+    if (!parser.checkHostname(hostname)) { return; } // hostname error
+
     let targetUser = findUser(hostname);
     if (targetUser) { return targetUser; } // already exists
 
@@ -89,26 +92,11 @@ function addUserFromFriendList() {
     friendList.forEach(address => {
         if (config.getSetting().blackList && contact.isBlack(address)) { return; }
         if (!config.getSetting().whiteList || (config.getSetting().whiteList && contact.isWhite(address))) {
-            let hostname = parser.normalizeHostname(address);
-            if (!parser.checkHostname(hostname)) { return; }
-            addUser(hostname);
+            addUser(address);
         }
     });
 }
 exports.addUserFromFriendList = addUserFromFriendList;
-
-function addIncomingUser(hostname, cookieOppsite) {
-    hostname = parser.normalizeHostname(hostname);
-    if (!parser.checkHostname(hostname)) { return; }
-
-    if (config.getSetting().blackList && contact.isBlack(hostname)) { return; }
-    if (!config.getSetting().whiteList || (config.getSetting().whiteList && contact.isWhite(hostname))) {
-        let targetUser = addUser(hostname);
-        targetUser.reserveSendPong(cookieOppsite);
-        return targetUser;
-    }
-}
-exports.addIncomingUser = addIncomingUser;
 
 function removeDestroyedUser() {
     userList = userList.filter((user) => {

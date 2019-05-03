@@ -172,5 +172,10 @@ class SocketIn extends EventEmitter {
         }
     }
 
+    destroy() {
+        if (this.socket && !this.socket.destroyed) { this.socket.destroy(); }
+        this.socket = null;
+    }
+
 }
 module.exports = SocketIn;

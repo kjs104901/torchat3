@@ -285,7 +285,7 @@ class User extends EventEmitter {
                 debug.log("income Destroy Wait")
                 this.destroy();
             }
-        }, constant.pongWaitingTime);
+        }, constant.PongWaitingTime);
     }
 
     bufferCheck() {
