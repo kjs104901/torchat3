@@ -62,8 +62,8 @@ async function boot() {
     await netServer.start();
     tor.start();
 
-    tor.event.once('success', () => {setInterval(autoAddUser, 1000 * 0.1);});
-    tor.event.once('fail', () => { debug.log("failed"); });
+    tor.event.once('success', () => { setInterval(autoAddUser, 1000 * 0.1); });
+    tor.event.once('fail', (err) => { debug.log(err); });
 }
 
 function autoAddUser() {

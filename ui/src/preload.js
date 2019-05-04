@@ -486,7 +486,7 @@ window.langs = langs;
 // tor
 tor.event.on('update', () => { eventEmitter.emit('torUpdate'); });
 tor.event.on('success', () => { eventEmitter.emit('torSuccess'); });
-tor.event.on('fail', () => { eventEmitter.emit('torFail'); });
+tor.event.on('fail', (err) => { eventEmitter.emit('torFail', err); });
 
 // setting
 config.event.on('settingUpdate', () => { eventEmitter.emit('settingUpdate'); });

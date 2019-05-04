@@ -5,6 +5,10 @@ import BootPage from './components/BootPage';
 import ChatPage from './components/ChatPage';
 import SettingPage from './components/SettingPage';
 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+const MySwal = withReactContent(Swal)
+
 const remoteControl = window.remoteControl;
 
 import './assets/global.css'
@@ -28,7 +32,7 @@ export default class App extends Component {
         
         remoteControl.event.on('torUpdate', this.updateUI);
         remoteControl.event.on('torSuccess', this.updateUI);
-        remoteControl.event.on('torFail', this.updateUI);
+        remoteControl.event.on('torFail', this.showError);
     }
 
     componentWillUnmount() {
@@ -36,11 +40,26 @@ export default class App extends Component {
         
         remoteControl.event.removeListener('torUpdate', this.updateUI);
         remoteControl.event.removeListener('torSuccess', this.updateUI);
-        remoteControl.event.removeListener('torFail', this.updateUI);
+        remoteControl.event.removeListener('torFail', this.showError);
     }
 
     updateUI = () => {
         this.forceUpdate();
+    }
+
+    showError = (err) => {
+        if (err) {
+            console.log(err);
+            let errStr = err.message;
+            if (errStr) {
+                MySwal.fire({
+                    title: 'Error',
+                    text: errStr,
+                    heightAuto: false,
+                    width: 400,
+                })
+            }
+        }
     }
 
     selectPage = (num) => { this.setState({ selectedPage: num }) }

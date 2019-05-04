@@ -49,13 +49,7 @@ exports.start = () => {
 
     checkBootProcess()
         .then(() => {
-            checkLoopback()
-                .then(() => {
-                    eventEmitter.emit("success");
-                })
-                .catch((err) => {
-                    eventEmitter.emit("fail", err);
-                })
+            eventEmitter.emit("success");
         })
         .catch((err) => {
             eventEmitter.emit("fail", err);
@@ -79,7 +73,7 @@ exports.getBootLogs = () => { return bootLogs; }
 
 exports.getSuccess = () => { return bootSuccess; }
 exports.getError = () => { return bootError; }
-exports.getFail = () => { if (!bootError && bootSuccess) { return true; } else { return false; } }
+exports.getFail = () => { if (bootError) { return true; } else { return false; } }
 
 exports.getKeyPair = () => { return keyPair; }
 exports.getHostname = () => { return hostname; }
@@ -133,10 +127,4 @@ function checkBootProcess() {
             }
         }, 100);
     })
-}
-
-function checkLoopback() {
-    return new Promise((resolve, reject) => {
-        reject(err);
-    });
 }

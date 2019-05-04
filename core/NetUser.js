@@ -13,7 +13,6 @@ const fileHandler = require('./fileHandler');
 
 const debug = require('./debug');
 
-
 const SocketIn = require('./NetSocketIn');
 const SocketOut = require('./NetSocketOut');
 
@@ -176,7 +175,7 @@ class NetUser extends EventEmitter {
 
     setSocketOut(socket) {
         socket.setKeepAlive(true, constant.KeepAliveTime);
-        
+
         if (this.socketOut) { this.socketOut.destroy(); }
         this.socketOut = new SocketOut(socket, "");
         this.socketOutConnected = true;

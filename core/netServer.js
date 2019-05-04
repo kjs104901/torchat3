@@ -76,9 +76,6 @@ let server = net.createServer((client) => {
                         debug.log("pong arrived before ping");
                         break;
 
-                    case 'loopback':
-                        protocol.loopback(client);
-
                     default:
                         debug.log("Unknown instruction: ", dataList);
                         break;
