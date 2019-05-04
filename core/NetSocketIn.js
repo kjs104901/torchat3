@@ -139,13 +139,13 @@ class SocketIn extends EventEmitter {
                         fileID = dataList[1];
                         blockIndex = dataList[2] * 1;
 
-                        this.emit('fileError', fileID, blockIndex);
+                        this.emit('fileerror', fileID, blockIndex);
                         break;
 
                     case 'filecancel':
                         fileID = dataList[1];
 
-                        this.emit('fileCancel', fileID);
+                        this.emit('filecancel', fileID);
                         break;
 
                     default:
@@ -162,20 +162,22 @@ class SocketIn extends EventEmitter {
     }
 
     close() {
-        if (this.socket && !this.socket.destroyed) { this.socket.destroy(); }
+        debug.log("[socket IN] Closed");
+        this.emit('close');
         if (this.socket) {
-            debug.log("[socket IN] Closed");
-            this.socket = null;
+            if (!this.socket.destroyed) { this.socket.destroy(); }
             this.buffer = "";
-
-            this.emit('close');
+            this.socket = null;
         }
     }
 
     destroy() {
-        if (this.socket && !this.socket.destroyed) { this.socket.destroy(); }
-        this.socket = null;
+        if (this.socket) {
+            if (!this.socket.destroyed) { this.socket.destroy(); }
+            this.buffer = "";
+            this.socket = null;
+        }
+        this.removeAllListeners();
     }
-
 }
 module.exports = SocketIn;

@@ -98,8 +98,15 @@ class FileSendList extends EventEmitter {
         this.fileList.forEach(filesend => {
             if (filesend.accepted && !sendFirstFile) {
                 const blockNum = fileHandler.getBlockNum(filesend.file, constant.FileBlockSize);
-                while (filesend.accepted && filesend.sendBlock < blockNum && filesend.sendBlock < filesend.okayBlock + constant.FileBlockWindow
-                    && filesend.bufferSize < constant.FileBufferSize && this.socketDrain) {
+
+                console.log(filesend.sendBlock, blockNum, filesend.okayBlock, filesend.okayList[filesend.sendBlock]);
+                while (filesend.okayList[filesend.sendBlock]) {
+                    filesend.sendBlock += 1;
+                }
+                while (filesend.accepted && filesend.sendBlock < blockNum &&
+                    filesend.sendBlock < filesend.okayBlock + constant.FileBlockWindow &&
+                    filesend.bufferSize < constant.FileBufferSize && this.socketDrain) {
+
                     filesend.bufferSize += constant.FileBlockSize;
                     fileHandler.readFileBlock(filesend.file, constant.FileBlockSize, filesend.sendBlock)
                         .then((data) => {
@@ -116,6 +123,7 @@ class FileSendList extends EventEmitter {
                             filesend.accepted = false;
                             this.emit('error', filesend.fileID);
                         })
+
                     filesend.sendBlock += 1;
                 }
                 if (filesend.accepted && !filesend.finished) {

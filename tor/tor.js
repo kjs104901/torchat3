@@ -18,7 +18,7 @@ let torProcess = null;
 
 let bootProcess = 0;
 let bootSuccess = false;
-let bootError = false;
+let bootError;
 let bootLogs = [];
 
 let keyPair = null;
@@ -43,17 +43,22 @@ exports.start = () => {
         .then(() => {
             torControl.start(controlPassword, keyPair)
                 .catch((err) => {
-                    debug.log(err);
-                    bootError = true;
+                    bootError = err;
                 })
         })
 
     checkBootProcess()
         .then(() => {
-            eventEmitter.emit("success");
+            checkLoopback()
+                .then(() => {
+                    eventEmitter.emit("success");
+                })
+                .catch((err) => {
+                    eventEmitter.emit("fail", err);
+                })
         })
-        .catch(() => {
-            eventEmitter.emit("fail");
+        .catch((err) => {
+            eventEmitter.emit("fail", err);
         })
 }
 
@@ -66,13 +71,15 @@ torControl.event.on('process', (percent) => {
 
 torControl.event.on('socksport', (port) => {
     socksPort = port;
+    config.setProxyPort(socksPort);
 })
 
 exports.getProgress = () => { return bootProcess; }
 exports.getBootLogs = () => { return bootLogs; }
 
 exports.getSuccess = () => { return bootSuccess; }
-exports.getFail = () => { return bootError; }
+exports.getError = () => { return bootError; }
+exports.getFail = () => { if (!bootError && bootSuccess) { return true; } else { return false; } }
 
 exports.getKeyPair = () => { return keyPair; }
 exports.getHostname = () => { return hostname; }
@@ -114,14 +121,22 @@ function checkBootProcess() {
             torControl.controlCheckBootstrap();
             if (bootError) {
                 clearInterval(bootIntv);
-                reject();
+
+                bootSuccess = false;
+                reject(bootError);
             }
             else if (bootProcess >= 100 && socksPort) {
                 clearInterval(bootIntv);
-                config.setProxyPort(socksPort);
+
                 bootSuccess = true;
                 resolve();
             }
         }, 100);
     })
+}
+
+function checkLoopback() {
+    return new Promise((resolve, reject) => {
+        reject(err);
+    });
 }

@@ -138,6 +138,7 @@ exports.controlCheckBootstrap = () => {
     }
 }
 
+// [Experimental] Do not call this function yet
 exports.newHiddenService = () => {
     if (controlAuth && controlHiddenService) {
         controlConnection.write(`DEL_ONION ${controlHiddenService} \r\n`);

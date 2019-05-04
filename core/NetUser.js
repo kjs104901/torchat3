@@ -115,6 +115,9 @@ class NetUser extends EventEmitter {
                 const options = config.getProxyOptions(this.hostname);
                 debug.log("[Proxy] Try to connect. options", options);
 
+                if (this.socksClient) {
+                    this.socksClient.removeAllListeners();
+                }
                 this.socksClient = new SocksClient(options);
                 this.socksClient.on('established', (info) => {
                     debug.log("[Proxy] Connect success", this.hostname);
@@ -173,6 +176,8 @@ class NetUser extends EventEmitter {
 
     setSocketOut(socket) {
         socket.setKeepAlive(true, constant.KeepAliveTime);
+        
+        if (this.socketOut) { this.socketOut.destroy(); }
         this.socketOut = new SocketOut(socket, "");
         this.socketOutConnected = true;
         this.emit('socketOutConnected');
@@ -201,6 +206,7 @@ class NetUser extends EventEmitter {
     }
 
     setSocketIn(socket, buffer) {
+        if (this.socketIn) { this.socketIn.destroy(); }
         this.socketIn = new SocketIn(socket, buffer);
 
         this.socketIn.on('close', () => {
@@ -251,8 +257,8 @@ class NetUser extends EventEmitter {
             this.fileSendList.fileError(fileID, blockIndex);
         })
         this.socketIn.on('filecancel', (fileID) => {
-            this.fileSendList.fileCancel(fileID)
-                .catch((err) => { debug.log(err) })
+            this.fileSendList.fileCancel(fileID);
+            this.fileRecvList.fileCancel(fileID);
         })
     }
 
@@ -359,6 +365,9 @@ class NetUser extends EventEmitter {
                 resolve();
             }
             else if (this.fileSendList.fileCancel(fileID)) {
+                if (this.socketOut) {
+                    this.socketOut.sendFileCancel(fileID);
+                }
                 resolve();
             }
             else {

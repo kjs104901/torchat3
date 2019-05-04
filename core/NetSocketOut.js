@@ -53,7 +53,8 @@ class SocksOut extends EventEmitter {
                         blockHash = dataList[3];
                         blockData = parser.unescape(dataList[4]);
 
-                        if (fileHandler.getMD5(blockData) == blockHash) {
+                        //test
+                        if (fileHandler.getMD5(blockData) == blockHash && Math.random() > 0.5) {
                             this.emit('filedata', fileID, blockIndex, blockData);
                         }
                         else {
@@ -115,20 +116,22 @@ class SocksOut extends EventEmitter {
     }
 
     close() {
-        if (this.socket && !this.socket.destroyed) { this.socket.destroy(); }
+        debug.log("[socket OUT] Closed");
+        this.emit('close');
         if (this.socket) {
-            debug.log("[socket OUT] Closed");
-
-            this.socket = null;
+            if (!this.socket.destroyed) { this.socket.destroy(); }
             this.buffer = "";
-
-            this.emit('close');
+            this.socket = null;
         }
     }
-    
+
     destroy() {
-        if (this.socket && !this.socket.destroyed) { this.socket.destroy(); }
-        this.socket = null;
+        if (this.socket) {
+            if (!this.socket.destroyed) { this.socket.destroy(); }
+            this.buffer = "";
+            this.socket = null;
+        }
+        this.removeAllListeners();
     }
 }
 module.exports = SocksOut;

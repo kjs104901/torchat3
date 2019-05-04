@@ -9,6 +9,12 @@ function isSocketOkay(socket) {
     return false;
 }
 
+exports.loopback = (socket) => {
+    if (isSocketOkay(socket)) {
+        socket.write("loopback" + '\n');
+    }
+}
+
 exports.ping = (socket, publicKeyStr, cookie, signedStr) => {
     if (isSocketOkay(socket)) {
         socket.write("ping " + publicKeyStr + ' ' + cookie + ' ' + signedStr + '\n');
@@ -79,6 +85,7 @@ exports.filedata = (socket, fileID, blockIndex, blockHash, blockData) => {
 exports.validate = (dataList) => {
     let isValid = false;
     switch (dataList[0]) {
+        case 'loopback': isValid = (dataList.length == 1); break;
         case 'ping': isValid = (dataList.length == 4); break;
         case 'pong': isValid = (dataList.length == 4); break;
         case 'alive': isValid = (dataList.length == 2); break;
@@ -90,7 +97,7 @@ exports.validate = (dataList) => {
         case 'fileerror': isValid = (dataList.length == 3); break;
         case 'filecancel': isValid = (dataList.length == 2); break;
         case 'filedata': isValid = (dataList.length == 5); break;
-        default: isValid = true;  break;
+        default: isValid = true; break;
     }
     if (!isValid) { debug.log("Invalid dataList", dataList); }
     return isValid;
