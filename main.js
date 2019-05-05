@@ -1,11 +1,13 @@
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require('path');
 
-const netServer = require('./core/netServer');
-const tor = require('./tor/tor');
-const netUserList = require('./core/netUserList');
+global.__base = __dirname;
 
-const debug = require('./core/debug');
+const netServer = require(`${__base}/core/network/netServer`);
+const tor = require(`${__base}/tor/tor`);
+const netUserList = require(`${__base}/core/netUserList`);
+
+const debug = require(`${__base}/core/debug`);
 
 //Security: force sandbox mode
 if (process.argv.indexOf('--enable-sandbox') == -1 || process.argv.indexOf('--no-sandbox') > -1) {

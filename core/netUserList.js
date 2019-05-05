@@ -1,9 +1,12 @@
 const EventEmitter = require('events');
 
-const config = require('../config');
-const User = require('./NetUser');
-const parser = require('./parser');
-const contact = require('./contact');
+const config = require(`${__base}/core/config`);
+
+const User = require(`${__base}/core/NetUser`);
+const parser = require(`${__base}/core/network/parser`);
+const contact = require(`${__base}/core/contact`);
+
+const tor = require(`${__base}/tor/tor`);
 
 // ############################ user List ############################ //
 let userList = [];
@@ -95,6 +98,8 @@ function addUserFromFriendList() {
             addUser(address);
         }
     });
+
+    addUser(tor.getHostname());
 }
 exports.addUserFromFriendList = addUserFromFriendList;
 

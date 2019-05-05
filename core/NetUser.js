@@ -5,19 +5,19 @@ const path = require('path');
 const EventEmitter = require('events');
 const SocksClient = require('socks').SocksClient;
 
-const config = require('../config');
-const constant = require('../constant');
-const contact = require('./contact');
+const config = require(`${__base}/core/config`);
+const constant = require(`${__base}/core/constant`);
 
-const fileHandler = require('./fileHandler');
+const contact = require(`${__base}/core/contact`);
+const parser = require(`${__base}/core/network/parser`);
+const fileHandler = require(`${__base}/core/fileIO/fileHandler`);
+const debug = require(`${__base}/core/debug`);
 
-const debug = require('./debug');
+const SocketIn = require(`${__base}/core/network/NetSocketIn`);
+const SocketOut = require(`${__base}/core/network/NetSocketOut`);
 
-const SocketIn = require('./NetSocketIn');
-const SocketOut = require('./NetSocketOut');
-
-const FileRecvList = require('./FileRecvList');
-const FileSendList = require('./FileSendList');
+const FileRecvList = require(`${__base}/core/fileIO/FileRecvList`);
+const FileSendList = require(`${__base}/core/fileIO/FileSendList`);
 
 class NetUser extends EventEmitter {
     constructor(hostname) {
@@ -107,7 +107,7 @@ class NetUser extends EventEmitter {
     }
 
     checkSocketOut() {
-        if (contact.isFriend(this.hostname) || this.socketIn) {
+        if (contact.isFriend(this.hostname) || parser.isMyHostname(this.hostname) || this.socketIn) {
             if (!this.socketOut && this.socketOutConnecting == false && this.socketOutWaiting == false) {
                 this.socketOutConnecting = true;
 

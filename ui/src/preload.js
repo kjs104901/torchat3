@@ -10,13 +10,17 @@ const crypto = remote.require('crypto');
 const { clipboard } = remote.require('electron');
 const { BrowserWindow, dialog } = remote;
 
-const netUserList = remote.require('./core/netUserList');
-const contact = remote.require('./core/contact');
-const config = remote.require('./config');
-const constant = remote.require('./constant');
-const tor = remote.require('./tor/tor')
-const torControl = remote.require('./tor/torControl')
-const langs = remote.require('./core/langs')
+
+const __base = remote.app.getAppPath()
+
+const netUserList = remote.require(`${__base}/core/netUserList`);
+const contact = remote.require(`${__base}/core/contact`);
+const config = remote.require(`${__base}/core/config`);
+const constant = remote.require(`${__base}/core/constant`);
+const langs = remote.require(`${__base}/core/langs`)
+
+const tor = remote.require(`${__base}/tor/tor`)
+const torControl = remote.require(`${__base}/tor/torControl`)
 
 // ------------------------- ------------- ------------------------- //
 // ------------------------- remoteControl ------------------------- //

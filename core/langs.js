@@ -1,8 +1,8 @@
-const config = require('../config');
+const config = require(`${__base}/core/config`);
 
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync')
-const input = fs.readFileSync('./languages.csv');
+const input = fs.readFileSync(`${__base}/data/languages.csv`);
 const tempRecords = parse(input, { columns: true })
 
 const records = {};

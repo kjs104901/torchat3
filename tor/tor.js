@@ -1,11 +1,11 @@
 const child_process = require('child_process');
 
-const config = require('../config');
-const parser = require('../core/parser');
-const torUtils = require('./torUtils');
-const torControl = require('./torControl');
+const config = require(`${__base}/core/config`);
+const parser = require(`${__base}/core/network/parser`);
+const torUtils = require(`${__base}/tor/torUtils`);
+const torControl = require(`${__base}/tor/torControl`);
 
-const debug = require('../core/debug');
+const debug = require(`${__base}/core/debug`);
 
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
@@ -79,7 +79,7 @@ exports.getKeyPair = () => { return keyPair; }
 exports.getHostname = () => { return hostname; }
 
 function startTorProcess() {
-    torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', __dirname + '/torrc'], { cwd: torDir });
+    torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', torDir + '/torrc'], { cwd: torDir });
 
     torProcess.stdout.on('data', (data) => { pushLog(data); });
     torProcess.stderr.on('data', (data) => { pushLog(data); });

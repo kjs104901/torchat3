@@ -1,0 +1,13 @@
+
+SocksPort auto
+ControlPort auto
+ControlPortWriteToFile C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data/controlPort
+HashedControlPassword 16:B70993AFA0A5C548607B2D9B9C12791CD2C08C9C2F148D4A70DA4DF0E2
+
+UseBridges 0
+
+
+DataDirectory C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data
+GeoIPFile C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data/geoip
+GeoIPv6File C:\Users\g\Desktop\torchat3\torchat3\tor/bin/data/geoipv6
+    

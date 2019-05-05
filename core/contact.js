@@ -2,15 +2,15 @@ const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
 
-const constant = require('../constant');
-const parser = require('./parser');
+const constant = require(`${__base}/core/constant`);
+const parser = require(`${__base}/core/network/parser`);
 
 /**
  * low db
  */
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync(constant.ContactFile);
+const adapter = new FileSync(`${__base}/data/contact`);
 const contactDB = low(adapter);
 contactDB.defaults({ friend: [], nickname: {}, black: [], white: [] })
     .write()
@@ -57,7 +57,6 @@ exports.removeFriend = (address) => {
 }
 
 // ############################ nickname List ############################ //
-//test
 let nicknameList = contactDB.get('nickname').value();
 exports.getNickname = (address) => {
     const hostname = parser.normalizeHostname(address);

@@ -6,7 +6,7 @@ const child_process = require('child_process');
 
 const supercop = require('supercop.js')
 
-const config = require('../config');
+const config = require(`${__base}/core/config`);
 
 const torDir = __dirname + "/bin";
 const hiddenServiceDir = torDir + "/hidden_service";
@@ -91,7 +91,7 @@ exports.makeTorrc = (controlPassword) => {
     if (config.getSetting().bridge == 1) { bridgeLine = "Bridge " + config.getSetting().bridge; }
     try {
 
-        fs.writeFileSync(__dirname + '/torrc',
+        fs.writeFileSync(torDir + '/torrc',
             `
 SocksPort auto
 ControlPort auto

@@ -1,9 +1,10 @@
 const fs = require('fs');
 const net = require('net');
 
-const parser = require('../core/parser');
-const config = require('../config');
-const constant = require('../constant');
+const config = require(`${__base}/core/config`);
+const constant = require(`${__base}/core/constant`);
+
+const parser = require(`${__base}/core/network/parser`);
 
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
