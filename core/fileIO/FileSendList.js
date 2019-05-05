@@ -99,7 +99,6 @@ class FileSendList extends EventEmitter {
             if (filesend.accepted && !sendFirstFile) {
                 const blockNum = fileHandler.getBlockNum(filesend.file, constant.FileBlockSize);
 
-                console.log(filesend.sendBlock, blockNum, filesend.okayBlock, filesend.okayList[filesend.sendBlock]);
                 while (filesend.okayList[filesend.sendBlock]) {
                     filesend.sendBlock += 1;
                 }

@@ -23,7 +23,7 @@ class NetUser extends EventEmitter {
     constructor(hostname) {
         super();
         this.hostname = hostname;
-        console.log("userStart")
+        debug.log("userStart")
 
         this.socketIn = null;
         this.socketInConnected = false;
@@ -140,7 +140,7 @@ class NetUser extends EventEmitter {
 
         if (this.socketOut && this.socketIn) {
             if (this.sendPongReq) {
-                console.log('<send pong>', this.cookieOppsite)
+                debug.log('<send pong>', this.cookieOppsite)
                 this.socketOut.sendPong(this.cookieOppsite);
                 this.pongWait = true;
                 this.pongWaitTimer = constant.PongWaitingTime;
@@ -148,7 +148,7 @@ class NetUser extends EventEmitter {
             }
             if (this.socketOutConnected && this.socketInConnected) {
                 if (this.sendProfileReq) {
-                    console.log('<send profile>')
+                    debug.log('<send profile>')
                     this.socketOut.sendProfile()
                     this.sendProfileReq = false;
                 }
@@ -200,7 +200,7 @@ class NetUser extends EventEmitter {
                 this.socketOut.sendFileCancel(fileID);
             }
         })
-        console.log('<send ping>')
+        debug.log('<send ping>')
         this.socketOut.sendPing(this.cookie);
     }
 
@@ -215,13 +215,13 @@ class NetUser extends EventEmitter {
             if (this.socketIn) { this.socketIn.destroy(); }
             this.socketIn = null;
         })
-        this.socketIn.on('invalid', () => { console.log('<invalid1>'); this.destroy(); })
+        this.socketIn.on('invalid', () => { debug.log('<invalid1>'); this.destroy(); })
 
         this.socketIn.on('drain', () => { this.fileSendList.setSocketDrain(true); })
 
         this.socketIn.on('ping', (hostname, cookieOppsite) => {
-            if (this.hostname != hostname) { console.log('<invalid2>'); this.destroy(); return; }
-            console.log("cookieOppsite", cookieOppsite);
+            if (this.hostname != hostname) { debug.log('<invalid2>'); this.destroy(); return; }
+            debug.log("cookieOppsite", cookieOppsite);
             this.reserveSendPong(cookieOppsite);
         })
         this.socketIn.on('pong', (cookie, clientName, clientVersion) => {
@@ -262,18 +262,18 @@ class NetUser extends EventEmitter {
     }
 
     reserveSendPong(cookieOppsite) {
-        console.log('<sendpong reserve>')
+        debug.log('<sendpong reserve>')
         this.cookieOppsite = cookieOppsite;
         this.sendPongReq = true;
     }
 
     reserveSendProfile() {
-        console.log('<sendprofile reserve>')
+        debug.log('<sendprofile reserve>')
         this.sendProfileReq = true;
     }
 
     pongValidate(cookie, clientName, clientVersion) {
-        if (this.cookie != cookie) { console.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
+        if (this.cookie != cookie) { debug.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
 
         this.pongWait = false;
         this.socketInConnected = true;
@@ -288,7 +288,7 @@ class NetUser extends EventEmitter {
 
     sendAlive() {
         if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
-            console.log('<send alive>')
+            debug.log('<send alive>')
             this.socketOut.sendAlive();
         }
     }
@@ -388,7 +388,7 @@ class NetUser extends EventEmitter {
     }
 
     destroy() {
-        console.log('<destroy>')
+        debug.log('<destroy>')
         if (this.socketIn) { this.socketIn.destroy(); }
         this.socketIn = null;
 

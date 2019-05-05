@@ -8,10 +8,9 @@ const EventEmitter = remote.require('events');
 const Identicon = remote.require('identicon.js');
 const crypto = remote.require('crypto');
 const { clipboard } = remote.require('electron');
-const { BrowserWindow, dialog } = remote;
+const { BrowserWindow, dialog, app } = remote;
 
-
-const __base = remote.app.getAppPath()
+const __base = app.getAppPath()
 
 const netUserList = remote.require(`${__base}/core/netUserList`);
 const contact = remote.require(`${__base}/core/contact`);

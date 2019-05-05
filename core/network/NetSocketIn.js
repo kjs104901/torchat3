@@ -45,12 +45,12 @@ class SocketIn extends EventEmitter {
             let fileID, fileSize, fileName, parsed, blockIndex;
 
             while (this.buffer.indexOf('\n') > -1) {
-                console.log("buffer", this.buffer);
+                debug.log("buffer", this.buffer);
                 const parsedBuffer = parser.buffer(this.buffer);
                 const dataList = parsedBuffer.dataList;
                 this.buffer = parsedBuffer.leftBuffer;
 
-                console.log("dataList", dataList);
+                debug.log("dataList", dataList);
                 if (!protocol.validate(dataList)) { continue; }
                 switch (dataList[0]) {
                     case 'ping':

@@ -47,7 +47,7 @@ app.on('ready', () => {
     mainWindow.webContents.on('will-navigate', (event, url) => { event.preventDefault(); })
     mainWindow.webContents.on('will-redirect', (event, url) => { event.preventDefault(); })
 
-    mainWindow.once('ready-to-show', () => { });
+    mainWindow.once('ready-to-show', () => {});
     mainWindow.once('close', () => { mainWindow = null; });
 
     mainWindow.webContents.openDevTools();
@@ -62,10 +62,11 @@ app.on('window-all-closed', () => {
 //// ------------ Core ------------ ////
 async function boot() {
     await netServer.start();
-    tor.start();
 
     tor.event.once('success', () => { setInterval(autoAddUser, 1000 * 0.1); });
     tor.event.once('fail', (err) => { debug.log(err); });
+
+    tor.start();
 }
 
 function autoAddUser() {
