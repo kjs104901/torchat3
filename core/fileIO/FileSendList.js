@@ -51,7 +51,7 @@ class FileSendList extends EventEmitter {
                 if (blockNum - 1 <= filesend.okayBlock) {
                     filesend.accepted = false;
                     filesend.finished = true;
-                    this.fileSlowFree(filesend.fileID);
+                    this.fileFreeTimeout(filesend.fileID);
                     this.emit('finished', filesend.fileID);
                 }
             }
@@ -82,7 +82,7 @@ class FileSendList extends EventEmitter {
         return changed;
     }
 
-    fileSlowFree(fileID) {
+    fileFreeTimeout(fileID) {
         setTimeout(() => {
             this.fileList = this.fileList.filter((file) => {
                 if (file.fileID == fileID) { return false; }

@@ -85,7 +85,7 @@ class FileRecvList extends EventEmitter {
         })
     }
 
-    fileSlowFree(fileID) {
+    fileFreeTimeout(fileID) {
         setTimeout(() => {
             this.fileList = this.fileList.filter((file) => {
                 if (file.fileID == fileID) { return false; }
@@ -131,7 +131,7 @@ class FileRecvList extends EventEmitter {
             if (filerecv.fileSize <= filerecv.recvSize && filerecv.blockWriting == false) {
                 filerecv.accepted = false;
                 filerecv.finished = true;
-                this.fileSlowFree(filerecv.fileID);
+                this.fileFreeTimeout(filerecv.fileID);
                 this.emit('finished', filerecv.fileID);
             }
         })
