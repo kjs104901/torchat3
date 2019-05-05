@@ -2,15 +2,13 @@
 TODO
 setting
 contact
-temp/
 dist/
-node_modulesOut
 
 ############### Tor ###############
 tor/bin/data
 tor/bin/hidden_service
 tor/bin/*.dll
-tor/torrc
+tor/bin/torrc
 
 ############### node.js default ###############
 # Logs
