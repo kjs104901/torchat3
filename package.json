@@ -46,6 +46,7 @@
     "electron-builder": "^20.39.0",
     "identicon.js": "^2.3.3",
     "lowdb": "^1.0.0",
+    "node-notifier": "^5.4.0",
     "prop-types": "^15.7.2",
     "rc-progress": "^2.3.0",
     "rc-switch": "^1.9.0",

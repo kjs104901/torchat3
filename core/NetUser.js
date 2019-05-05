@@ -180,6 +180,7 @@ class NetUser extends EventEmitter {
         this.socketOut = new SocketOut(socket, "");
         this.socketOutConnected = true;
         this.emit('socketOutConnected');
+        if (this.socketInConnected) { this.emit('socketBothConnected'); }
 
         this.socketOut.on('close', () => {
             this.socketOutConnected = false;
@@ -278,6 +279,8 @@ class NetUser extends EventEmitter {
         this.pongWait = false;
         this.socketInConnected = true;
         this.emit('socketInConnected');
+        if (this.socketOutConnected) { this.emit('socketBothConnected'); }
+
         this.reserveSendProfile();
 
         if (this.clientName != clientName || this.clientVersion != clientVersion) {
@@ -397,6 +400,7 @@ class NetUser extends EventEmitter {
 
         this.destroyed = true;
         this.emit('destroy');
+        this.removeAllListeners();
     }
 }
 module.exports = NetUser;

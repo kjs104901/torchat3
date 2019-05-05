@@ -4,10 +4,15 @@ const path = require('path');
 global.__base = __dirname;
 
 const netServer = require(`${__base}/core/network/netServer`);
-const tor = require(`${__base}/tor/tor`);
 const netUserList = require(`${__base}/core/netUserList`);
+const notification = require(`${__base}/core/notification`);
+
+const parser = require(`${__base}/core/network/parser`);
 
 const debug = require(`${__base}/core/debug`);
+
+const tor = require(`${__base}/tor/tor`);
+
 
 //// ------------ App ------------ ////
 //Security: force sandbox mode
@@ -26,7 +31,7 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
     if (!mainWindow) { openMainWindow(); }
     if (mainWindow) {
         if (mainWindow.isMinimized()) { mainWindow.restore(); }
-        if (!mainWindow.isVisible()) { mainWindow.show(); }
+        if (!mainWindow.isVisible()) { showMainWindow(); }
         mainWindow.focus()
     }
 })
@@ -96,6 +101,7 @@ function openMainWindow() {
 
 function hideMainWindow() {
     if (mainWindow) { mainWindow.hide(); }
+    notification.clearHistory();
 }
 
 function showMainWindow() {
@@ -107,6 +113,7 @@ let tray = null
 app.on('ready', () => {
     tray = new Tray(`${__base}/data/logo.png`); //TODO change this to proper ico icon.
     const contextMenu = Menu.buildFromTemplate([
+        //LANG
         { label: 'Show App', click: () => { showMainWindow(); } },
         { label: 'Quit', click: () => { appQuit(); } }
     ])
@@ -115,11 +122,38 @@ app.on('ready', () => {
     //tray.setToolTip('이것은 나의 애플리케이션 입니다!')
 })
 
+//// ------------ Notifications ------------ ////
+netUserList.event.on('userSocketBothConnected', (address) => {
+    if (!mainWindow.isVisible()) {
+        if (parser.isMyHostname(address)) {
+            //LANG
+            notification.notify("", "Tor", "connected");
+        }
+        else {
+            notification.newConnection(address);
+        }
+    }
+})
+
+netUserList.event.on('userMessage', (address, message, options) => {
+    if (!mainWindow.isVisible()) {
+        notification.newMessage(address, message);
+    }
+});
+
+notification.event.on('click', (address) => {
+    showMainWindow();
+})
+
 //// ------------ Core ------------ ////
 async function boot() {
     await netServer.start();
 
-    tor.event.once('success', () => { setInterval(autoAddUser, 1000 * 0.1); });
+    tor.event.once('success', () => {
+        setTimeout(() => {
+            setInterval(autoAddUser, 1000 * 0.1);
+        }, 1000);
+    });
     tor.event.once('fail', (err) => { debug.log(err); });
 
     tor.start();

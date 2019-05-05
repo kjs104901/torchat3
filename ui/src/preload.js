@@ -16,10 +16,11 @@ const netUserList = remote.require(`${__base}/core/netUserList`);
 const contact = remote.require(`${__base}/core/contact`);
 const config = remote.require(`${__base}/core/config`);
 const constant = remote.require(`${__base}/core/constant`);
-const langs = remote.require(`${__base}/core/langs`)
+const langs = remote.require(`${__base}/core/langs`);
+const notification = remote.require(`${__base}/core/notification`);
 
-const tor = remote.require(`${__base}/tor/tor`)
-const torControl = remote.require(`${__base}/tor/torControl`)
+const tor = remote.require(`${__base}/tor/tor`);
+const torControl = remote.require(`${__base}/tor/torControl`);
 
 // ------------------------- ------------- ------------------------- //
 // ------------------------- remoteControl ------------------------- //
@@ -230,8 +231,6 @@ class User {
     }
 }
 
-let eventUserEmitter = new EventEmitter();
-
 function findUser(address) {
     let targetUser;
     userList.forEach(user => {
@@ -264,6 +263,7 @@ function removeUser(address) {
     })
 }
 
+let eventUserEmitter = new EventEmitter();
 window.userList = {
     event: eventUserEmitter,
     getList: () => { return userList; },
@@ -500,23 +500,24 @@ contact.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
 // user
 netUserList.event.on('newUser', (address) => { window.userList.addUser(address); });
 
+netUserList.event.on('userSocketOutConnected', (address) => { window.userList.socketOutConnected(address); });
+netUserList.event.on('userSocketOutDisconnected', (address) => { window.userList.socketOutDisconnected(address); });
+netUserList.event.on('userSocketInConnected', (address) => { window.userList.socketInConnected(address); });
+netUserList.event.on('userSocketInDisconnected', (address) => { window.userList.socketInDisconnected(address); });
 
-netUserList.eventUser.on('socketOutConnected', (address) => { window.userList.socketOutConnected(address); });
-netUserList.eventUser.on('socketOutDisconnected', (address) => { window.userList.socketOutDisconnected(address); });
-netUserList.eventUser.on('socketInConnected', (address) => { window.userList.socketInConnected(address); });
-netUserList.eventUser.on('socketInDisconnected', (address) => { window.userList.socketInDisconnected(address); });
+netUserList.event.on('userStatus', (address, status) => { window.userList.status(address, status); });
+netUserList.event.on('userProfile', (address, name, info) => { window.userList.profile(address, name, info); });
+netUserList.event.on('userClient', (address, name, version) => { window.userList.client(address, name, version); });
+netUserList.event.on('userMessage', (address, message, options) => { window.userList.message(address, message, options); });
+netUserList.event.on('userDestroy', (address) => { window.userList.destroy(address); });
 
-netUserList.eventUser.on('userStatus', (address, status) => { window.userList.status(address, status); });
-netUserList.eventUser.on('userProfile', (address, name, info) => { window.userList.profile(address, name, info); });
-netUserList.eventUser.on('userClient', (address, name, version) => { window.userList.client(address, name, version); });
-netUserList.eventUser.on('userMessage', (address, message, options) => { window.userList.message(address, message, options); });
-netUserList.eventUser.on('userDestroy', (address) => { window.userList.destroy(address); });
+netUserList.event.on('userFileAccept', (address, fileID) => { window.userList.fileAccept(address, fileID); });
+netUserList.event.on('userFileFinished', (address, fileID) => { window.userList.fileFinished(address, fileID); });
+netUserList.event.on('userFileError', (address, fileID) => { window.userList.fileError(address, fileID); });
+netUserList.event.on('userFileCancel', (address, fileID) => { window.userList.fileCancel(address, fileID); });
+netUserList.event.on('userFileData', (address, fileID, accumSize) => { window.userList.fileData(address, fileID, accumSize); });
+netUserList.event.on('userFileSpeed', (address, fileID, speed) => { window.userList.fileSpeed(address, fileID, speed); });
 
-netUserList.eventUser.on('userFileAccept', (address, fileID) => { window.userList.fileAccept(address, fileID); });
-netUserList.eventUser.on('userFileFinished', (address, fileID) => { window.userList.fileFinished(address, fileID); });
-netUserList.eventUser.on('userFileError', (address, fileID) => { window.userList.fileError(address, fileID); });
-netUserList.eventUser.on('userFileCancel', (address, fileID) => { window.userList.fileCancel(address, fileID); });
-netUserList.eventUser.on('userFileData', (address, fileID, accumSize) => { window.userList.fileData(address, fileID, accumSize); });
-netUserList.eventUser.on('userFileSpeed', (address, fileID, speed) => { window.userList.fileSpeed(address, fileID, speed); });
+notification.event.on('click', (address) => { eventEmitter.emit('clickUser', address); })
 
 /** */

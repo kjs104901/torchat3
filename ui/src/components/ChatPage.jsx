@@ -53,6 +53,7 @@ export default class ChatPage extends Component {
         remoteControl.event.on('contactUpdate', this.updateUI);
         remoteControl.event.on('chatError', this.showError);
         remoteControl.event.on('contactError', this.showError);
+        remoteControl.event.on('clickUser', this.selectUserByAddress);
     }
 
     componentWillUnmount() {
@@ -60,6 +61,7 @@ export default class ChatPage extends Component {
         remoteControl.event.removeListener('contactUpdate', this.updateUI);
         remoteControl.event.removeListener('chatError', this.showError);
         remoteControl.event.removeListener('contactError', this.showError);
+        remoteControl.event.removeListener('clickUser', this.selectUserByAddress);
     }
 
     updateUI = () => {
@@ -78,6 +80,13 @@ export default class ChatPage extends Component {
                     width: 400,
                 })
             }
+        }
+    }
+
+    selectUserByAddress = (address) => {
+        if (address && address.length > 0) {
+            const user = userList.findUser(address);
+            if (user) { this.setState({ selectedUser: user }) }
         }
     }
 
@@ -160,7 +169,7 @@ export default class ChatPage extends Component {
             let color = 'red';
             if (user.socketOutConnected && user.socketInConnected) { color = 'green'; }
             else if (user.socketOutConnected || user.socketInConnected) { color = 'orange'; }
-            
+
             let friendButton = (<span onClick={() => { this.addFriend(user.address); }}>친추</span>);
             if (remoteControl.isFriend(user.address)) {
                 friendButton = (<span onClick={() => { this.removeFriend(user.address); }}>친삭</span>);

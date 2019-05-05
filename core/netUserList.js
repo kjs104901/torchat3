@@ -14,28 +14,6 @@ setInterval(removeDestroyedUser, 1000 * 1); // seconds
 
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
-/**
- * newUser [hostname]
- * contactUpdate
- */
-
-let eventEmitterUser = new EventEmitter();
-exports.eventUser = eventEmitterUser;
-/**
- * userHalfConnect [hostname]
- * userConnect [hostname]
- * userDisconnect [hostname]
- * userStatus [hostname] [status]
- * userProfile [hostname] [name] [info]
- * userClient [hostname] [name] [version]
- * userMessage [hostname] [message] [options]
- * userFileAccept [hostname] [fileID]
- * userFileFinished [hostname] [fileID]
- * userFileError [hostname] [fileID]
- * userFileCancel [hostname] [fileID]
- * userFileData [hostname] [fileID] [accumSize]
- * userFileSpeed [hostname] [fileID] [speed]
- */
 
 function findUser(hostname) {
     let targetUser;
@@ -59,24 +37,26 @@ function addUser(address) {
     userList.push(targetUser);
 
     eventEmitter.emit('newUser', hostname);
-    targetUser.on('socketOutConnected', () => { eventEmitterUser.emit('socketOutConnected', hostname); })
-    targetUser.on('socketOutDisconnected', () => { eventEmitterUser.emit('socketOutDisconnected', hostname); })
-    targetUser.on('socketInConnected', () => { eventEmitterUser.emit('socketInConnected', hostname); })
-    targetUser.on('socketInDisconnected', () => { eventEmitterUser.emit('socketInDisconnected', hostname); })
 
-    targetUser.on('status', (status) => { eventEmitterUser.emit('userStatus', hostname, status); })
-    targetUser.on('profile', (name, info) => { eventEmitterUser.emit('userProfile', hostname, name, info); })
-    targetUser.on('client', (name, version) => { eventEmitterUser.emit('userClient', hostname, name, version); })
-    targetUser.on('message', (message, options) => { eventEmitterUser.emit('userMessage', hostname, message, options); })
+    targetUser.on('socketOutConnected', () => { eventEmitter.emit('userSocketOutConnected', hostname); })
+    targetUser.on('socketOutDisconnected', () => { eventEmitter.emit('userSocketOutDisconnected', hostname); })
+    targetUser.on('socketInConnected', () => { eventEmitter.emit('userSocketInConnected', hostname); })
+    targetUser.on('socketInDisconnected', () => { eventEmitter.emit('userSocketInDisconnected', hostname); })
+    targetUser.on('socketBothConnected', () => { eventEmitter.emit('userSocketBothConnected', hostname); })
 
-    targetUser.on('destroy', () => { eventEmitterUser.emit('userDestroy', hostname); })
+    targetUser.on('status', (status) => { eventEmitter.emit('userStatus', hostname, status); })
+    targetUser.on('profile', (name, info) => { eventEmitter.emit('userProfile', hostname, name, info); })
+    targetUser.on('client', (name, version) => { eventEmitter.emit('userClient', hostname, name, version); })
+    targetUser.on('message', (message, options) => { eventEmitter.emit('userMessage', hostname, message, options); })
 
-    targetUser.on('fileaccept', (fileID) => { eventEmitterUser.emit('userFileAccept', hostname, fileID); })
-    targetUser.on('filefinished', (fileID) => { eventEmitterUser.emit('userFileFinished', hostname, fileID); })
-    targetUser.on('fileerror', (fileID) => { eventEmitterUser.emit('userFileError', hostname, fileID); })
-    targetUser.on('filecancel', (fileID) => { eventEmitterUser.emit('userFileCancel', hostname, fileID); })
-    targetUser.on('filedata', (fileID, accumSize) => { eventEmitterUser.emit('userFileData', hostname, fileID, accumSize); })
-    targetUser.on('filespeed', (fileID, speed) => { eventEmitterUser.emit('userFileSpeed', hostname, fileID, speed); })
+    targetUser.on('destroy', () => { eventEmitter.emit('userDestroy', hostname); })
+
+    targetUser.on('fileaccept', (fileID) => { eventEmitter.emit('userFileAccept', hostname, fileID); })
+    targetUser.on('filefinished', (fileID) => { eventEmitter.emit('userFileFinished', hostname, fileID); })
+    targetUser.on('fileerror', (fileID) => { eventEmitter.emit('userFileError', hostname, fileID); })
+    targetUser.on('filecancel', (fileID) => { eventEmitter.emit('userFileCancel', hostname, fileID); })
+    targetUser.on('filedata', (fileID, accumSize) => { eventEmitter.emit('userFileData', hostname, fileID, accumSize); })
+    targetUser.on('filespeed', (fileID, speed) => { eventEmitter.emit('userFileSpeed', hostname, fileID, speed); })
 
     return targetUser;
 }
