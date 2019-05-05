@@ -50,18 +50,35 @@ function getMD5(targetStr) {
 }
 exports.getMD5 = getMD5;
 
-// creating temp directory
-let tempDirBase = os.tmpdir() + "/torchat3";
+
+// creating temp directory and clean
+let tempDirBase = os.tmpdir() + "/torchat3temp";
 let tempDirCount = 0;
-while (fs.existsSync(tempDirBase + "_" + tempDirCount) && !fs.lstatSync(tempDirBase + "_" + tempDirCount).isDirectory()) {
-    tempDirCount += 1;
-}
-if (!fs.existsSync(tempDirBase + "_" + tempDirCount)) {
-    fs.mkdirSync(tempDirBase + "_" + tempDirCount);
+let tempDir = tempDirBase + "_" + tempDirCount;
+try {
+    while (fs.existsSync(tempDirBase + "_" + tempDirCount) && !fs.lstatSync(tempDirBase + "_" + tempDirCount).isDirectory()) {
+        tempDirCount += 1;
+    }
+
+    tempDir = tempDirBase + "_" + tempDirCount;
+    if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir);
+    }
+
+    if (fs.existsSync(tempDir)) {
+        fs.readdirSync(tempDir).forEach((file) => {
+            const curPath = tempDir + "/" + file;
+            if (fs.lstatSync(curPath).isFile()) {
+                fs.unlinkSync(curPath);
+            }
+        })
+    }
+} catch (error) {
+    console.log(error);
 }
 
 function getTempDir() {
-    return tempDirBase + "_" + tempDirCount;
+    return tempDir;
 }
 exports.getTempDir = getTempDir;
 

@@ -8,15 +8,23 @@ export default class ChatMessage extends Component {
     constructor(props) {
         super(props);
 
-        userList.event.on('updateFile', (address) => {
-            if (address == this.props.selectedUser.address) {
-                this.forceUpdate();
-            }
-        })
-
         this.state = {
         };
     };
+
+    componentDidMount() {
+        userList.event.on('updateFile', this.updateFileUI)
+    }
+
+    componentWillUnmount() {
+        userList.event.removeListener('updateFile', this.updateFileUI)
+    }
+
+    updateFileUI = (address) => {
+        if (address == this.props.selectedUser.address) {
+            this.forceUpdate();
+        }
+    }
 
     acceptFile = (fileID) => {
         remoteControl.acceptFile(this.props.selectedUser.address, fileID);
