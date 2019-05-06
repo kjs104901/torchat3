@@ -153,5 +153,9 @@ class FileSendList extends EventEmitter {
             }
         });
     }
+    
+    destroy() {
+        this.removeAllListeners();
+    }
 }
 module.exports = FileSendList

@@ -392,11 +392,10 @@ class NetUser extends EventEmitter {
 
     destroy() {
         debug.log('<destroy>')
-        if (this.socketIn) { this.socketIn.destroy(); }
-        this.socketIn = null;
-
-        if (this.socketOut) { this.socketOut.destroy(); }
-        this.socketOut = null;
+        if (this.socketIn) { this.socketIn.destroy(); this.socketIn = null; }
+        if (this.socketOut) { this.socketOut.destroy(); this.socketOut = null; }
+        if (this.fileSendList) { this.fileSendList.destroy(); this.fileSendList = null; }
+        if (this.fileRecvList) { this.fileRecvList.destroy(); this.fileRecvList = null; }
 
         this.destroyed = true;
         this.emit('destroy');

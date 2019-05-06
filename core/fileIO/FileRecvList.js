@@ -158,5 +158,9 @@ class FileRecvList extends EventEmitter {
             }
         });
     }
+    
+    destroy() {
+        this.removeAllListeners();
+    }
 }
 module.exports = FileRecvList
