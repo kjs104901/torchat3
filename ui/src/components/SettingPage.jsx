@@ -62,13 +62,13 @@ export default class SettingPage extends Component {
     }
 
     saveProfile = () => {
-        if (this.state.inputProfileName > remoteControl.MaxLenProfileName) {
+        if (this.state.inputProfileName.length > remoteControl.MaxLenProfileName) {
             this.showError(new Error("profile name too long"));
         }
         else if ((/^[\x00-\xFF]*$/).test(this.state.inputProfileName) == false) {
             this.showError(new Error("profile name only ascii"));
         }
-        else if (this.state.inputProfileInfo > remoteControl.MaxLenProfileInfo) {
+        else if (this.state.inputProfileInfo.length > remoteControl.MaxLenProfileInfo) {
             this.showError(new Error("profile info too long"));
         }
         else {

@@ -45,7 +45,7 @@ export default class App extends Component {
     selectPage = (num) => { this.setState({ selectedPage: num }) }
 
     renderPage() {
-        if (remoteControl.getSuccess() == false || remoteControl.getFail() == true) {
+        if (remoteControl.getSuccess() == false || remoteControl.getFail() == true) {  
             return (
                 <BootPage />
             )

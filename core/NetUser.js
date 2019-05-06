@@ -155,7 +155,7 @@ class NetUser extends EventEmitter {
             }
         }
 
-        if (contact.isBlack(this.hostname)) {
+        if (contact.isBlack(this.hostname) && this.destroyed == false) {
             this.destroy();
         }
     }

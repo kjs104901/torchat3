@@ -96,8 +96,9 @@ window.remoteControl = {
         config.saveSetting();
     },
 
-    saveConnection: (torrcExpand, bridge) => {
+    saveConnection: (torrcExpand, useBridge, bridge) => {
         config.setTorrcExpand(torrcExpand);
+        config.setUseBridge(useBridge);
         config.setBridge(bridge);
         config.saveSetting();
     },

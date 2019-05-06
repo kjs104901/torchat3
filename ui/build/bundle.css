@@ -6,6 +6,8 @@ html, body, #app, #page, .file-drop {
     overflow: hidden;
 }
 
+/* ------ Tags ------ */
+
 .centered {
     display: table;
     margin-left: auto;
@@ -19,8 +21,11 @@ input {
 }
 
 textarea {
-    height: 20px;
     border-radius: 5px;
+}
+
+textarea .chat-input {
+    height: 20px;
 }
 
 input[type=text], textarea {
@@ -43,6 +48,72 @@ input[type=text]:focus, textarea:focus {
     border: 1px solid #5C3E73;
 }
 
+.button-custom {
+    min-width: 100px;
+    margin: 3px;
+    padding: 8px 18px;
+    outline: 0;
+    border: 0;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.button-custom.tor {
+    color: #FFF;
+    background-color: #735A93;
+}
+
+.button-custom.tor:hover {
+    background-color: #5C3E73;
+}
+
+.button-custom.confirm {
+    color: #FFF;
+    background-color: #3085d6;
+}
+
+.button-custom.confirm:hover {
+    background-color: #2b77c0;
+}
+
+.button-custom.cancel {
+    color: #FFF;
+    background-color: #d33;
+}
+
+.button-custom.cancel:hover {
+    background-color: #c62e2e;
+}
+
+.form-group {
+    position: relative;
+    width: 300px;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-control {
+    width: 100%;
+}
+
+.form-control-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 7px 0 0 13px;
+    transition: all 200ms;
+    opacity: 0.5;
+}
+
+.form-control:focus+.form-control-placeholder, .form-control:valid+.form-control-placeholder {
+    font-size: 75%;
+    transform: translate3d(0, -100%, 0);
+    opacity: 1;
+}
+
 /* ------ Side bar ------ */
 
 #side-bar {
@@ -54,7 +125,6 @@ input[type=text]:focus, textarea:focus {
 #side-menu {
     width: 100%;
     height: 70px;
-
     background-color: var(--background-color-2);
 }
 
@@ -62,7 +132,6 @@ input[type=text]:focus, textarea:focus {
     width: 100%;
     height: calc(100% - 70px);
     overflow: auto;
-
     background-color: var(--background-color-1);
 }
 
@@ -72,7 +141,6 @@ input[type=text]:focus, textarea:focus {
     width: calc(100% - 200px);
     height: 100%;
     float: left;
-
     background-color: var(--background-color-3);
 }
 
@@ -80,14 +148,12 @@ input[type=text]:focus, textarea:focus {
     width: 100%;
     height: calc(100% - 60px);
     overflow: auto;
-    
     background-color: var(--background-color-4);
 }
 
 #message-input {
     width: 100%;
     height: 60px;
-
     background-color: var(--background-color-5);
 }
 

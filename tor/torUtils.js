@@ -63,32 +63,36 @@ exports.verify = (content, signature, publicKey) => {
 }
 
 exports.generateControlPassword = () => {
-    const controlPassword = crypto.randomBytes(20).toString('hex');
-    let controlPasswordHashed;
+    try {
+        const controlPassword = crypto.randomBytes(20).toString('hex');
+        let controlPasswordHashed;
 
-    const execString = child_process.execFileSync(torDir + '/tor.exe',
-        ['--hash-password', controlPassword],
-        { cwd: torDir, encoding: 'utf8' });
+        const execString = child_process.execFileSync(torDir + '/tor.exe',
+            ['--hash-password', controlPassword],
+            { cwd: torDir, encoding: 'utf8' });
 
-    if (execString.length <= 0) { return; }
-    const execList = execString.split('\n');
-    execList.forEach(line => {
-        if (line.indexOf('16:') == 0) {
-            controlPasswordHashed = line.replace('\r', '');
-        }
-    });
-    if (!controlPasswordHashed) { return; }
+        if (execString.length <= 0) { return; }
+        const execList = execString.split('\n');
+        execList.forEach(line => {
+            if (line.indexOf('16:') == 0) {
+                controlPasswordHashed = line.replace('\r', '');
+            }
+        });
+        if (!controlPasswordHashed) { return; }
 
-    return {
-        string: controlPassword,
-        hashed: controlPasswordHashed
-    };
+        return {
+            string: controlPassword,
+            hashed: controlPasswordHashed
+        };
+    } catch (error) {
+        return;
+    }
 }
 
 
 exports.makeTorrc = (controlPassword) => {
     let bridgeLine = '';
-    if (config.getSetting().bridge == 1) { bridgeLine = "Bridge " + config.getSetting().bridge; }
+    if (config.getSetting().useBridge) { bridgeLine = "Bridge " + config.getSetting().bridge; }
     try {
 
         fs.writeFileSync(torDir + '/torrc',
@@ -104,6 +108,6 @@ ${bridgeLine}
 DataDirectory ${torDir}/data
 GeoIPFile ${torDir}/data/geoip
 GeoIPv6File ${torDir}/data/geoipv6
-    ` + config.getSetting().torrcExpand);
+` + config.getSetting().torrcExpand);
     } catch (error) { }
 }

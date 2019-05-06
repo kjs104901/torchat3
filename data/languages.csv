@@ -1,3 +1,6 @@
-﻿none,Default,English,Korean
+﻿Excel,Default,English,Korean
 ,ButtonTorConf,Tor Configure,Tor 설정
 ,ButtonAddFriend,Add friend,친구 추가
+,ConfTorrcExpand,Torrc expansion,Torrc 확장
+,ConfBridge,Bridge,브릿지
+,ButtonSave,Save,저장

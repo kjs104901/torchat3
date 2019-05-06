@@ -99,6 +99,8 @@ export default class ChatPage extends Component {
         MySwal.fire({
             title: 'Add nickname test',
             input: 'text',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
             inputValue: inputValue,
             showCancelButton: true,
             heightAuto: false,
@@ -277,7 +279,7 @@ export default class ChatPage extends Component {
                         </FileDrop>
                     </div>
                     <div id='message-input'>
-                        <textarea cols="40" rows="1"
+                        <textarea className="chat-input" cols="40" rows="1"
                             onKeyDown={this.handleKeyPress}
                             value={this.state.inputMessage}
                             onChange={(e) => { this.setState({ inputMessage: e.target.value }) }} />
