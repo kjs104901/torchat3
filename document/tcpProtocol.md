@@ -10,7 +10,7 @@ Every message has new line(0x0A) as a footer.
 
 The fisrt word of message indicates the type of message.
 
-Last of the message are arguments.
+Leftover of the message are arguments.
 
 If arguments have posiblity of having new line(0x0A) or space(0x20),
 they must be escaped.

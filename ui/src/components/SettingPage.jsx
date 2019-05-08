@@ -24,7 +24,7 @@ export default class SettingPage extends Component {
 
             inputBlackAddress: "",
 
-            inputNigthMode: this.settingValue.nigthMode
+            inputNightMode: this.settingValue.nightMode
         };
     };
 
@@ -145,7 +145,7 @@ export default class SettingPage extends Component {
             return (
                 <React.Fragment>
                     <div onClick={() => { this.switchNightMode() }}>
-                        {this.settingValue.nigthMode ? "nightmode" : "daymode"}
+                        {this.settingValue.nightMode ? "nightmode" : "daymode"}
                     </div>
                 </React.Fragment>)
 

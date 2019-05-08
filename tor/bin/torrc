@@ -2,7 +2,7 @@
 SocksPort auto
 ControlPort auto
 ControlPortWriteToFile C:\Users\HAPPY\Desktop\torchat3\torchat3\tor/bin/data/controlPort
-HashedControlPassword 16:C8A4661DA9C843A06013A0BD63533FF81B81BB208AECA6F5D75848BABC
+HashedControlPassword 16:8F946E6CF735CE1460C131B41F4B08516C34BBBD9E2B0E8A44F41483EE
 
 UseBridges 0
 

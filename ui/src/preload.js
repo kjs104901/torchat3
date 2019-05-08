@@ -104,7 +104,7 @@ window.remoteControl = {
     },
 
     switchNightMode: () => {
-        config.setNigthMode(!config.getSetting().nigthMode);
+        config.setNightMode(!config.getSetting().nightMode);
         config.saveSetting();
     },
 

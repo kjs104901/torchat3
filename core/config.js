@@ -48,7 +48,7 @@ settingDB.get('setting')
         blackList: true,
         whiteList: false,
 
-        nigthMode: false,
+        nightMode: false,
         language: "English",
     }).write();
 
@@ -70,5 +70,5 @@ exports.setProfileInfo = (data) => { setting.profileInfo = data; eventEmitter.em
 exports.setBlackList = (data) => { setting.blackList = data; eventEmitter.emit('settingUpdate'); }
 exports.setWhiteList = (data) => { setting.whiteList = data; eventEmitter.emit('settingUpdate'); }
 
-exports.setNigthMode = (data) => { setting.nigthMode = data; eventEmitter.emit('settingUpdate'); }
+exports.setNightMode = (data) => { setting.nightMode = data; eventEmitter.emit('settingUpdate'); }
 exports.setLanguage = (lang) => { setting.language = lang; eventEmitter.emit('settingUpdate'); }

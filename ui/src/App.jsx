@@ -66,7 +66,7 @@ export default class App extends Component {
 
     render() {
         return (
-            <div id='page' className={remoteControl.getSetting().nigthMode ? 'night-mode' : 'day-mode'}>
+            <div id='page' className={remoteControl.getSetting().nightMode ? 'night-mode' : 'day-mode'}>
                 {this.renderPage()}
             </div>
         )

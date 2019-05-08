@@ -135,6 +135,10 @@ input[type=text]:focus, textarea:focus {
     background-color: var(--background-color-1);
 }
 
+.profile-picture {
+
+}
+
 /* ------ content ------ */
 
 #content {

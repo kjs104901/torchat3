@@ -186,7 +186,7 @@ export default class ChatPage extends Component {
 
             row.push(
                 <div className="user" key={index} style={{ color }}>
-                    <img src={"data:image/svg+xml;base64," + user.profile.image} />
+                    <img className="profile-picture" src={"data:image/svg+xml;base64," + user.profile.image} />
                     {friendButton}
                     {blackButton}
                     nick: {nickname}
@@ -249,7 +249,7 @@ export default class ChatPage extends Component {
             <React.Fragment>
                 <div id='side-bar'>
                     <div id='side-menu'>
-                        <div id='my-name'>my name</div>
+                        <div id='my-name'>my name rew</div>
                         <div id='my-address'>my address</div>
                         <div id='button-setting'
                             onClick={() => { this.props.selectPage(2) }}>

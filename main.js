@@ -6,13 +6,9 @@ global.__base = __dirname;
 const netServer = require(`${__base}/core/network/netServer`);
 const netUserList = require(`${__base}/core/netUserList`);
 const notification = require(`${__base}/core/notification`);
-
 const parser = require(`${__base}/core/network/parser`);
-
 const debug = require(`${__base}/core/debug`);
-
 const tor = require(`${__base}/tor/tor`);
-
 
 //// ------------ App ------------ ////
 //Security: force sandbox mode
