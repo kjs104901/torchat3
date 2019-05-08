@@ -85,6 +85,7 @@ exports.generateControlPassword = () => {
             hashed: controlPasswordHashed
         };
     } catch (error) {
+        console.log(error);
         return;
     }
 }

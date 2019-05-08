@@ -39,6 +39,8 @@ window.remoteControl = {
     getBootLogs: () => { return tor.getBootLogs(); },
     getSuccess: () => { return tor.getSuccess(); },
     getFail: () => { return tor.getFail(); },
+    getHostname: () => { return tor.getHostname(); },
+
     newHiddenService: () => { torControl.newHiddenService(); },
 
     // contact
@@ -59,6 +61,9 @@ window.remoteControl = {
             .then((err) => { eventEmitter.emit('contactError', err); })
     },
 
+    getUserName: (address) => {
+        return netUserList.getUserName(address);
+    },
     getNickname: (address) => {
         return contact.getNickname(address);
     },
@@ -228,6 +233,7 @@ class User {
         this.client = { name: "", version: "" };
 
         this.messageList = [];
+        this.lastMessage = "";
         this.lastActiveTime = new Date();
     }
 }
@@ -410,6 +416,7 @@ window.userList = {
             }
 
             targetUser.messageList.push({ message, options });
+            targetUser.lastMessage = message;
             targetUser.lastActiveTime = new Date();
 
             eventUserEmitter.emit('updated');

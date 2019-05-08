@@ -146,9 +146,7 @@ async function boot() {
     await netServer.start();
 
     tor.event.once('success', () => {
-        setTimeout(() => {
-            setInterval(autoAddUser, 1000 * 0.1);
-        }, 1000);
+        setInterval(autoAddUser, 1000 * 0.1);
     });
     tor.event.once('fail', (err) => { debug.log(err); });
 

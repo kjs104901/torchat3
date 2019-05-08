@@ -26,6 +26,16 @@ function findUser(hostname) {
 }
 exports.findUser = findUser;
 
+exports.getUserName = (address) => {
+    let nickname = contact.getNickname(address);
+    if (nickname.length == 0) {
+        const targetUser = findUser(address);
+        if (targetUser) { nickname = targetUser.profileName; }
+    }
+    if (nickname.length == 0) { nickname = "tc3:" + address; }
+    return nickname;
+}
+
 function addUser(address) {
     const hostname = parser.normalizeHostname(address);
     if (!parser.checkHostname(hostname)) { return; } // hostname error

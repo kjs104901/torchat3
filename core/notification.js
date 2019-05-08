@@ -1,6 +1,7 @@
 const notifier = require('node-notifier');
 
 const contact = require(`${__base}/core/contact`);
+const netUserList = require(`${__base}/core/netUserList`);
 
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
@@ -13,8 +14,7 @@ exports.newMessage = (address, message) => {
     if (newMessageList.indexOf(address) == -1) {
         newMessageList.push(address);
 
-        let nickname = contact.getNickname(address);
-        if (nickname.length == 0) { nickname = "tc3:" + address; }
+        let nickname = netUserList.getUserName(address);
 
         notify(address, nickname, message)
     }
@@ -24,8 +24,7 @@ exports.newConnection = (address) => {
     if (newConnectionList.indexOf(address) == -1) {
         newConnectionList.push(address);
 
-        let nickname = contact.getNickname(address);
-        if (nickname.length == 0) { nickname = "tc3:" + address; }
+        let nickname = netUserList.getUserName(address);
         
         //LANG
         notify(address, "New connection", nickname)

@@ -241,10 +241,10 @@ class NetUser extends EventEmitter {
             }
         })
         this.socketIn.on('message', (message) => {
-            this.pushMessage(message, { fromMe: false });
+            this.pushMessage(message, { fromSelf: false });
         })
         this.socketIn.on('filesend', (fileID, fileSize, fileName) => {
-            this.pushMessage(fileName, { fromMe: false, fileID, fileSize });
+            this.pushMessage(fileName, { fromSelf: false, fileID, fileSize });
             this.fileRecvList.push(fileID, fileSize);
         })
         this.socketIn.on('fileaccept', (fileID) => {
@@ -310,7 +310,7 @@ class NetUser extends EventEmitter {
     sendMessage(message) { //interface
         return new Promise((resolve, reject) => {
             if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
-                this.pushMessage(message, { fromMe: true });
+                this.pushMessage(message, { fromSelf: true });
                 this.socketOut.sendMessage(message);
                 resolve();
             }
@@ -332,7 +332,7 @@ class NetUser extends EventEmitter {
                 const fileName = path.basename(file);
                 const fileSize = fileHandler.getSize(file);
 
-                this.pushMessage(fileName, { fromMe: true, fileID, fileSize: fileSize });
+                this.pushMessage(fileName, { fromSelf: true, fileID, fileSize: fileSize });
                 this.fileSendList.push(fileID, file, fileHandler.getSize(file))
 
                 this.socketOut.sendFilesend(fileID, fileSize, fileName);

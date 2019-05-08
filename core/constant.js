@@ -22,8 +22,8 @@ module.exports = {
 
     ChatListSize: 5000,
 
-    MaxLenChatMessage: 10, //1000,
-    MaxLenProfileName: 10, //20,
-    MaxLenProfileInfo: 10, //200,
+    MaxLenChatMessage: 1000,
+    MaxLenProfileName: 20,
+    MaxLenProfileInfo: 200,
     MaxLenFileName: 200,
 }

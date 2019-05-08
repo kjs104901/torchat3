@@ -4,3 +4,7 @@
 ,ConfTorrcExpand,Torrc expansion,Torrc 확장
 ,ConfBridge,Bridge,브릿지
 ,ButtonSave,Save,저장
+,ButtonAcceptFile,Accept,수락
+,ButtonCancelFile,Cancel,취소
+,ButtonSaveFile,Save,저장
+,StatusCanceled,Canceled,취소됨

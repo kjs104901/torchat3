@@ -89,7 +89,8 @@ export default class BootPage extends Component {
                         </div>
                     </Collapsible>
                     <div className='centered' style={{ width: "80%" }}>
-                        <PerfectScrollbar style={{ width: "100%", height: 200, marginTop: 20, fontSize: 12, overflow: 'auto' }}>
+                        <PerfectScrollbar
+                            style={{ width: "100%", height: 200, marginTop: 20, fontSize: 12, overflow: 'auto' }}>
                             {this.logsRender()}
                         </PerfectScrollbar>
                     </div>
