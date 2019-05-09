@@ -70,7 +70,6 @@ exports.getNickname = (address) => {
 exports.setNickname = (address, nickname) => {
     const hostname = parser.normalizeHostname(address);
     if (!parser.checkHostname(hostname)) { return; }
-    if (nickname.length <= 0) { return; }
 
     nicknameList[hostname] = nickname;
     eventEmitter.emit('contactUpdate');

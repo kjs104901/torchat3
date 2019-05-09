@@ -10,13 +10,23 @@ const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
 exports.event = eventEmitter;
 
-const torDir = __dirname + "/bin";
+const torDir = fixPathForAsarUnpack(__dirname + "/bin");
 
 let controlConnection = null;
 let controlAuth = false;
 let controlHiddenService = false;
 let controlHiddenServiceDestroy = false;
 const controlPortFile = torDir + "/data/controlPort";
+
+function fixPathForAsarUnpack(targetPath) {
+    const isElectron = 'electron' in process.versions;
+    const isUsingAsar = isElectron && process.mainModule && process.mainModule.filename.includes('app.asar');
+
+    if (isUsingAsar) {
+        return targetPath.replace('app.asar', 'app.asar.unpacked');
+    }
+    return targetPath;
+}
 
 exports.deleteControlFile = () => {
     if (fs.existsSync(controlPortFile)) {

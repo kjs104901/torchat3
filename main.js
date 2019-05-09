@@ -14,13 +14,15 @@ const tor = require(`${__base}/tor/tor`);
 //Security: force sandbox mode
 if (process.argv.indexOf('--enable-sandbox') == -1 || process.argv.indexOf('--no-sandbox') > -1) {
     console.log("[Error] Not in sandbox mode. Use --enable-sandbox");
-    app.quit(); return;
+    app.quit();
+    return;
 }
 
 const instanceLock = app.requestSingleInstanceLock()
 if (!instanceLock) {
     console.log("[Error] The app is already running");
-    app.quit(); return;
+    app.quit();
+    return;
 }
 
 app.on('second-instance', (event, commandLine, workingDirectory) => {

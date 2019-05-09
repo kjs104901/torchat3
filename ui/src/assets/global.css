@@ -20,9 +20,9 @@ html {
     --color-profile-red: #d96666;
     --color-font: #000;
     --color-font-dim: #888;
-    --color-background__side-menu: #FFF;
-    --color-background__side-menu-deep: #DDD;
-    --color-background__side-content: #EEE;
+    --color-background__side-menu: #E8E8E8;
+    --color-background__side-menu-deep: #E0E0E0;
+    --color-background__side-content: #F3F3F3;
     --color-background__side-content-hover: #F9F9F9;
     --color-background__side-content-selected: #FFF;
     --color-background__main-header: #F4F4F4;
@@ -198,6 +198,7 @@ input[type=text]:focus, textarea:focus {
     width: 100%;
     height: 130px;
     background-color: var(--color-background__side-menu);
+    overflow: hidden;
 }
 
 #side-content {
@@ -213,6 +214,33 @@ input[type=text]:focus, textarea:focus {
     padding: 3px;
 }
 
+#user-list {
+    width: 100%;
+    height: calc(100% - 40px)
+}
+
+@media (max-width: 500px) {
+    #side-bar {
+        width: 50px;
+    }
+    #side-menu {
+        display: none;
+    }
+    #side-content {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: var(--color-background__side-content);
+    }
+    #user-list-menu {
+        display: none;
+    }
+    #user-list {
+        width: 100%;
+        height: 100%;
+    }
+}
+
 #contact-input-block {
     float: left;
     width: calc(100% - 60px);
@@ -226,16 +254,17 @@ input[type=text]:focus, textarea:focus {
 }
 
 .my-address {
-    width: 185px;
+    width: 190px;
     height: 30px;
-    padding-left: 10px;
+    padding-left: 5px;
     padding-right: 5px;
 }
 
 .my-address__address {
     float: left;
-    width: 155px;
-    height: 30px;
+    width: 150px;
+    height: 40px;
+    padding-left: 5px;
     word-break: break-all;
     color: var(--color-font-dim);
     font-size: 8pt;
@@ -250,8 +279,7 @@ input[type=text]:focus, textarea:focus {
     float: left;
     width: 50%;
     height: 22px;
-    margin-top: 15px;
-    padding-top: 3px;
+    padding-top: 8px;
     border-radius: 15px 15px 0px 0px;
     font-size: 10pt;
     cursor: pointer;
@@ -265,7 +293,7 @@ input[type=text]:focus, textarea:focus {
 
 .user {
     width: 185px;
-    height: 60px;
+    height: 50px;
     padding: 5px 15px 5px 0px;
     overflow: hidden;
 }
@@ -281,17 +309,28 @@ input[type=text]:focus, textarea:focus {
 .profile__head {
     float: left;
     overflow: hidden;
+    width: 50px;
+    height: 50px;
+}
+
+.profile__head.big {
     width: 60px;
     height: 60px;
 }
 
 .profile__head__background {
     position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 13px;
+    margin: 8px;
+    background-color: var(--color-profile-gray);
+}
+
+.profile__head__background.big {
     width: 44px;
     height: 44px;
     border-radius: 14px;
-    margin: 8px;
-    background-color: var(--color-profile-gray);
 }
 
 .profile__head__background.yellow {
@@ -309,16 +348,28 @@ input[type=text]:focus, textarea:focus {
 .profile__head__picture {
     position: relative;
     left: 0px;
+    top: -50px;
+    width: 26px;
+    height: 26px;
+    margin: 12px;
+    border-radius: 10px;
+}
+
+.profile__head__picture.big {
     top: -60px;
     width: 36px;
     height: 36px;
-    margin: 12px;
     border-radius: 12px;
 }
 
 .profile__body {
     float: left;
     overflow: hidden;
+    width: calc(100% - 50px);
+    height: 50px;
+}
+
+.profile__body.big {
     width: calc(100% - 60px);
     height: 60px;
 }
@@ -327,24 +378,34 @@ input[type=text]:focus, textarea:focus {
     float: left;
     width: 100%;
     height: 20px;
-    padding-top: 10px;
+    padding-top: 6px;
     overflow: hidden;
     white-space: nowrap;
 }
 
+.profile__body__nickname.big {
+    height: 20px;
+    padding-top: 10px;
+}
+
 .profile__body__nickname.alone {
-    padding-top: 18px;
+    padding-top: 14px;
 }
 
 .profile__body__last-message {
     float: left;
     width: 100%;
-    height: 30px;
+    height: 20px;
     padding-top: 2px;
     color: var(--color-font-dim);
     font-size: 8pt;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.profile__body__last-message.big {
+    height: 30px;
+    padding-top: 2px;
 }
 
 .option-list__option {
@@ -376,6 +437,13 @@ input[type=text]:focus, textarea:focus {
     height: 100%;
     float: left;
     background-color: var(--color-background__main-content);
+}
+
+
+@media (max-width: 500px) {
+    #content {
+        width: calc(100% - 50px);
+    }
 }
 
 #content__header {
@@ -448,18 +516,17 @@ input[type=text]:focus, textarea:focus {
 
 .friend-alert__text {
     float: left;
-    width: calc(100% - 140px);
+    width: calc(100% - 110px);
     height: calc(100% - 26px);
-    padding: 13px 10px 13px 20px;
+    padding: 15px 10px 13px 20px;
     overflow: hidden;
     white-space: nowrap;
-    font-weight: bold;
     color: var(--color-text__main-alert);
 }
 
 .friend-alert__button {
     float: left;
-    width: 50px;
+    width: 40px;
     height: 100%;
 }
 
@@ -552,12 +619,13 @@ input[type=text]:focus, textarea:focus {
 
 .profile-header {
     width: 100%;
+    height: 20px;
 }
 
 .profile-close {
     width: 20px;
     height: 20px;
-    padding: 20px;
+    padding: 15px 20px;
     float: right;
 }
 
@@ -568,9 +636,11 @@ input[type=text]:focus, textarea:focus {
     margin-top: 30px;
     margin-left: auto;
     margin-right: auto;
+    background-color: #EEE;
+    padding: 1px 20px 10px 20px;
 }
 
-.profile-group * {
+.profile-group>* {
     margin-top: 10px;
     word-break: break-all;
 }

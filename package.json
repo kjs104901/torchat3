@@ -81,6 +81,10 @@
       "createDesktopShortcut": "always",
       "installerHeaderIcon": "./assets/icon.ico"
     },
-    "asar": false
+    "asar": true,
+    "asarUnpack": [
+      "data/**",
+      "tor/bin/**"
+    ]
   }
 }

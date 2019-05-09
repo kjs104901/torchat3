@@ -6,11 +6,13 @@ const userList = window.userList;
 const langs = window.langs;
 
 import PerfectScrollbar from 'react-perfect-scrollbar'
+
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 const MySwal = withReactContent(Swal)
 
 import ChatMessagePage from './ChatMessagePage';
+import ProfilePage from './ProfilePage';
 
 import imgAddContact from '../assets/addContact.png'
 import imgAddWhite from '../assets/addWhite.png'
@@ -52,9 +54,6 @@ export default class ChatPage extends Component {
     constructor(props) {
         super(props);
 
-        this.scrollRef = null;
-        this.scrollReachEnd = true;
-
         this.state = {
             selectedUser: null,
             showProfile: false,
@@ -80,12 +79,15 @@ export default class ChatPage extends Component {
 
     updateUI = () => {
         this.forceUpdate();
+    }
 
-        if (this.scrollRef) {
-            if (this.scrollReachEnd) {
-                this.scrollRef.scrollTop = this.scrollRef.scrollHeight;
-            }
-        }
+    setClipboard = (address) => {
+        remoteControl.setClipboard("tc3:" + address);
+        MySwal.fire({
+            text: langs.get('PopupClipboard'),
+            heightAuto: false,
+            width: 400,
+        })
     }
 
     showError = (err) => {
@@ -116,56 +118,6 @@ export default class ChatPage extends Component {
 
     addFriendInput = () => { remoteControl.addFriend(this.state.inputUserAddress); }
 
-    addFriend = (targetAddress) => { remoteControl.addFriend(targetAddress); }
-    removeFriend = (targetAddress) => { remoteControl.removeFriend(targetAddress); }
-    setNicknameDialog = (targetAddress) => {
-        let inputValue = remoteControl.getNickname(targetAddress);
-        MySwal.fire({
-            title: langs.get('PopupSetNickname'),
-            input: 'text',
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            inputValue: inputValue,
-            showCancelButton: true,
-            heightAuto: false,
-            width: 400,
-        }).then((result) => {
-            if (result) {
-                let nickname = result.value;
-                if (nickname) {
-                    remoteControl.setNickname(targetAddress, nickname);
-                }
-                else if (!result.dismiss) {
-                    remoteControl.setNickname(targetAddress, "");
-                }
-            }
-        })
-    }
-    addBlack = (targetAddress) => {
-        MySwal.fire({
-            title: langs.get('PopupBlackTitle'),
-            text: langs.get('PopupBlackText'),
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'okay',
-            cancelButtonText: 'cancel',
-            heightAuto: false,
-            width: 400,
-        }).then((result) => {
-            if (result.value) {
-                remoteControl.addBlack(targetAddress);
-                MySwal.fire({
-                    title: langs.get('PopupBlackFinishedTitle'),
-                    text: langs.get('PopupBlackFinishedText'),
-                    heightAuto: false,
-                    width: 400,
-                })
-            }
-        })
-    }
-    removeBlack = (targetAddress) => { remoteControl.removeBlack(targetAddress); }
-
     renderUserList = () => {
         let row = [];
 
@@ -191,7 +143,15 @@ export default class ChatPage extends Component {
                     <div className="profile__head">
                         <div className={"profile__head__background " + color}></div>
                         <img className="image-button profile__head__picture"
-                            onClick={(e) => { e.stopPropagation(); this.setState({ selectedUser: user, showProfile: true }) }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (window.innerWidth > 500) {
+                                    this.setState({ selectedUser: user, showProfile: true })
+                                }
+                                else {
+                                    this.setState({ selectedUser: user, showProfile: false })
+                                }
+                            }}
                             src={"data:image/svg+xml;base64," + user.profile.image} />
                     </div>
                     <div className="profile__body">
@@ -234,14 +194,14 @@ export default class ChatPage extends Component {
                 <div id='side-bar'>
                     <div id='side-menu'>
                         <div className="myself">
-                            <div className="profile__head">
-                                <div className={"profile__head__background " + myColor}></div>
-                                <img className="image-button profile__head__picture"
+                            <div className="profile__head big">
+                                <div className={"profile__head__background big " + myColor}></div>
+                                <img className="profile__head__picture big"
                                     src={"data:image/svg+xml;base64," + myProfileImage} />
                             </div>
-                            <div className="profile__body">
-                                <div className="profile__body__nickname">{myName}</div>
-                                <div className="profile__body__last-message">{myProfileInfo}</div>
+                            <div className="profile__body big">
+                                <div className="profile__body__nickname big">{myName}</div>
+                                <div className="profile__body__last-message big">{myProfileInfo}</div>
                             </div>
                         </div>
 
@@ -249,11 +209,12 @@ export default class ChatPage extends Component {
                             <div className="my-address__address dragable">
                                 {"tc3:" + myAddress}
                             </div>
-                            <div style={{ float: 'left', width: 30 }}
-                                onClick={() => { remoteControl.setClipboard("tc3:" + myAddress) }}>
+                            <div style={{ float: 'left', width: 30, paddingTop: 3 }}
+                                onClick={() => { this.setClipboard(myAddress) }}>
                                 <img className="image-button size20margin5" src={imgCopy} />
                             </div>
                         </div>
+                        <div className="clearfix"></div>
                         <div className="menu-select">
                             <div className="menu-select__item selected" onClick={() => { this.props.selectPage(1) }}>
                                 {langs.get('MenuChat')}
@@ -280,23 +241,25 @@ export default class ChatPage extends Component {
                                 <img className="image-button size20margin5" src={imgAddContact} />
                             </div>
                         </div>
-                        <PerfectScrollbar id='user-list' style={{ width: '100%', height: 'calc(100% - 40px)' }}>
-                            {this.renderUserList()}
-                        </PerfectScrollbar>
+                        <div id='user-list' >
+                            <PerfectScrollbar style={{ width: '100%', height: '100%' }}>
+                                {this.renderUserList()}
+                            </PerfectScrollbar>
+                        </div>
                     </div>
                 </div>
                 <div id='content'>
                     {this.state.selectedUser ?
                         this.state.showProfile ?
-                            <React.Fragment>
-                                <div>profile</div>
-                                <div onClick={() => { this.setState({ showProfile: false }) }}>Close Button</div>
-                            </React.Fragment>
+                            <ProfilePage selectedUser={this.state.selectedUser} turnProfile={this.turnProfile} />
                             :
                             <ChatMessagePage selectedUser={this.state.selectedUser} turnProfile={this.turnProfile} />
                         :
                         <React.Fragment>
-                            <div>plz select chat</div>
+                            <div style={{ width: '100%', height: 'calc(50% - 25px)' }}></div>
+                            <div style={{ width: '100%', height: 25, textAlign: 'center', fontSize: '15px' }}>
+                                {langs.get('BackgroundStartChat')}
+                            </div>
                         </React.Fragment>}
                 </div>
             </React.Fragment>

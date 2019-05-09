@@ -8,8 +8,18 @@ const supercop = require('supercop.js')
 
 const config = require(`${__base}/core/config`);
 
-const torDir = __dirname + "/bin";
+const torDir = fixPathForAsarUnpack(__dirname + "/bin");
 const hiddenServiceDir = torDir + "/hidden_service";
+
+function fixPathForAsarUnpack (targetPath) {
+    const isElectron = 'electron' in process.versions;
+    const isUsingAsar = isElectron && process.mainModule && process.mainModule.filename.includes('app.asar');
+
+    if (isUsingAsar) {
+        return targetPath.replace('app.asar', 'app.asar.unpacked');
+    }
+    return targetPath;
+}
 
 exports.generateKeyPair = () => {
     let secret, public;
@@ -67,6 +77,8 @@ exports.generateControlPassword = () => {
         const controlPassword = crypto.randomBytes(20).toString('hex');
         let controlPasswordHashed;
 
+        //test
+        console.log("torDir", torDir);
         const execString = child_process.execFileSync(torDir + '/tor.exe',
             ['--hash-password', controlPassword],
             { cwd: torDir, encoding: 'utf8' });

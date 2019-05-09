@@ -1,6 +1,5 @@
 ﻿Excel,Default,English,Korean
-,ButtonTorConf,Tor Configure,Tor 설정
-,ButtonAddFriend,Add friend,친구 추가
+,ButtonTorConf,Tor Configurations,Tor 설정
 ,ConfTorrcExpand,Torrc expansion,Torrc 확장
 ,ConfBridge,Bridge,브릿지
 ,ButtonSave,Save,저장
@@ -12,9 +11,20 @@
 ,StatusCompleted,Completed,완료됨
 ,AlertNotFriend,[Alert] Not a friend.,[경고] 친구가 아닙니다
 ,PopupSetNickname,Set nickname,닉네임 설정
-,PopupBlackTitle,Add to blacklist,블랙리스트에 추가
-,PopupBlackText,"It will be disconnected, and you won't be able to talk.","연결이 끊어지며, 대화가 불가능합니다"
-,PopupBlackFinishedTitle,Added to blacklist,블랙리스트에 추가됨
-,PopupBlackFinishedText,You can remove it on the settings,설정에서 제거 가능합니다
+,PopupBlockTitle,Block,블랙리스트에 추가
+,PopupBlockText,"Connetion will be lost, and you won't be able to talk.","연결이 끊어지며, 대화가 불가능합니다"
+,PopupBlockFinishedTitle,Blocked,블랙리스트에 추가됨
+,PopupBlockFinishedText,You can unblock on the settings,설정에서 제거 가능합니다
 ,MenuChat,Chat,채팅
 ,MenuSettings,Settings,설정에서 제거 가능합니다
+,BackgroundStartChat,Start a chat,대화를 시작해보세요
+,ButtonCopy,Copy,복사
+,ButtonSetNickname,Set nickname,닉네임 설정
+,PopupRemoveFriendTitle,Unfriend,친구 삭제
+,PopupRemoveFriendText,The address will be lost,주소가 없어집니다
+,PopupRemoveFriendFinishedTitle,Unfriended,친구 삭제됨
+,ButtonFriend,Friend,친구 추가
+,ButtonUnfriend,Unfriend,친구 삭제
+,ButtonBlock,Block,차단
+,ButtonUnblock,Unblock,차단해제
+,PopupClipboard,Copied to Clipboard,클립보드에 복사됨

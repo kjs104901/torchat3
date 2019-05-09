@@ -228,7 +228,7 @@ class User {
         this.status = 0;
         this.profile = {
             name: "", info: "",
-            image: new Identicon(hash, { format: 'svg' }).toString()
+            image: new Identicon(hash, { format: 'svg', background: [255, 255, 255, 255] }).toString()
         };
         this.client = { name: "", version: "" };
 

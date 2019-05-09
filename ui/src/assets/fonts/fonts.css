@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'NG';
+    src: url('./NanumGothic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'NSR';
+    src: url('./NanumSquareRound.woff') format('woff');
+}
+
+body {
+    font-family: 'NG', 'NSR', Arial, Helvetica, sans-serif, 'Times New Roman', Times;
+}

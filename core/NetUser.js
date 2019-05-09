@@ -112,7 +112,7 @@ class NetUser extends EventEmitter {
                 this.socketOutConnecting = true;
 
                 const options = config.getProxyOptions(this.hostname);
-                debug.log("[Proxy] Try to connect. options", options);
+                debug.log("[Proxy] Try to connect: ", this.hostname);
 
                 if (this.socksClient) {
                     this.socksClient.removeAllListeners();
@@ -124,7 +124,7 @@ class NetUser extends EventEmitter {
                     this.socketOutConnecting = false;
                 });
                 this.socksClient.on('error', (err) => {
-                    debug.log("[Proxy] Connect error: ", err);
+                    debug.log("[Proxy] Connect error: ", this.hostname);
                     this.socketOutConnecting = false;
                     this.socketOutWaiting = true;
                     setTimeout(() => { this.socketOutWaiting = false; }, constant.ConnectionRetryTime);
