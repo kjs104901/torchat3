@@ -26,7 +26,8 @@ html {
     --color-background__side-content-hover: #F9F9F9;
     --color-background__side-content-selected: #FFF;
     --color-background__main-header: #F4F4F4;
-    --color-background__main-alert: #E99;
+    --color-background__main-alert: #E37473;
+    --color-text__main-alert: #FFF;
     --color-background__main-content: #FFF;
     --color-background__chat-input: #EEE;
     --color-background__chat-left: #d1c7dd;
@@ -452,6 +453,8 @@ input[type=text]:focus, textarea:focus {
     padding: 13px 10px 13px 20px;
     overflow: hidden;
     white-space: nowrap;
+    font-weight: bold;
+    color: var(--color-text__main-alert);
 }
 
 .friend-alert__button {

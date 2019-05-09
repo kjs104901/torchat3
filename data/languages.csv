@@ -8,3 +8,13 @@
 ,ButtonCancelFile,Cancel,취소
 ,ButtonSaveFile,Save,저장
 ,StatusCanceled,Canceled,취소됨
+,StatusAcceptWaiting,Waiting to accept file,파일 수락 기다리는 중
+,StatusCompleted,Completed,완료됨
+,AlertNotFriend,[Alert] Not a friend.,[경고] 친구가 아닙니다
+,PopupSetNickname,Set nickname,닉네임 설정
+,PopupBlackTitle,Add to blacklist,블랙리스트에 추가
+,PopupBlackText,"It will be disconnected, and you won't be able to talk.","연결이 끊어지며, 대화가 불가능합니다"
+,PopupBlackFinishedTitle,Added to blacklist,블랙리스트에 추가됨
+,PopupBlackFinishedText,You can remove it on the settings,설정에서 제거 가능합니다
+,MenuChat,Chat,채팅
+,MenuSettings,Settings,설정에서 제거 가능합니다

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
-import FileDrop from 'react-file-drop';
 
 const remoteControl = window.remoteControl;
 const userList = window.userList;
@@ -11,7 +10,7 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 const MySwal = withReactContent(Swal)
 
-import ChatMessage from './ChatMessage';
+import ChatMessagePage from './ChatMessagePage';
 
 import imgAddContact from '../assets/addContact.png'
 import imgAddWhite from '../assets/addWhite.png'
@@ -21,6 +20,7 @@ import imgCopy from '../assets/copy.png'
 import imgPaste from '../assets/paste.png'
 import imgSend from '../assets/send.png'
 import imgSetting from '../assets/setting.png'
+import imgInfo from '../assets/info.png'
 import imgUpload from '../assets/upload.png'
 
 //test temp example
@@ -57,8 +57,8 @@ export default class ChatPage extends Component {
 
         this.state = {
             selectedUser: null,
+            showProfile: false,
             inputUserAddress: "",
-            inputMessage: "",
         };
     };
 
@@ -106,8 +106,12 @@ export default class ChatPage extends Component {
     selectUserByAddress = (address) => {
         if (address && address.length > 0) {
             const user = userList.findUser(address);
-            if (user) { this.setState({ selectedUser: user }) }
+            if (user) { this.setState({ selectedUser: user, showProfile: false }) }
         }
+    }
+
+    turnProfile = (onOff) => {
+        this.setState({ showProfile: onOff })
     }
 
     addFriendInput = () => { remoteControl.addFriend(this.state.inputUserAddress); }
@@ -117,7 +121,7 @@ export default class ChatPage extends Component {
     setNicknameDialog = (targetAddress) => {
         let inputValue = remoteControl.getNickname(targetAddress);
         MySwal.fire({
-            title: 'Add nickname test',
+            title: langs.get('PopupSetNickname'),
             input: 'text',
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
@@ -137,55 +141,30 @@ export default class ChatPage extends Component {
             }
         })
     }
-    addBlack = (targetAddress) => { remoteControl.addBlack(targetAddress); }
-    removeBlack = (targetAddress) => { remoteControl.removeBlack(targetAddress); }
-
-    sendMessage = () => {
-        if (this.state.selectedUser && this.state.inputMessage.length > 0) {
-            if (this.state.inputMessage.length > remoteControl.MaxLenChatMessage) {
-                this.showError(new Error("can't send over char: " + remoteControl.MaxLenChatMessage));
-            }
-            else {
-                remoteControl.sendMessage(this.state.selectedUser.address, this.state.inputMessage);
-                this.setState({
-                    inputMessage: ""
+    addBlack = (targetAddress) => {
+        MySwal.fire({
+            title: langs.get('PopupBlackTitle'),
+            text: langs.get('PopupBlackText'),
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'okay',
+            cancelButtonText: 'cancel',
+            heightAuto: false,
+            width: 400,
+        }).then((result) => {
+            if (result.value) {
+                remoteControl.addBlack(targetAddress);
+                MySwal.fire({
+                    title: langs.get('PopupBlackFinishedTitle'),
+                    text: langs.get('PopupBlackFinishedText'),
+                    heightAuto: false,
+                    width: 400,
                 })
             }
-        }
+        })
     }
-
-    sendFileDialog = () => {
-        if (this.state.selectedUser) {
-            remoteControl.sendFileDialog(this.state.selectedUser.address);
-        }
-    }
-
-    sendFile = (path) => {
-        if (this.state.selectedUser) {
-            remoteControl.sendFile(this.state.selectedUser.address, path)
-        }
-    }
-
-    renderAlert = () => {
-        if (this.state.selectedUser) {
-            const targetUser = this.state.selectedUser;
-            if (!remoteControl.isFriend(targetUser.address)) {
-                return (
-                    <div className="friend-alert">
-                        <div className="friend-alert__text">This is not a friend.</div>
-                        <div className="friend-alert__button"
-                            onClick={() => { this.addBlack(targetUser.address) }}>
-                            <img className="image-button size30margin10" src={imgBlackWhite} />
-                        </div>
-                        <div className="friend-alert__button"
-                            onClick={() => { this.addFriend(targetUser.address) }}>
-                            <img className="image-button size30margin10" src={imgAddWhite} />
-                        </div>
-                    </div>
-                )
-            }
-        }
-    }
+    removeBlack = (targetAddress) => { remoteControl.removeBlack(targetAddress); }
 
     renderUserList = () => {
         let row = [];
@@ -208,10 +187,11 @@ export default class ChatPage extends Component {
 
             row.push(
                 <div className={selected ? "user selected" : "user"} key={index}
-                    onClick={() => { this.setState({ selectedUser: user }) }}>
+                    onClick={() => { this.setState({ selectedUser: user, showProfile: false }) }}>
                     <div className="profile__head">
                         <div className={"profile__head__background " + color}></div>
                         <img className="image-button profile__head__picture"
+                            onClick={(e) => { e.stopPropagation(); this.setState({ selectedUser: user, showProfile: true }) }}
                             src={"data:image/svg+xml;base64," + user.profile.image} />
                     </div>
                     <div className="profile__body">
@@ -224,51 +204,6 @@ export default class ChatPage extends Component {
             )
         });
         return row;
-    }
-
-    renderMessages = () => {
-        let row = [];
-        if (this.state.selectedUser) {
-            this.state.selectedUser.messageList.forEach((message, index) => {
-                row.push(
-                    <ChatMessage
-                        selectedUser={this.state.selectedUser}
-                        message={message}
-                        key={index} />
-                )
-            });
-        }
-        return (
-            <div className="message-list-inner">
-                <div style={{ height: 300 }}></div>
-                <div>{row}</div>
-            </div>
-        );
-    }
-
-    handleDrop = (files, event) => {
-        if (files.length > 10) {
-            this.showError(new Error("more than 10 files"))
-        }
-        else {
-            for (let index = 0; index < files.length; index++) {
-                const file = files[index];
-                this.sendFile(file.path);
-            }
-        }
-    }
-
-    handleKeyPress = (event) => {
-        if ((event.keyCode == 10 || event.keyCode == 13)) {
-            if (event.ctrlKey) {
-                this.setState({ inputMessage: this.state.inputMessage + "\n" })
-            }
-            else {
-                this.sendMessage();
-            }
-            event.preventDefault();
-            event.stopPropagation();
-        }
     }
 
     render() {
@@ -294,21 +229,6 @@ export default class ChatPage extends Component {
             myProfileImage = myselfUser.profile.image;
         }
 
-        // selected
-        let selectedUser;
-        let selectedAddress = "";
-        let selectedProfileImage = "";
-        let selectedName = "";
-
-        if (this.state.selectedUser) {
-            selectedUser = this.state.selectedUser;
-            if (selectedUser) {
-                selectedAddress = selectedUser.address;
-                selectedName = remoteControl.getUserName(selectedAddress);
-                selectedProfileImage = selectedUser.profile.image;
-            }
-        }
-
         return (
             <React.Fragment>
                 <div id='side-bar'>
@@ -330,16 +250,16 @@ export default class ChatPage extends Component {
                                 {"tc3:" + myAddress}
                             </div>
                             <div style={{ float: 'left', width: 30 }}
-                                onClick={() => { remoteControl.setClipboard(myAddress) }}>
+                                onClick={() => { remoteControl.setClipboard("tc3:" + myAddress) }}>
                                 <img className="image-button size20margin5" src={imgCopy} />
                             </div>
                         </div>
                         <div className="menu-select">
                             <div className="menu-select__item selected" onClick={() => { this.props.selectPage(1) }}>
-                                chat
+                                {langs.get('MenuChat')}
                             </div>
                             <div className="menu-select__item" onClick={() => { this.props.selectPage(2) }}>
-                                setting
+                                {langs.get('MenuSettings')}
                             </div>
                         </div>
                     </div>
@@ -366,50 +286,14 @@ export default class ChatPage extends Component {
                     </div>
                 </div>
                 <div id='content'>
-                    {selectedUser ?
-                        <FileDrop onDrop={this.handleDrop}>
-                            <div id='content__header'>
-                                <img id="content__header__picture" className="image-button"
-                                    src={"data:image/svg+xml;base64," + selectedProfileImage} />
-                                <div id='content__header__info'>
-                                    <div id='content__header__info__nickname'>
-                                        {selectedName}
-                                    </div>
-                                    <div id='content__header__info__address' className='dragable'>
-                                        {"tc3:" + selectedAddress}
-                                    </div>
-                                </div>
-                                <div id='content__header__button'>
-                                    <img className="image-button size30margin10" src={imgSetting} />
-                                </div>
-                            </div>
-                            {this.renderAlert()}
-                            <div id='message-list'>
-                                <PerfectScrollbar
-                                    containerRef={(ref) => { this.scrollRef = ref; }}
-                                    style={{ width: '100%', height: '100%' }}
-                                    onScrollUp={() => { this.scrollReachEnd = false; }}
-                                    onYReachEnd={() => { this.scrollReachEnd = true; }}>
-                                    {this.renderMessages()}
-                                </PerfectScrollbar>
-                            </div>
-                            <div id='message-input'>
-                                <div style={{ float: "left", width: 30, height: 40 }}
-                                    onClick={() => { this.sendFileDialog() }}>
-                                    <img className="image-button size20margin5" style={{ marginTop: 10, marginBottom: 10 }} src={imgUpload} />
-                                </div>
-
-                                <textarea className="chat-input" cols="40" rows="1"
-                                    onKeyDown={this.handleKeyPress}
-                                    value={this.state.inputMessage}
-                                    onChange={(e) => { this.setState({ inputMessage: e.target.value }) }} />
-
-                                <div style={{ float: "left", width: 30, height: 40 }}
-                                    onClick={() => { this.sendMessage() }}>
-                                    <img className="image-button size20margin5" style={{ marginTop: 10, marginBottom: 10 }} src={imgSend} />
-                                </div>
-                            </div>
-                        </FileDrop>
+                    {this.state.selectedUser ?
+                        this.state.showProfile ?
+                            <React.Fragment>
+                                <div>profile</div>
+                                <div onClick={() => { this.setState({ showProfile: false }) }}>Close Button</div>
+                            </React.Fragment>
+                            :
+                            <ChatMessagePage selectedUser={this.state.selectedUser} turnProfile={this.turnProfile} />
                         :
                         <React.Fragment>
                             <div>plz select chat</div>

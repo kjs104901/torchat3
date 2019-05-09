@@ -58,6 +58,7 @@ function appQuit() {
 
 //// ------------ Main windows ------------ ////
 let mainWindow
+let mainWindowHided = false;
 let mainWindowSetting = {
     width: 1600, height: 800,
     minWidth: 600, minHeight: 400,
@@ -97,10 +98,12 @@ function openMainWindow() {
 
 function hideMainWindow() {
     if (mainWindow) { mainWindow.hide(); }
+    mainWindowHided = true;
     notification.clearHistory();
 }
 
 function showMainWindow() {
+    mainWindowHided = false;
     if (mainWindow) { mainWindow.show(); }
 }
 
@@ -120,7 +123,7 @@ app.on('ready', () => {
 
 //// ------------ Notifications ------------ ////
 netUserList.event.on('userSocketBothConnected', (address) => {
-    if (!mainWindow.isVisible()) {
+    if (mainWindowHided) {
         if (parser.isMyHostname(address)) {
             //LANG
             notification.notify("", "Tor", "connected");
@@ -132,7 +135,7 @@ netUserList.event.on('userSocketBothConnected', (address) => {
 })
 
 netUserList.event.on('userMessage', (address, message, options) => {
-    if (!mainWindow.isVisible()) {
+    if (mainWindowHided) {
         notification.newMessage(address, message);
     }
 });
