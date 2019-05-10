@@ -1,5 +1,3 @@
-"use strict";
-
 const config = require(`${__base}/core/config`);
 
 const fs = require('fs');

@@ -1,5 +1,3 @@
-"use strict";
-
 const fs = require('fs');
 const crypto = require("crypto");
 const { SHA3 } = require('sha3');
@@ -24,7 +22,7 @@ function fixPathForAsarUnpack(targetPath) {
 }
 
 exports.generateKeyPair = () => {
-    let secret, public;
+    let secretKey, publicKey;
 
     const secretKeyDir = hiddenServiceDir + "/secretKey";
     const publicKeyDir = hiddenServiceDir + "/publicKey";
@@ -33,21 +31,21 @@ exports.generateKeyPair = () => {
 
     if (fs.existsSync(secretKeyDir) && fs.existsSync(publicKeyDir)) { // already exists
         try {
-            secret = fs.readFileSync(secretKeyDir);
-            public = fs.readFileSync(publicKeyDir);
-            return { secret, public }
+            secretKey = fs.readFileSync(secretKeyDir);
+            publicKey = fs.readFileSync(publicKeyDir);
+            return { secretKey, publicKey }
         } catch (error) {
             return;
         }
     }
     else {
         const keyPair = supercop.createKeyPair(supercop.createSeed());
-        secret = keyPair.secretKey;
-        public = keyPair.publicKey;
+        secretKey = keyPair.secretKey;
+        publicKey = keyPair.publicKey;
         try {
-            fs.writeFileSync(secretKeyDir, secret);
-            fs.writeFileSync(publicKeyDir, public);
-            return { secret, public }
+            fs.writeFileSync(secretKeyDir, secretKey);
+            fs.writeFileSync(publicKeyDir, publicKey);
+            return { secretKey, publicKey }
         } catch (error) {
             return;
         }
@@ -55,7 +53,8 @@ exports.generateKeyPair = () => {
 }
 
 exports.generateHostname = (publicKey) => {
-    const salt = Buffer.alloc(".onion checksum".length, ".onion checksum");
+    const saltStr = ".onion checksum";
+    const salt = Buffer.alloc(saltStr.length, saltStr);
     const version = Buffer.alloc(1, 3);
 
     const hash = new SHA3(256);

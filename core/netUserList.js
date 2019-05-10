@@ -1,5 +1,3 @@
-"use strict";
-
 const EventEmitter = require('events');
 
 const config = require(`${__base}/core/config`);

@@ -1,5 +1,3 @@
-"use strict";
-
 module.exports = {
     // Constants // start with upper case
     ClientName: "TorChat3",

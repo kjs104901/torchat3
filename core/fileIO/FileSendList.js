@@ -1,5 +1,3 @@
-"use strict";
-
 const EventEmitter = require('events');
 const constant = require(`${__base}/core/constant`);
 const fileHandler = require(`${__base}/core/fileIO/fileHandler`);
