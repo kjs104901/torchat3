@@ -1,5 +1,3 @@
-const xss = require("xss");
-const xssFilters = require('xss-filters');
 const constant = require(`${__base}/core/constant`);
 const tor = require(`${__base}/tor/tor`);
 
@@ -65,12 +63,6 @@ function letOnlyAscii(targetStr) {
     return targetStr.replace(/[^\x00-\xFF]/g, "");
 }
 exports.letOnlyAscii = letOnlyAscii;
-
-function preventXSS(str) {
-    str = str.toString('utf8');
-    return xssFilters.inHTMLData(xss(str));
-}
-exports.preventXSS = preventXSS;
 
 function findStringBetween(str, a, b) {
     if (temp = findStringAfter(str, a)) {

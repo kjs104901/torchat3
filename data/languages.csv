@@ -1,7 +1,5 @@
 ﻿Excel,Default,English,Korean
 ,ButtonTorConf,Tor Configurations,Tor 설정
-,ConfTorrcExpand,Torrc expansion,Torrc 확장
-,ConfBridge,Bridge,브릿지
 ,ButtonSave,Save,저장
 ,ButtonAcceptFile,Accept,수락
 ,ButtonCancelFile,Cancel,취소
@@ -16,8 +14,8 @@
 ,PopupBlockFinishedTitle,Blocked,블랙리스트에 추가됨
 ,PopupBlockFinishedText,You can unblock on the settings,설정에서 제거 가능합니다
 ,MenuChat,Chat,채팅
-,MenuSettings,Settings,설정에서 제거 가능합니다
-,BackgroundStartChat,Start a chat,대화를 시작해보세요
+,MenuSettings,Settings,설정
+,BackgroundStartChat,<< Start a chat,<< 대화를 시작해보세요
 ,ButtonCopy,Copy,복사
 ,ButtonSetNickname,Set nickname,닉네임 설정
 ,PopupRemoveFriendTitle,Unfriend,친구 삭제
@@ -28,3 +26,18 @@
 ,ButtonBlock,Block,차단
 ,ButtonUnblock,Unblock,차단해제
 ,PopupClipboard,Copied to Clipboard,클립보드에 복사됨
+,MenuMyProfile,My profile,내 프로필
+,MenuGeneral,General,일반
+,MenuConnections,Connections,접속
+,MenuBlacklist,Blacklist,블랙리스트
+,MenuAppearence,Appearance,외관
+,MenuBackup,Backup,백업
+,OptionProfileName,Name,이름
+,OptionProfileMessage,Message,프로필 메시지
+,OptionTorrcExpand,Torrc expansion,Torrc 확장
+,OptionBridge,Bridge,브릿지
+,ButtonAdd,Add,추가
+,ButtonRemove,Remove,제거
+,OptionBlackList,Blacklist,블랙리스트
+,OptionTheme,Theme,테마
+,OptionLanguage,Language,언어

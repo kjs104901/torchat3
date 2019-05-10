@@ -1,13 +1,45 @@
-.day-mode{
-    --font-color: #000;
-
-    --background-color-1: #AAA;
-    --background-color-2: #888;
-    --background-color-3: #EEE;
-    --background-color-4: #EEE;
-    --background-color-5: #888;
+.day-mode {
+    --color-tor: #5C3E73;
+    --color-tor-dim: #735A93;
+    --color-confirm: #3085d6;
+    --color-confirm-deep: #2b77c0;
+    --color-cancel: #D33;
+    --color-cancel-deep: #c62e2e;
+    --color-profile-gray: #999;
+    --color-profile-yellow: #ffe14d;
+    --color-profile-green: #66d966;
+    --color-profile-red: #d96666;
+    --color-font: #000;
+    --color-font-dim: #888;
+    --color-background: #FFF;
+    --color-background__side-menu: #FBFBFB;
+    --color-background__side-menu-deep: #E0E0E0;
+    --color-background__side-content: #F3F3F3;
+    --color-background__side-content-hover: #F9F9F9;
+    --color-background__side-content-selected: #FFF;
+    --color-background__main-header: #F4F4F4;
+    --color-background__main-alert: #E37473;
+    --color-text__main-alert: #FFF;
+    --color-background__main-content: #FFF;
+    --color-background__chat-input: #EEE;
+    --color-background__chat-left: #d1c7dd;
+    --color-background__chat-right: #d0e7d0;
+    --color-background__items: #EEE;
+    --color-input-background: #FFF;
+    --color-input-text: #000;
 }
 
 .day-mode {
-    color: var(--font-color);
+    color: var(--color-font);
+    background-color: var(--color-background);
+}
+
+.day-mode input[type=text] {
+    background-color: var(--color-input-background);
+    color: var(--color-input-text);
+}
+
+.day-mode textarea {
+    background-color: var(--color-input-background);
+    color: var(--color-input-text);
 }

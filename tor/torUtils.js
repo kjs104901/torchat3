@@ -11,7 +11,7 @@ const config = require(`${__base}/core/config`);
 const torDir = fixPathForAsarUnpack(__dirname + "/bin");
 const hiddenServiceDir = torDir + "/hidden_service";
 
-function fixPathForAsarUnpack (targetPath) {
+function fixPathForAsarUnpack(targetPath) {
     const isElectron = 'electron' in process.versions;
     const isUsingAsar = isElectron && process.mainModule && process.mainModule.filename.includes('app.asar');
 
@@ -76,22 +76,29 @@ exports.generateControlPassword = () => {
     try {
         const controlPassword = crypto.randomBytes(20).toString('hex');
         let controlPasswordHashed;
+        let execString;
 
-        //test
-        console.log("torDir", torDir);
-        const execString = child_process.execFileSync(torDir + '/tor.exe',
-            ['--hash-password', controlPassword],
-            { cwd: torDir, encoding: 'utf8' });
+        for (let index = 0; index < 3; index++) {
+            if (!controlPasswordHashed) {
+                execString = child_process.execFileSync(torDir + '/tor.exe',
+                    ['--hash-password', controlPassword],
+                    { cwd: torDir, encoding: 'utf8' });
 
-        if (execString.length <= 0) { return; }
-        const execList = execString.split('\n');
-        execList.forEach(line => {
-            if (line.indexOf('16:') == 0) {
-                controlPasswordHashed = line.replace('\r', '');
+                //test
+                console.log("try:", index, 'execString', execString);
+
+                if (execString.length > 0) {
+                    const execList = execString.split('\n');
+                    execList.forEach(line => {
+                        if (line.indexOf('16:') == 0) {
+                            controlPasswordHashed = line.replace('\r', '');
+                        }
+                    });
+                }
             }
-        });
-        if (!controlPasswordHashed) { return; }
+        }
 
+        if (!controlPasswordHashed) { return; }
         return {
             string: controlPassword,
             hashed: controlPasswordHashed

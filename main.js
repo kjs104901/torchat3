@@ -63,7 +63,7 @@ let mainWindow
 let mainWindowHided = false;
 let mainWindowSetting = {
     width: 1600, height: 800,
-    minWidth: 600, minHeight: 400,
+    minWidth: 350, minHeight: 460,
     backgroundColor: '#ffffff', //TODO change it depends on theme
     resizable: true,
     webPreferences: {

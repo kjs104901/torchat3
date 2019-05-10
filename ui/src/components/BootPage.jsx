@@ -60,13 +60,13 @@ export default class BootPage extends Component {
                             <textarea className="form-control" id="torrc-expand" cols="40" rows="4" required
                                 value={this.state.inputTorrcExpand}
                                 onChange={(e) => { this.setState({ inputTorrcExpand: e.target.value }) }} />
-                            <label className="form-control-placeholder" htmlFor="torrc-expand">{langs.get("ConfTorrcExpand")}</label>
+                            <label className="form-control-placeholder" htmlFor="torrc-expand">{langs.get("OptionTorrcExpand")}</label>
                         </div>
                         <div className="form-group">
                             <input type="text" id="bridge" className="form-control" required
                                 value={this.state.inputBridge}
                                 onChange={(e) => { this.setState({ inputBridge: e.target.value }) }} />
-                            <label className="form-control-placeholder" htmlFor="bridge">{langs.get("ConfBridge")}</label>
+                            <label className="form-control-placeholder" htmlFor="bridge">{langs.get("OptionBridge")}</label>
                             <div style={{ position: 'absolute', top: 9, right: -50 }}>
                                 <Switch
                                     onChange={(checked) => { this.setState({ inputUseBridge: checked }) }}
@@ -90,7 +90,8 @@ export default class BootPage extends Component {
                     </Collapsible>
                     <div className='centered' style={{ width: "80%" }}>
                         <PerfectScrollbar
-                            style={{ width: "100%", height: 200, marginTop: 20, fontSize: 12, overflow: 'auto' }}>
+                            style={{ width: "100%", height: 200, marginTop: 20, fontSize: 12, overflow: 'auto' }}
+                            option={{suppressScrollX: true}}>
                             {this.logsRender()}
                         </PerfectScrollbar>
                     </div>

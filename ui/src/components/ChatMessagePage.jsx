@@ -216,7 +216,7 @@ export default class ChatMessagePage extends Component {
                         <div id='content__header__info__nickname'>
                             {selectedName}
                         </div>
-                        <div id='content__header__info__address' className='dragable'>
+                        <div id='content__header__info__address' className='draggable'>
                             {"tc3:" + selectedAddress}
                         </div>
                     </div>
@@ -231,7 +231,8 @@ export default class ChatMessagePage extends Component {
                         containerRef={(ref) => { this.scrollRef = ref; }}
                         style={{ width: '100%', height: '100%' }}
                         onScrollUp={() => { this.scrollReachEnd = false; }}
-                        onYReachEnd={() => { this.scrollReachEnd = true; }}>
+                        onYReachEnd={() => { this.scrollReachEnd = true; }}
+                        option={{suppressScrollX: true}}>
                         {this.renderMessages()}
                     </PerfectScrollbar>
                 </div>

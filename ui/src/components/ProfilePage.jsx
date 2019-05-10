@@ -124,7 +124,8 @@ export default class ProfilePage extends Component {
 
         return (
             <PerfectScrollbar
-                style={{ width: '100%', height: '100%' }}>
+                style={{ width: '100%', height: '100%' }}
+                option={{suppressScrollX: true}}>
 
                 <div className="profile-header"
                     onClick={() => { this.props.turnProfile(false) }}>
@@ -138,7 +139,7 @@ export default class ProfilePage extends Component {
 
                 <div className="profile-group">
                     <li>Address</li>
-                    <div className='profile__text dragable'>{'tc3:' + selectedAddress}</div>
+                    <div className='profile__text draggable'>{'tc3:' + selectedAddress}</div>
                     <button className="button-custom tor"
                         style={{ float: "right" }}
                         onClick={() => { this.setClipboard(selectedAddress) }}>
@@ -149,17 +150,17 @@ export default class ProfilePage extends Component {
 
                 <div className="profile-group">
                     <li>Profile name</li>
-                    <div className='profile__text dragable'>{selectedProfileName}</div>
+                    <div className='profile__text draggable'>{selectedProfileName}</div>
                 </div>
 
                 <div className="profile-group">
                     <li>Profile message</li>
-                    <div className='profile__text dragable'>{selectedProfileInfo}</div>
+                    <div className='profile__text draggable'>{selectedProfileInfo}</div>
                 </div>
 
                 <div className="profile-group">
                     <li>Nickname</li>
-                    <div className='profile__text dragable'>{selectedNickname}</div>
+                    <div className='profile__text draggable'>{selectedNickname}</div>
                     <button className="button-custom tor"
                         style={{ float: "right" }}
                         onClick={() => { this.setNicknameDialog(selectedAddress) }}>

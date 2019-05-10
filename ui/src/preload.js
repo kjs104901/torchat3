@@ -108,11 +108,11 @@ window.remoteControl = {
         config.saveSetting();
     },
 
-    switchNightMode: () => {
-        config.setNightMode(!config.getSetting().nightMode);
+    setNightMode: (value) => {
+        config.setNightMode(value);
         config.saveSetting();
     },
-
+    
     setLanguage: (lang) => {
         config.setLanguage(lang);
         config.saveSetting();

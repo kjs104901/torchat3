@@ -1,13 +1,45 @@
 .night-mode{
-    --font-color: #FFF;
-
-    --background-color-1: #111;
-    --background-color-2: #222;
-    --background-color-3: #333;
-    --background-color-4: #444;
-    --background-color-5: #555;
+    --color-tor: #5C3E73;
+    --color-tor-dim: #735A93;
+    --color-confirm: #3085d6;
+    --color-confirm-deep: #2b77c0;
+    --color-cancel: #D33;
+    --color-cancel-deep: #c62e2e;
+    --color-profile-gray: #999;
+    --color-profile-yellow: #ffe14d;
+    --color-profile-green: #66d966;
+    --color-profile-red: #d96666;
+    --color-font: #FFF;
+    --color-font-dim: #BBB;
+    --color-background: #222;
+    --color-background__side-menu: #1e1e1e;
+    --color-background__side-menu-deep: #252525;
+    --color-background__side-content: #333333;
+    --color-background__side-content-hover: #292929;
+    --color-background__side-content-selected: #222;
+    --color-background__main-header: #333333;
+    --color-background__main-alert: #E37473;
+    --color-text__main-alert: #FFF;
+    --color-background__main-content: #222;
+    --color-background__chat-input: #333333;
+    --color-background__chat-left: #4b4158;
+    --color-background__chat-right: #455d45;
+    --color-background__items: #333;
+    --color-input-background: #222;
+    --color-input-text: #FFF;
 }
 
 .night-mode {
-    color: var(--font-color);
+    color: var(--color-font);
+    background-color: var(--color-background);
+}
+
+.night-mode input[type=text] {
+    background-color: var(--color-input-background);
+    color: var(--color-input-text);
+}
+
+.night-mode textarea {
+    background-color: var(--color-input-background);
+    color: var(--color-input-text);
 }

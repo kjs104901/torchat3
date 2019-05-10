@@ -121,7 +121,7 @@ export default class ChatMessage extends Component {
                         <img className="message__fileicon size30margin10" style={{ marginLeft: 0 }}
                             src={options.fromSelf ? imgUpload : imgDownload} />
                         <div className="message__fileinfo">
-                            <div className="message__filename dragable">{message} ( {fileSizeStr} )</div>
+                            <div className="message__filename draggable">{message} ( {fileSizeStr} )</div>
                         </div>
                         <div className="clearfix"></div>
                         <div style={{ width: '100%' }}>{buttonList}</div>
@@ -157,7 +157,7 @@ export default class ChatMessage extends Component {
         else {
             return (
                 <div className={'message ' + (options.fromSelf ? 'right' : 'left')}>
-                    <div className="message__inner dragable">{this.renderMessage(message)}</div>
+                    <div className="message__inner draggable">{this.renderMessage(message)}</div>
                 </div>
             )
         }

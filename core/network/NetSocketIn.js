@@ -90,12 +90,10 @@ class SocketIn extends EventEmitter {
                         profileName = parser.removeNewline(parser.unescape(profileName));
                         profileName = parser.limitateLength(profileName, constant.MaxLenProfileName);
                         profileName = parser.letOnlyAscii(profileName);
-                        profileName = parser.preventXSS(profileName);
 
                         profileInfo = parser.unescape(profileInfo);
                         profileInfo = parser.removeCarriageReturn(profileInfo);
                         profileInfo = parser.limitateLength(profileInfo, constant.MaxLenProfileInfo);
-                        profileInfo = parser.preventXSS(profileInfo);
 
                         this.emit('profile', profileName, profileInfo);
                         break;
@@ -105,7 +103,6 @@ class SocketIn extends EventEmitter {
                         message = parser.unescape(message);
                         message = parser.removeCarriageReturn(message);
                         message = parser.limitateLength(message, constant.MaxLenChatMessage);
-                        message = parser.preventXSS(message);
 
                         this.emit('message', message);
                         break;
@@ -118,7 +115,6 @@ class SocketIn extends EventEmitter {
                         fileName = parser.removeNewline(parser.unescape(fileName));
                         parsed = path.parse(fileName);
                         fileName = parser.limitateLength(parsed.name, constant.MaxLenFileName) + parsed.ext;
-                        fileName = parser.preventXSS(fileName);
 
                         this.emit('filesend', fileID, fileSize, fileName);
                         break;
