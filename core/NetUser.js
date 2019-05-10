@@ -341,52 +341,46 @@ class NetUser extends EventEmitter {
 
     sendMessage(message) { //interface
         return new Promise((resolve, reject) => {
-            if (this.isBothConnected()) {
-                this.pushMessage(message, { fromSelf: true });
-                this.socketOut.sendMessage(message);
-                resolve();
-            }
-            else {
-                reject(new Error("Not connected"));
-            }
+            if (!this.isBothConnected()) { reject(new Error("Not connected")); return; }
+            if (!contact.isFriend(this.hostname)) { reject(new Error("Not Friend")); return; }
+
+            this.pushMessage(message, { fromSelf: true });
+            this.socketOut.sendMessage(message);
+            resolve();
         });
     }
 
     sendFile(file) { //interface
         return new Promise((resolve, reject) => {
-            if (this.isBothConnected()) {
-                if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
-                if (!fileHandler.isFile(file)) { reject(new Error("Not a File")); return; }
-                if (fileHandler.getSize(file) <= 0) { reject(new Error("File size zero")); return; }
-                if (fileHandler.getSize(file) > constant.FileMaximumSize) { reject(new Error("File size too big")); return; }
+            if (!this.isBothConnected()) { reject(new Error("Not connected")); return; }
+            if (!contact.isFriend(this.hostname)) { reject(new Error("Not Friend")); return; }
 
-                const fileID = crypto.randomBytes(20).toString('hex');
-                const fileName = path.basename(file);
-                const fileSize = fileHandler.getSize(file);
+            if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
+            if (!fileHandler.isFile(file)) { reject(new Error("Not a File")); return; }
+            if (fileHandler.getSize(file) <= 0) { reject(new Error("File size zero")); return; }
+            if (fileHandler.getSize(file) > constant.FileMaximumSize) { reject(new Error("File size too big")); return; }
 
-                this.pushMessage(fileName, { fromSelf: true, fileID, fileSize: fileSize });
-                this.fileSendList.push(fileID, file, fileHandler.getSize(file))
+            const fileID = crypto.randomBytes(20).toString('hex');
+            const fileName = path.basename(file);
+            const fileSize = fileHandler.getSize(file);
 
-                this.socketOut.sendFilesend(fileID, fileSize, fileName);
+            this.pushMessage(fileName, { fromSelf: true, fileID, fileSize: fileSize });
+            this.fileSendList.push(fileID, file, fileHandler.getSize(file))
 
-                resolve();
-            }
-            else {
-                reject(new Error("Not connected"));
-            }
+            this.socketOut.sendFilesend(fileID, fileSize, fileName);
+
+            resolve();
         });
     }
 
     acceptFile(fileID) { //interface
         return new Promise((resolve, reject) => {
-            if (this.isBothConnected()) {
-                this.fileRecvList.acceptFile(fileID);
-                this.socketOut.sendFileaccept(fileID);
-                resolve();
-            }
-            else {
-                reject(new Error("Not connected"));
-            }
+            if (!this.isBothConnected()) { reject(new Error("Not connected")); return; }
+            if (!contact.isFriend(this.hostname)) { reject(new Error("Not Friend")); return; }
+
+            this.fileRecvList.acceptFile(fileID);
+            this.socketOut.sendFileaccept(fileID);
+            resolve();
         });
     }
 
