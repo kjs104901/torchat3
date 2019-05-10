@@ -1,3 +1,5 @@
+'use strict';
+
 const parser = require(`${__base}/core/network/parser`);
 const debug = require(`${__base}/core/debug`);
 

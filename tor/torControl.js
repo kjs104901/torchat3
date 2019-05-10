@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const net = require('net');
 
@@ -89,7 +91,7 @@ exports.start = (controlPassword, keyPair) => {
                 if (!controlAuth || controlHiddenServiceDestroy) {
                     if (line.substr(0, 6) === '250 OK') {
                         controlAuth = true;
-                        const secretKeySerial = keyPair.secret.toString('base64')
+                        const secretKeySerial = keyPair.secretKey.toString('base64')
 
                         controlConnection.write(
                             `ADD_ONION ED25519-V3:${secretKeySerial} ` +

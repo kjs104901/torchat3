@@ -1,3 +1,5 @@
+'use strict';
+
 // node require
 const { remote } = require('electron');
 //Security: disable node require after this point

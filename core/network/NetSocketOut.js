@@ -1,3 +1,5 @@
+'use strict';
+
 const SocksClient = require('socks').SocksClient;
 const crypto = require("crypto");
 const fs = require('fs');
@@ -72,8 +74,8 @@ class SocksOut extends EventEmitter {
 
     sendPing(cookie) {
         const keyPair = tor.getKeyPair();
-        const publicKeyStr = keyPair.public.toString('base64');
-        const signed = torUtil.sign(publicKeyStr + cookie, keyPair.public, keyPair.secret);
+        const publicKeyStr = keyPair.publicKey.toString('base64');
+        const signed = torUtil.sign(publicKeyStr + cookie, keyPair.publicKey, keyPair.secretKey);
         const signedStr = signed.toString('base64');
         protocol.ping(this.socket, publicKeyStr, cookie, signedStr);
     }

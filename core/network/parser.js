@@ -1,3 +1,5 @@
+'use strict';
+
 const constant = require(`${__base}/core/constant`);
 const tor = require(`${__base}/tor/tor`);
 

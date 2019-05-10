@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const crypto = require("crypto");
 const { SHA3 } = require('sha3');

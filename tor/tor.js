@@ -1,3 +1,5 @@
+'use strict';
+
 const child_process = require('child_process');
 
 const config = require(`${__base}/core/config`);
@@ -42,7 +44,7 @@ exports.start = () => {
     keyPair = torUtils.generateKeyPair();
     if (!keyPair) { eventEmitter.emit("fail", new Error("failed to generate key pair")); return; }
 
-    hostname = torUtils.generateHostname(keyPair.public);
+    hostname = torUtils.generateHostname(keyPair.publicKey);
     debug.log("hostname: ", hostname);
 
     if (!controlPassword) { eventEmitter.emit("fail", new Error("failed to generate control Password")); return; }

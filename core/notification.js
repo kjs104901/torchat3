@@ -1,3 +1,5 @@
+'use strict';
+
 const notifier = require('node-notifier');
 
 const contact = require(`${__base}/core/contact`);
