@@ -1,3 +1,5 @@
+"use strict";
+
 const child_process = require('child_process');
 
 const config = require(`${__base}/core/config`);
