@@ -34,7 +34,8 @@ export default class SettingPage extends Component {
         this.state = {
             selectedSetting: 1,
             // 1: MenuMyProfile // 2: MenuGeneral // 3: MenuConnections
-            // 4: MenuBlacklist // 5: MenuAppearence // 6: MenuBackup
+            // 4: MenuBlockedlist // 5: MenuAppearence // 6: MenuBackup
+            // 7: Licenses
 
             inputProfileName: this.settingValue.profileName,
             inputProfileInfo: this.settingValue.profileInfo,
@@ -47,6 +48,9 @@ export default class SettingPage extends Component {
 
             inputNightMode: this.settingValue.nightMode,
             inputLanguage: this.settingValue.language,
+
+            inputMinimizeToTray: this.settingValue.minimizeToTray,
+            inputNotification: this.settingValue.notification,
         };
     };
 
@@ -103,7 +107,21 @@ export default class SettingPage extends Component {
     }
 
     saveConnection = () => {
-        remoteControl.saveConnection(this.state.inputTorrcExpand, this.state.inputUseBridge, this.state.inputBridge);
+        MySwal.fire({
+            title: langs.get('PopupConnectionAlertTitle'),
+            text: langs.get('PopupConnectionAlertText'),
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'okay',
+            cancelButtonText: 'cancel',
+            heightAuto: false,
+            width: 400,
+        }).then((result) => {
+            if (result.value) {
+                remoteControl.saveConnection(this.state.inputTorrcExpand, this.state.inputUseBridge, this.state.inputBridge);
+            }
+        })
     };
 
     addBlack = () => {
@@ -174,6 +192,47 @@ export default class SettingPage extends Component {
         else if (this.state.selectedSetting === 2) { // 2: MenuGeneral 
             return (
                 <React.Fragment>
+                    <div className="option-group">
+                        <li>{langs.get('OptionMinimizeToTray')}</li>
+                        <div style={{ float: 'right' }}>
+                            <Switch
+                                onChange={(checked) => {
+                                    this.setState({ inputMinimizeToTray: checked });
+                                    remoteControl.setMinimizeToTray(checked);
+                                }}
+                                checked={this.state.inputMinimizeToTray}
+                                onColor="#3085d6"
+                                onHandleColor="#2b77c0"
+                                handleDiameter={13}
+                                height={20}
+                                width={40}
+                                uncheckedIcon={false}
+                                checkedIcon={false}
+                                activeBoxShadow="0px 0px 0px 0px rgba(0, 0, 0, 0)"
+                                className="react-switch" />
+                        </div>
+                    </div>
+                    <div className="clearfix"></div>
+                    <div className="option-group">
+                        <li>{langs.get('OptionNotification')}</li>
+                        <div style={{ float: 'right' }}>
+                            <Switch
+                                onChange={(checked) => {
+                                    this.setState({ inputNotification: checked });
+                                    remoteControl.setNotification(checked);
+                                }}
+                                checked={this.state.inputNotification}
+                                onColor="#3085d6"
+                                onHandleColor="#2b77c0"
+                                handleDiameter={13}
+                                height={20}
+                                width={40}
+                                uncheckedIcon={false}
+                                checkedIcon={false}
+                                activeBoxShadow="0px 0px 0px 0px rgba(0, 0, 0, 0)"
+                                className="react-switch" />
+                        </div>
+                    </div>
                 </React.Fragment>
             )
 
@@ -223,7 +282,7 @@ export default class SettingPage extends Component {
             )
 
         }
-        else if (this.state.selectedSetting === 4) { // 4: MenuBlacklist 
+        else if (this.state.selectedSetting === 4) { // 4: MenuBlockedlist 
 
             let low = [];
 
@@ -247,7 +306,7 @@ export default class SettingPage extends Component {
             return (
                 <React.Fragment>
                     <div className="option-group">
-                        <li>{langs.get('OptionBlackList')}</li>
+                        <li>{langs.get('OptionBlockedList')}</li>
                         <input type="text" className="option-control large" required
                             style={{ width: 'calc(100% - 130px)' }}
                             value={this.state.inputBlackAddress}
@@ -276,7 +335,8 @@ export default class SettingPage extends Component {
                 <React.Fragment>
                     <div className="option-group">
                         <li>{langs.get('OptionTheme')}</li>
-                        <div className="option-group">
+                        <div className="option-group"
+                            style={{ color: 'black' }}>
                             <Select
                                 value={{
                                     value: this.state.inputNightMode,
@@ -295,7 +355,8 @@ export default class SettingPage extends Component {
                     </div>
                     <div className="option-group">
                         <li>{langs.get('OptionLanguage')}</li>
-                        <div className="option-group">
+                        <div className="option-group"
+                            style={{ color: 'black' }}>
                             <Select
                                 value={{
                                     value: this.state.inputLanguage,
@@ -316,6 +377,10 @@ export default class SettingPage extends Component {
             )
         }
         else if (this.state.selectedSetting === 6) { // 6: MenuBackup
+
+        }
+        else if (this.state.selectedSetting === 7) { // 7: MenuLicense
+
         }
     }
 
@@ -376,7 +441,7 @@ export default class SettingPage extends Component {
                             </div>
                             <div className={"option-list__option" + (this.state.selectedSetting === 4 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(4) }}>
-                                <div className="option-name">{langs.get('MenuBlacklist')}</div>
+                                <div className="option-name">{langs.get('MenuBlockedList')}</div>
                             </div>
                             <div className={"option-list__option" + (this.state.selectedSetting === 5 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(5) }}>
@@ -385,6 +450,10 @@ export default class SettingPage extends Component {
                             <div className={"option-list__option" + (this.state.selectedSetting === 6 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(6) }}>
                                 <div className="option-name">{langs.get('MenuBackup')}</div>
+                            </div>
+                            <div className={"option-list__option" + (this.state.selectedSetting === 7 ? " selected" : "")}
+                                onClick={() => { this.selectSetting(7) }}>
+                                <div className="option-name">{langs.get('MenuLicense')}</div>
                             </div>
                         </PerfectScrollbar>
                     </div>

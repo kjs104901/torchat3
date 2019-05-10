@@ -8,6 +8,8 @@ const netUserList = require(`${__base}/core/netUserList`);
 const notification = require(`${__base}/core/notification`);
 const fileHandler = require(`${__base}/core/fileIO/fileHandler`);
 const parser = require(`${__base}/core/network/parser`);
+const config = require(`${__base}/core/config`);
+const langs = require(`${__base}/core/langs`);
 const debug = require(`${__base}/core/debug`);
 const tor = require(`${__base}/tor/tor`);
 
@@ -91,8 +93,8 @@ function openMainWindow() {
         mainWindow.webContents.on('will-redirect', (event, url) => { event.preventDefault(); })
 
         mainWindow.once('ready-to-show', () => { });
-        mainWindow.on('close', function (event) {
-            if (!appQuiting) {
+        mainWindow.on('close', (event) => {
+            if (!appQuiting && config.getSetting().minimizeToTray) {
                 event.preventDefault();
                 hideMainWindow();
             }
@@ -119,21 +121,18 @@ let tray = null
 app.on('ready', () => {
     tray = new Tray(`${__base}/data/logoTray.png`);
     const contextMenu = Menu.buildFromTemplate([
-        //LANG
-        { label: 'Show App', click: () => { showMainWindow(); } },
-        { label: 'Quit', click: () => { appQuit(); } }
+        { label: langs.get('TrayMenuOpen'), click: () => { showMainWindow(); } },
+        { label: langs.get('TrayMenuQuit'), click: () => { appQuit(); } }
     ])
     tray.on('double-click', () => { showMainWindow(); })
-    tray.setContextMenu(contextMenu)
-    //tray.setToolTip('이것은 나의 애플리케이션 입니다!')
+    tray.setContextMenu(contextMenu);
 })
 
 //// ------------ Notifications ------------ ////
 netUserList.event.on('userSocketBothConnected', (address) => {
-    if (mainWindowHided) {
+    if (mainWindowHided && config.getSetting().notification) {
         if (parser.isMyHostname(address)) {
-            //LANG
-            notification.notify("", "Tor", "connected");
+            notification.notify("", "Tor", langs.get('NotificationConnected'));
         }
         else {
             notification.newConnection(address);
@@ -142,7 +141,7 @@ netUserList.event.on('userSocketBothConnected', (address) => {
 })
 
 netUserList.event.on('userMessage', (address, message, options) => {
-    if (mainWindowHided) {
+    if (mainWindowHided && config.getSetting().notification) {
         notification.newMessage(address, message);
     }
 });

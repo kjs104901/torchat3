@@ -29,7 +29,7 @@
 ,MenuMyProfile,My profile,내 프로필
 ,MenuGeneral,General,일반
 ,MenuConnections,Connections,접속
-,MenuBlacklist,Blacklist,블랙리스트
+,MenuBlockedList,Blocked list,차단 목록
 ,MenuAppearence,Appearance,외관
 ,MenuBackup,Backup,백업
 ,OptionProfileName,Name,이름
@@ -38,7 +38,15 @@
 ,OptionBridge,Bridge,브릿지
 ,ButtonAdd,Add,추가
 ,ButtonRemove,Remove,제거
-,OptionBlackList,Blacklist,블랙리스트
+,OptionBlockedList,Blocked list,차단 목록
 ,OptionTheme,Theme,테마
 ,OptionLanguage,Language,언어
 ,StatusSaved,Saved,저장됨
+,PopupConnectionAlertTitle,Alert,경고
+,PopupConnectionAlertText,This setting can cause the app to fail to start.,이 설정은 앱의 시작을 실패하게 만들 수 있습니다.
+,MenuLicense,License,라이선스
+,OptionMinimizeToTray,Minimize to Tray when close,종료시 트레이 아이콘으로
+,OptionNotification,Notification when Tray mode,트레이 모드시 알림
+,NotificationConnected,Connected,연결됨
+,TrayMenuOpen,Open,열기
+,TrayMenuQuit,Quit,종료

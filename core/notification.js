@@ -5,6 +5,7 @@ const notifier = require('node-notifier');
 const contact = require(`${__base}/core/contact`);
 const netUserList = require(`${__base}/core/netUserList`);
 const fileHandler  = require(`${__base}/core/fileIO/fileHandler`)
+const langs = require(`${__base}/core/langs`);
 
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
@@ -29,8 +30,7 @@ exports.newConnection = (address) => {
 
         let nickname = netUserList.getUserName(address);
         
-        //LANG
-        notify(address, "New connection", nickname)
+        notify(address, langs.get('NotificationConnected'), nickname)
     }
 }
 

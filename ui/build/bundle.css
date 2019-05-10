@@ -293,7 +293,7 @@ input[type=text]:focus, textarea:focus {
 
 .my-address {
     width: 190px;
-    height: 30px;
+    height: 45px;
     padding-left: 5px;
     padding-right: 5px;
 }
@@ -301,7 +301,7 @@ input[type=text]:focus, textarea:focus {
 .my-address__address {
     float: left;
     width: 150px;
-    height: 40px;
+    height: 25px;
     padding-left: 5px;
     word-break: break-all;
     color: var(--color-font-dim);
@@ -310,14 +310,14 @@ input[type=text]:focus, textarea:focus {
 
 .menu-select {
     width: "100%";
-    height: 30px;
+    height: 25px;
 }
 
 .menu-select__item {
     float: left;
     width: 50%;
     height: 22px;
-    padding-top: 8px;
+    padding-top: 5px;
     border-radius: 15px 15px 0px 0px;
     font-size: 10pt;
     cursor: pointer;
@@ -415,10 +415,11 @@ input[type=text]:focus, textarea:focus {
 .profile__body__nickname {
     float: left;
     width: 100%;
-    height: 20px;
-    padding-top: 6px;
+    height: 16px;
+    padding-top: 8px;
     overflow: hidden;
     white-space: nowrap;
+    font-size: 14px;
 }
 
 .profile__body__nickname.big {
@@ -427,7 +428,7 @@ input[type=text]:focus, textarea:focus {
 }
 
 .profile__body__nickname.alone {
-    padding-top: 14px;
+    padding-top: 16px;
 }
 
 .profile__body__last-message {
@@ -463,8 +464,9 @@ input[type=text]:focus, textarea:focus {
 
 .option-name {
     width: 100%;
-    padding-top: 8px;
+    padding-top: 11px;
     text-align: center;
+    font-size: 14px;
 }
 
 /* ------ content ------ */

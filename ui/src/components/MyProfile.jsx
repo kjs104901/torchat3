@@ -74,7 +74,7 @@ export default class MyProfile extends Component {
                     <div className="my-address__address draggable">
                         {"tc3:" + myAddress}
                     </div>
-                    <div style={{ float: 'left', width: 30, paddingTop: 3 }}
+                    <div style={{ float: 'left', width: 30 }}
                         onClick={() => { this.setClipboard(myAddress) }}>
                         <img className="image-button size20margin5" src={imgCopy} />
                     </div>

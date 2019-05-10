@@ -120,6 +120,16 @@ window.remoteControl = {
         config.saveSetting();
     },
 
+    setMinimizeToTray: (value) => {
+        config.setMinimizeToTray(value);
+        config.saveSetting();
+    },
+
+    setNotification: (value) => {
+        config.setNotification(value);
+        config.saveSetting();
+    },
+
     MaxLenChatMessage: constant.MaxLenChatMessage,
     MaxLenProfileName: constant.MaxLenProfileName,
     MaxLenProfileInfo: constant.MaxLenProfileInfo,

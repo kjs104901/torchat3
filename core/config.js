@@ -52,6 +52,9 @@ settingDB.get('setting')
 
         nightMode: false,
         language: "English",
+
+        minimizeToTray: true,
+        notification: true,
     }).write();
 
 let setting = settingDB.get('setting').value();
@@ -74,3 +77,6 @@ exports.setWhiteList = (data) => { setting.whiteList = data; eventEmitter.emit('
 
 exports.setNightMode = (data) => { setting.nightMode = data; eventEmitter.emit('settingUpdate'); }
 exports.setLanguage = (lang) => { setting.language = lang; eventEmitter.emit('settingUpdate'); }
+
+exports.setMinimizeToTray = (data) => { setting.minimizeToTray = data; eventEmitter.emit('settingUpdate'); }
+exports.setNotification = (data) => { setting.notification = data; eventEmitter.emit('settingUpdate'); }
