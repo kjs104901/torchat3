@@ -57,20 +57,32 @@ class NetUser extends EventEmitter {
         this.fileSendList = new FileSendList();
 
         setTimeout(() => {
-            setInterval(() => { this.checkSocketOut(); }, 10); // milliseconds
-            setInterval(() => { this.checkPongWait(); }, 1000 * 1); // second
-            setInterval(() => { this.sendAlive(); }, 1000 * 20); // seconds
-            setInterval(() => {
+            this.checkSocketOutIntv = setInterval(() => {
+                this.checkSocketOut();
+            }, 10); // milliseconds
+
+            this.checkPongWaitIntv = setInterval(() => {
+                this.checkPongWait();
+            }, 1000 * 1); // second
+
+            this.sendAliveIntv = setInterval(() => {
+                this.sendAlive();
+                
+            }, 1000 * 20); // seconds
+
+            this.fileCheckIntv = setInterval(() => {
                 if (this.isBothConnected()) {
                     this.fileRecvList.fileTransCheck(); this.fileSendList.fileTransCheck();
                     this.fileRecvList.fileDataCheck(); this.fileSendList.fileDataCheck();
                 }
             }, 100); // milliseconds
-            setInterval(() => {
+
+            this.fileSpeedCheckIntv = setInterval(() => {
                 if (this.isBothConnected()) {
                     this.fileRecvList.fileSpeedCheck(); this.fileSendList.fileSpeedCheck();
                 }
             }, 1000 * 1); // seconds   
+
         }, Math.floor(Math.random() * (1000 - 10 + 1)) + 10); // 0.01s ~ 1s delay
 
         this.fileListinit();
@@ -409,6 +421,12 @@ class NetUser extends EventEmitter {
         if (this.socketOut) { this.socketOut.destroy(); this.socketOut = null; }
         if (this.fileSendList) { this.fileSendList.destroy(); this.fileSendList = null; }
         if (this.fileRecvList) { this.fileRecvList.destroy(); this.fileRecvList = null; }
+
+        if (this.checkSocketOutIntv) { clearInterval(this.checkSocketOutIntv) }
+        if (this.checkPongWaitIntv) { clearInterval(this.checkPongWaitIntv) }
+        if (this.sendAliveIntv) { clearInterval(this.sendAliveIntv) }
+        if (this.fileCheckIntv) { clearInterval(this.fileCheckIntv) }
+        if (this.fileSpeedCheckIntv) { clearInterval(this.fileSpeedCheckIntv) }
 
         this.destroyed = true;
         this.emit('destroy');
