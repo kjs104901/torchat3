@@ -6,6 +6,7 @@ global.__base = __dirname;
 const netServer = require(`${__base}/core/network/netServer`);
 const netUserList = require(`${__base}/core/netUserList`);
 const notification = require(`${__base}/core/notification`);
+const fileHandler = require(`${__base}/core/fileIO/fileHandler`);
 const parser = require(`${__base}/core/network/parser`);
 const debug = require(`${__base}/core/debug`);
 const tor = require(`${__base}/tor/tor`);
@@ -49,7 +50,11 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
-    app.quit();
+    appQuit();
+})
+
+app.on('will-quit', () => {
+    fileHandler.cleanTempDir();
 })
 
 let appQuiting = false;

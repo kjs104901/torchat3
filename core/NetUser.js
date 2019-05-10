@@ -194,6 +194,10 @@ class NetUser extends EventEmitter {
                 this.socketOut = null;
             }
         })
+        this.socketOut.on('invalid', () => {
+            debug.log('<invalid1>'); this.destroy();
+        })
+
         this.socketOut.on('filedata', (fileID, blockIndex, blockData) => {
             if (this.fileRecvList.hasFile(fileID)) {
                 this.fileRecvList.filedata(fileID, blockIndex, blockData);

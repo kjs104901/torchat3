@@ -39,6 +39,8 @@ exports.getUserName = (address) => {
 }
 
 function addUser(address) {
+    removeDestroyedUser()
+    
     const hostname = parser.normalizeHostname(address);
     if (!parser.checkHostname(hostname)) { return; } // hostname error
 

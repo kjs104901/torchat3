@@ -29,28 +29,26 @@ exports.generateKeyPair = () => {
     const secretKeyDir = hiddenServiceDir + "/secretKey";
     const publicKeyDir = hiddenServiceDir + "/publicKey";
 
-    if (!fs.existsSync(hiddenServiceDir)) { fs.mkdirSync(hiddenServiceDir) }
+    try {
+        if (!fs.existsSync(hiddenServiceDir)) { fs.mkdirSync(hiddenServiceDir) }
 
-    if (fs.existsSync(secretKeyDir) && fs.existsSync(publicKeyDir)) { // already exists
-        try {
+        if (fs.existsSync(secretKeyDir) && fs.existsSync(publicKeyDir)) { // already exists
             secretKey = fs.readFileSync(secretKeyDir);
             publicKey = fs.readFileSync(publicKeyDir);
             return { secretKey, publicKey }
-        } catch (error) {
-            return;
         }
-    }
-    else {
-        const keyPair = supercop.createKeyPair(supercop.createSeed());
-        secretKey = keyPair.secretKey;
-        publicKey = keyPair.publicKey;
-        try {
+        else {
+            const keyPair = supercop.createKeyPair(supercop.createSeed());
+            secretKey = keyPair.secretKey;
+            publicKey = keyPair.publicKey;
+
             fs.writeFileSync(secretKeyDir, secretKey);
             fs.writeFileSync(publicKeyDir, publicKey);
             return { secretKey, publicKey }
-        } catch (error) {
-            return;
         }
+    } catch (error) {
+        console.log(error);
+        return;
     }
 }
 
@@ -117,7 +115,6 @@ exports.makeTorrc = (controlPassword) => {
     let bridgeLine = '';
     if (config.getSetting().useBridge) { bridgeLine = "Bridge " + config.getSetting().bridge; }
     try {
-
         fs.writeFileSync(torDir + '/torrc',
             `
 SocksPort auto
@@ -132,5 +129,8 @@ DataDirectory ${torDir}/data
 GeoIPFile ${torDir}/data/geoip
 GeoIPv6File ${torDir}/data/geoipv6
 ` + config.getSetting().torrcExpand);
-    } catch (error) { }
+    }
+    catch (error) {
+        console.log(error);
+    }
 }

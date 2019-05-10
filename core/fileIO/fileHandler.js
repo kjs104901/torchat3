@@ -58,15 +58,20 @@ let tempDirBase = os.tmpdir() + "/torchat3temp";
 let tempDirCount = 0;
 let tempDir = tempDirBase + "_" + tempDirCount;
 try {
-    while (fs.existsSync(tempDirBase + "_" + tempDirCount) && !fs.lstatSync(tempDirBase + "_" + tempDirCount).isDirectory()) {
+    while (fs.existsSync(tempDirBase + "_" + tempDirCount) &&
+        !fs.lstatSync(tempDirBase + "_" + tempDirCount).isDirectory()) {
         tempDirCount += 1;
     }
 
     tempDir = tempDirBase + "_" + tempDirCount;
-    if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir);
-    }
+    if (!fs.existsSync(tempDir)) { fs.mkdirSync(tempDir); }
+    cleanTempDir();
 
+} catch (error) {
+    console.log(error);
+}
+
+function cleanTempDir() {
     if (fs.existsSync(tempDir)) {
         fs.readdirSync(tempDir).forEach((file) => {
             const curPath = tempDir + "/" + file;
@@ -75,9 +80,8 @@ try {
             }
         })
     }
-} catch (error) {
-    console.log(error);
 }
+exports.cleanTempDir = cleanTempDir;
 
 function getTempDir() {
     return tempDir;

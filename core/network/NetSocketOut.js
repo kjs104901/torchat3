@@ -37,7 +37,13 @@ class SocksOut extends EventEmitter {
         if (dataStr.length <= 0) { return; }
         this.buffer += dataStr;
 
-        if (this.buffer.length > constant.BufferMaximum) { this.emit('invalid'); }
+        //test
+        console.log("this.buffer.length", this.buffer.length);
+        if (this.buffer.length > constant.BufferMaximum) {
+            //test
+            console.log("invalid?")
+            this.emit('invalid');
+        }
 
         if (this.buffer.length > 0) {
             let fileID, blockIndex, blockHash, blockData;
