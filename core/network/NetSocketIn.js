@@ -1,3 +1,5 @@
+"use strict";
+
 const SocksClient = require('socks').SocksClient;
 const crypto = require("crypto");
 const fs = require('fs');

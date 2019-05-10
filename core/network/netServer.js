@@ -1,3 +1,5 @@
+"use strict";
+
 const net = require('net');
 
 const config = require(`${__base}/core/config`);

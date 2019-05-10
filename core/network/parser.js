@@ -1,3 +1,5 @@
+"use strict";
+
 const constant = require(`${__base}/core/constant`);
 const tor = require(`${__base}/tor/tor`);
 
@@ -65,6 +67,7 @@ function letOnlyAscii(targetStr) {
 exports.letOnlyAscii = letOnlyAscii;
 
 function findStringBetween(str, a, b) {
+    let temp = "";
     if (temp = findStringAfter(str, a)) {
         if (temp = findStringBefore(temp, b)) {
             return temp;

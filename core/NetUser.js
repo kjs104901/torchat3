@@ -1,3 +1,5 @@
+"use strict";
+
 const crypto = require("crypto");
 const fs = require('fs');
 const path = require('path');
@@ -30,7 +32,7 @@ class NetUser extends EventEmitter {
         this.socketOut = null;
         this.socketOutConnected = false;
         this.socketOutConnecting = false;
-        this.socketOutWaiting = false;
+        this.socketOutWaitingTime = 0;
 
         this.pongWait = false;
         this.pongWaitTimer = 0;
@@ -59,17 +61,13 @@ class NetUser extends EventEmitter {
             setInterval(() => { this.checkPongWait(); }, 1000 * 1); // second
             setInterval(() => { this.sendAlive(); }, 1000 * 20); // seconds
             setInterval(() => {
-                if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+                if (this.isBothConnected()) {
                     this.fileRecvList.fileTransCheck(); this.fileSendList.fileTransCheck();
+                    this.fileRecvList.fileDataCheck(); this.fileSendList.fileDataCheck();
                 }
             }, 100); // milliseconds
             setInterval(() => {
-                if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
-                    this.fileRecvList.fileDataCheck(); this.fileSendList.fileDataCheck();
-                }
-            }, 1000 * 0.1); // seconds
-            setInterval(() => {
-                if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+                if (this.isBothConnected()) {
                     this.fileRecvList.fileSpeedCheck(); this.fileSendList.fileSpeedCheck();
                 }
             }, 1000 * 1); // seconds   
@@ -94,7 +92,7 @@ class NetUser extends EventEmitter {
         this.fileSendList.on('speed', (fileID, speed) => { this.emit('filespeed', fileID, speed) });
 
         this.fileSendList.on('senddata', (fileID, blockIndex, blockData) => {
-            if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+            if (this.isBothConnected()) {
                 const sendResult = this.socketIn.sendFiledata(fileID, blockIndex, blockData);
                 if (sendResult == false) {
                     this.fileSendList.setSocketDrain(false);
@@ -107,8 +105,12 @@ class NetUser extends EventEmitter {
     }
 
     checkSocketOut() {
+        if (this.socketOutWaitingTime > 0) {
+            this.socketOutWaitingTime -= 10; // milliseconds
+        }
+
         if (contact.isFriend(this.hostname) || parser.isMyHostname(this.hostname) || this.socketIn) {
-            if (!this.socketOut && this.socketOutConnecting == false && this.socketOutWaiting == false) {
+            if (!this.socketOut && this.socketOutConnecting == false && this.socketOutWaitingTime <= 0) {
                 this.socketOutConnecting = true;
 
                 const options = config.getProxyOptions(this.hostname);
@@ -126,8 +128,8 @@ class NetUser extends EventEmitter {
                 this.socksClient.on('error', (err) => {
                     debug.log("[Proxy] Connect error: ", this.hostname);
                     this.socketOutConnecting = false;
-                    this.socketOutWaiting = true;
-                    setTimeout(() => { this.socketOutWaiting = false; }, constant.ConnectionRetryTime);
+                    this.socketOutWaitingTime = constant.ConnectionRetryTime;
+                    this.socketOutWaitingTime += (Math.floor(Math.random() * 10) * 1000); // 0 ~ 9 seconds
                     if (this.socketOut) {
                         this.emit('socketOutDisconnected');
                         if (this.socketOut) { this.socketOut.destroy(); }
@@ -184,8 +186,8 @@ class NetUser extends EventEmitter {
 
         this.socketOut.on('close', () => {
             this.socketOutConnected = false;
-            this.socketOutWaiting = true;
-            setTimeout(() => { this.socketOutWaiting = false; }, constant.ConnectionRetryTime);
+            this.socketOutWaitingTime = constant.ConnectionRetryTime
+            this.socketOutWaitingTime += (Math.floor(Math.random() * 10) * 1000); // 0 ~ 9 seconds
             if (this.socketOut) {
                 this.emit('socketOutDisconnected');
                 if (this.socketOut) { this.socketOut.destroy(); }
@@ -290,7 +292,7 @@ class NetUser extends EventEmitter {
     }
 
     sendAlive() {
-        if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+        if (this.isBothConnected()) {
             debug.log('<send alive>')
             this.socketOut.sendAlive();
         }
@@ -309,7 +311,7 @@ class NetUser extends EventEmitter {
 
     sendMessage(message) { //interface
         return new Promise((resolve, reject) => {
-            if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+            if (this.isBothConnected()) {
                 this.pushMessage(message, { fromSelf: true });
                 this.socketOut.sendMessage(message);
                 resolve();
@@ -322,7 +324,7 @@ class NetUser extends EventEmitter {
 
     sendFile(file) { //interface
         return new Promise((resolve, reject) => {
-            if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+            if (this.isBothConnected()) {
                 if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
                 if (!fileHandler.isFile(file)) { reject(new Error("Not a File")); return; }
                 if (fileHandler.getSize(file) <= 0) { reject(new Error("File size zero")); return; }
@@ -347,7 +349,7 @@ class NetUser extends EventEmitter {
 
     acceptFile(fileID) { //interface
         return new Promise((resolve, reject) => {
-            if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+            if (this.isBothConnected()) {
                 this.fileRecvList.acceptFile(fileID);
                 this.socketOut.sendFileaccept(fileID);
                 resolve();
@@ -388,6 +390,13 @@ class NetUser extends EventEmitter {
                     reject(err);
                 })
         })
+    }
+
+    isBothConnected() {
+        if (this.socketOut && this.socketOutConnected && this.socketIn && this.socketInConnected) {
+            return true;
+        }
+        return false;
     }
 
     destroy() {

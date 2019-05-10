@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = {
     // Constants // start with upper case
     ClientName: "TorChat3",
@@ -9,7 +11,7 @@ module.exports = {
 
     ConnectionTimeOut: 1000 * 60 * 2, // minuites
     KeepAliveTime: 1000 * 30, // seconds
-    ConnectionRetryTime: 1000 * 20, // seconds
+    ConnectionRetryTime: 1000 * 15, // seconds
     ProxyTimeOut: 1000 * 60 * 2, // minutes
     PongWaitingTime: 1000 * 60 * 1, // minutes
 
