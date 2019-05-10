@@ -47,18 +47,18 @@ export default class App extends Component {
     selectPage = (num) => { this.setState({ selectedPage: num }) }
 
     renderPage() {
-        if (remoteControl.getSuccess() == false || remoteControl.getFail() == true) {  
+        if (remoteControl.getSuccess() === false || remoteControl.getFail() === true) {  
             return (
                 <BootPage />
             )
         }
-        else if (this.state.selectedPage == 1) {
+        else if (this.state.selectedPage === 1) {
             return (
                 <ChatPage
                     selectPage={this.selectPage} />
             )
         }
-        else if (this.state.selectedPage == 2) {
+        else if (this.state.selectedPage === 2) {
             return (
                 <SettingPage
                     selectPage={this.selectPage} />

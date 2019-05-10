@@ -25,7 +25,7 @@ class FileRecvList extends EventEmitter {
     hasFile(fileID) {
         let fileIndex = -1;
         this.fileList.forEach((aFile, index) => {
-            if (aFile.fileID == fileID) { fileIndex = index; }
+            if (aFile.fileID === fileID) { fileIndex = index; }
         });
         if (-1 < fileIndex) { return true; }
         return false;
@@ -34,14 +34,14 @@ class FileRecvList extends EventEmitter {
     isFinished(fileID) {
         let finished = false;
         this.fileList.forEach((aFile) => {
-            if (aFile.fileID == fileID && aFile.finished) { finished = true; }
+            if (aFile.fileID === fileID && aFile.finished) { finished = true; }
         });
         return finished;
     }
 
     acceptFile(fileID) {
         this.fileList.forEach(aFile => {
-            if (aFile.fileID == fileID) {
+            if (aFile.fileID === fileID) {
                 aFile.accepted = true;
                 this.emit('accept', fileID);
             }
@@ -51,7 +51,7 @@ class FileRecvList extends EventEmitter {
     fileCancel(fileID) {
         let changed = false;
         this.fileList = this.fileList.filter((aFile) => {
-            if (aFile.fileID == fileID) {
+            if (aFile.fileID === fileID) {
                 this.emit('cancel', fileID);
                 changed = true;
                 return false;
@@ -63,7 +63,7 @@ class FileRecvList extends EventEmitter {
 
     filedata(fileID, blockIndex, blockData) {
         this.fileList.forEach(aFile => {
-            if (aFile.fileID == fileID && aFile.accepted) {
+            if (aFile.fileID === fileID && aFile.accepted) {
                 aFile.bufferList[blockIndex] = blockData;
             }
         });
@@ -90,7 +90,7 @@ class FileRecvList extends EventEmitter {
     fileFreeTimeout(fileID) {
         setTimeout(() => {
             this.fileList = this.fileList.filter((file) => {
-                if (file.fileID == fileID) { return false; }
+                if (file.fileID === fileID) { return false; }
                 return true;
             })
         }, 1000 * 10)
@@ -98,11 +98,11 @@ class FileRecvList extends EventEmitter {
 
     fileTransCheck() {
         this.fileList.forEach(filerecv => {
-            if (filerecv.accepted && filerecv.blockWriting == false && Object.keys(filerecv.bufferList).length > 0) {
+            if (filerecv.accepted && filerecv.blockWriting === false && Object.keys(filerecv.bufferList).length > 0) {
                 let bufferSum = "";
                 let filePath = fileHandler.getTempDir() + '/' + filerecv.fileID;
                 let createFile = false;
-                if (filerecv.blockIndex == 0) { createFile = true; }
+                if (filerecv.blockIndex === 0) { createFile = true; }
 
                 while (filerecv.bufferList[filerecv.blockIndex]) {
                     bufferSum += filerecv.bufferList[filerecv.blockIndex]
@@ -130,7 +130,7 @@ class FileRecvList extends EventEmitter {
                 }
             }
 
-            if (filerecv.fileSize <= filerecv.recvSize && filerecv.blockWriting == false) {
+            if (filerecv.fileSize <= filerecv.recvSize && filerecv.blockWriting === false) {
                 filerecv.accepted = false;
                 filerecv.finished = true;
                 this.fileFreeTimeout(filerecv.fileID);

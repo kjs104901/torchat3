@@ -118,7 +118,7 @@ export default class ChatPage extends Component {
 
         targetUserList.forEach((user, index) => {
             let selected = false;
-            if (user == this.state.selectedUser) { selected = true; }
+            if (user === this.state.selectedUser) { selected = true; }
 
             let color = '';
             if (user.socketOutConnected && user.socketInConnected) { color = 'green'; }

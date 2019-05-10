@@ -26,7 +26,7 @@ export default class ChatMessage extends Component {
     }
 
     updateFileUI = (address) => {
-        if (address == this.props.selectedUser.address) {
+        if (address === this.props.selectedUser.address) {
             this.forceUpdate();
         }
     }

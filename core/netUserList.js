@@ -20,7 +20,7 @@ exports.event = eventEmitter;
 function findUser(hostname) {
     let targetUser;
     userList.forEach(user => {
-        if (user.hostname == hostname) {
+        if (user.hostname === hostname) {
             targetUser = user;
         }
     });
@@ -30,11 +30,11 @@ exports.findUser = findUser;
 
 exports.getUserName = (address) => {
     let nickname = contact.getNickname(address);
-    if (nickname.length == 0) {
+    if (nickname.length === 0) {
         const targetUser = findUser(address);
         if (targetUser) { nickname = targetUser.profileName; }
     }
-    if (nickname.length == 0) { nickname = "tc3:" + address; }
+    if (nickname.length === 0) { nickname = "tc3:" + address; }
     return nickname;
 }
 

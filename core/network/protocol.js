@@ -81,17 +81,17 @@ exports.filedata = (socket, fileID, blockIndex, blockHash, blockData) => {
 exports.validate = (dataList) => {
     let isValid = false;
     switch (dataList[0]) {
-        case 'ping': isValid = (dataList.length == 4); break;
-        case 'pong': isValid = (dataList.length == 4); break;
-        case 'alive': isValid = (dataList.length == 2); break;
-        case 'profile': isValid = (dataList.length == 3); break;
-        case 'message': isValid = (dataList.length == 2); break;
-        case 'filesend': isValid = (dataList.length == 4); break;
-        case 'fileaccept': isValid = (dataList.length == 2); break;
-        case 'fileokay': isValid = (dataList.length == 3); break;
-        case 'fileerror': isValid = (dataList.length == 3); break;
-        case 'filecancel': isValid = (dataList.length == 2); break;
-        case 'filedata': isValid = (dataList.length == 5); break;
+        case 'ping': isValid = (dataList.length === 4); break;
+        case 'pong': isValid = (dataList.length === 4); break;
+        case 'alive': isValid = (dataList.length === 2); break;
+        case 'profile': isValid = (dataList.length === 3); break;
+        case 'message': isValid = (dataList.length === 2); break;
+        case 'filesend': isValid = (dataList.length === 4); break;
+        case 'fileaccept': isValid = (dataList.length === 2); break;
+        case 'fileokay': isValid = (dataList.length === 3); break;
+        case 'fileerror': isValid = (dataList.length === 3); break;
+        case 'filecancel': isValid = (dataList.length === 2); break;
+        case 'filedata': isValid = (dataList.length === 5); break;
         default: isValid = true; break;
     }
     if (!isValid) { debug.log("Invalid dataList", dataList); }

@@ -96,7 +96,7 @@ exports.findStringBefore = findStringBefore;
 
 function normalizeHostname(hostname) {
     hostname = hostname.toLowerCase();
-    if (hostname.indexOf('tc3:') == 0) { return hostname.substr('tc3:'.length); }
+    if (hostname.indexOf('tc3:') === 0) { return hostname.substr('tc3:'.length); }
     return hostname;
 }
 exports.normalizeHostname = normalizeHostname;
@@ -104,11 +104,11 @@ exports.normalizeHostname = normalizeHostname;
 function checkHostname(hostname) {
     let valid = true;
     hostname = normalizeHostname(hostname);
-    if (constant.HiddenServiceVersion == 3) {
-        if (hostname.length != 56) { return false; }
+    if (constant.HiddenServiceVersion === 3) {
+        if (hostname.length !== 56) { return false; }
     }
-    else if (constant.HiddenServiceVersion == 2) {
-        if (hostname.length != 16) { return false; }
+    else if (constant.HiddenServiceVersion === 2) {
+        if (hostname.length !== 16) { return false; }
     }
     hostname.split('').forEach(char => {
         if (!char.match(/[0-9]|[a-z]/)) { valid = false; }
@@ -118,7 +118,7 @@ function checkHostname(hostname) {
 exports.checkHostname = checkHostname;
 
 function isMyHostname(hostname) {
-    if (tor.getHostname() == hostname) {
+    if (tor.getHostname() === hostname) {
         return true;
     }
     return false;

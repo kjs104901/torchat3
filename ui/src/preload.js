@@ -243,7 +243,7 @@ class User {
 function findUser(address) {
     let targetUser;
     userList.forEach(user => {
-        if (user.address == address) {
+        if (user.address === address) {
             targetUser = user;
         }
     });
@@ -255,7 +255,7 @@ function findMessage(address, fileID) {
     if (targetUser) {
         let targetMessage;
         targetUser.messageList.forEach(message => {
-            if (message.options.fileID == fileID) {
+            if (message.options.fileID === fileID) {
                 targetMessage = message;
             }
         });
@@ -265,7 +265,7 @@ function findMessage(address, fileID) {
 
 function removeUser(address) {
     userList = userList.filter((user) => {
-        if (user.address == address) {
+        if (user.address === address) {
             return false;
         }
         return true;
@@ -290,14 +290,14 @@ window.userList = {
         if (connectCountA > connectCountB) { return -1; }
         else if (connectCountA < connectCountB) { return 1; }
 
-        else if ((connectCountA == 2) && (connectCountA == 2)) {
+        else if ((connectCountA === 2) && (connectCountA === 2)) {
 
             if (userA.lastActiveTime > userB.lastActiveTime) { return -1; }
             else if (userA.lastActiveTime < userB.lastActiveTime) { return 1; }
 
             else { return 0; }
         }
-        else if ((connectCountA == 1) && (connectCountA == 1)) {
+        else if ((connectCountA === 1) && (connectCountA === 1)) {
 
             if (!contact.isBlack(userA.address) && contact.isBlack(userB.address)) { return -1; }
             else if (contact.isBlack(userA.address) && !contact.isBlack(userB.address)) { return 1; }
@@ -324,7 +324,7 @@ window.userList = {
         console.log('socketOutconnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.socketOutConnected == false) {
+            if (targetUser.socketOutConnected === false) {
                 targetUser.socketOutConnected = true;
                 eventUserEmitter.emit('updated');
             }
@@ -336,7 +336,7 @@ window.userList = {
         console.log('socketOutDisconnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.socketOutConnected == true) {
+            if (targetUser.socketOutConnected === true) {
                 targetUser.socketOutConnected = false;
                 eventUserEmitter.emit('updated');
             }
@@ -348,7 +348,7 @@ window.userList = {
         console.log('socketInConnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.socketInConnected == false) {
+            if (targetUser.socketInConnected === false) {
                 targetUser.socketInConnected = true;
                 eventUserEmitter.emit('updated');
             }
@@ -360,7 +360,7 @@ window.userList = {
         console.log('socketInDisconnected');
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.socketInConnected == true) {
+            if (targetUser.socketInConnected === true) {
                 targetUser.socketInConnected = false;
                 eventUserEmitter.emit('updated');
             }
@@ -377,7 +377,7 @@ window.userList = {
     status: (address, status) => {
         let targetUser = findUser(address);
         if (targetUser) {
-            if (targetUser.status != status) {
+            if (targetUser.status !== status) {
                 targetUser.status = status;
                 eventUserEmitter.emit('updated');
             }

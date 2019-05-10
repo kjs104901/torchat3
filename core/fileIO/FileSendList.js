@@ -25,7 +25,7 @@ class FileSendList extends EventEmitter {
 
     accpetFile(fileID) {
         this.fileList.forEach(fileSend => {
-            if (fileSend.fileID == fileID) {
+            if (fileSend.fileID === fileID) {
                 fileSend.accepted = true;
                 this.emit('accept', fileID);
             }
@@ -34,7 +34,7 @@ class FileSendList extends EventEmitter {
 
     fileOkay(fileID, blockIndex) {
         this.fileList.forEach(filesend => {
-            if (filesend.fileID == fileID) {
+            if (filesend.fileID === fileID) {
                 if (!filesend.okayList[blockIndex]) {
                     filesend.okayList[blockIndex] = true;
 
@@ -63,7 +63,7 @@ class FileSendList extends EventEmitter {
 
     fileError(fileID, blockIndex) {
         this.fileList.forEach(filesend => {
-            if (filesend.fileID == fileID) {
+            if (filesend.fileID === fileID) {
                 if (blockIndex < filesend.sendBlock) {
                     filesend.sendBlock = blockIndex;
                 }
@@ -74,7 +74,7 @@ class FileSendList extends EventEmitter {
     fileCancel(fileID) {
         let changed = false;
         this.fileList = this.fileList.filter((aFile) => {
-            if (aFile.fileID == fileID) {
+            if (aFile.fileID === fileID) {
                 this.emit('cancel', fileID);
                 changed = true;
                 return false;
@@ -87,7 +87,7 @@ class FileSendList extends EventEmitter {
     fileFreeTimeout(fileID) {
         setTimeout(() => {
             this.fileList = this.fileList.filter((file) => {
-                if (file.fileID == fileID) { return false; }
+                if (file.fileID === fileID) { return false; }
                 return true;
             })
         }, 1000 * 10)

@@ -121,7 +121,7 @@ export default class ChatMessagePage extends Component {
     removeBlack = (targetAddress) => { remoteControl.removeBlack(targetAddress); }
 
     handleKeyPress = (event) => {
-        if ((event.keyCode == 10 || event.keyCode == 13)) {
+        if ((event.keyCode === 10 || event.keyCode === 13)) {
             if (event.ctrlKey) {
                 this.setState({ inputMessage: this.state.inputMessage + "\n" })
             }

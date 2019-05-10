@@ -86,7 +86,7 @@ exports.start = (controlPassword, keyPair) => {
 
             const lines = data.split('\r\n');
             lines.forEach(line => {
-                if (line.length == 0) { return; }
+                if (line.length === 0) { return; }
 
                 if (!controlAuth || controlHiddenServiceDestroy) {
                     if (line.substr(0, 6) === '250 OK') {

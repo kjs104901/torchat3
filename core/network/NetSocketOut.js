@@ -55,7 +55,7 @@ class SocksOut extends EventEmitter {
                         blockHash = dataList[3];
                         blockData = parser.unescape(dataList[4]);
 
-                        if (fileHandler.getMD5(blockData) == blockHash) {
+                        if (fileHandler.getMD5(blockData) === blockHash) {
                             this.emit('filedata', fileID, blockIndex, blockData);
                         }
                         else {

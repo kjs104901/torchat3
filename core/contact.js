@@ -32,7 +32,7 @@ exports.getFriendList = () => { return friendList; }
 exports.setFriendList = (newFriendList) => { friendList = newFriendList }
 exports.isFriend = (hostname) => {
     hostname = parser.normalizeHostname(hostname);
-    if (friendList.indexOf(hostname) == -1) { return false; }
+    if (friendList.indexOf(hostname) === -1) { return false; }
     return true;
 }
 exports.addFriend = (address) => {
@@ -50,7 +50,7 @@ exports.addFriend = (address) => {
 exports.removeFriend = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (friendList.indexOf(hostname) == -1) { reject(new Error('not friend')); return; }
+        if (friendList.indexOf(hostname) === -1) { reject(new Error('not friend')); return; }
 
         friendList.splice(friendList.indexOf(hostname), 1);
         eventEmitter.emit('contactUpdate')
@@ -83,7 +83,7 @@ exports.getBlackList = () => { return blackList; }
 exports.setBlackList = (newBlackList) => { blackList = newBlackList }
 function isBlack(hostname) {
     hostname = parser.normalizeHostname(hostname);
-    if (blackList.indexOf(hostname) == -1) { return false; }
+    if (blackList.indexOf(hostname) === -1) { return false; }
     return true;
 }
 exports.isBlack = isBlack;
@@ -102,7 +102,7 @@ exports.addBlack = (address) => {
 exports.removeBlack = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (blackList.indexOf(hostname) == -1) { reject(new Error('not black')); return; }
+        if (blackList.indexOf(hostname) === -1) { reject(new Error('not black')); return; }
 
         blackList.splice(blackList.indexOf(hostname), 1);
         eventEmitter.emit('contactUpdate');
@@ -116,7 +116,7 @@ exports.getWhiteList = () => { return whiteList; }
 exports.setWhiteList = (newWhiteList) => { whiteList = newWhiteList }
 function isWhite(hostname) {
     hostname = parser.normalizeHostname(hostname);
-    if (whiteList.indexOf(hostname) == -1) { return false; }
+    if (whiteList.indexOf(hostname) === -1) { return false; }
     return true;
 }
 exports.isWhite = isWhite;
@@ -135,7 +135,7 @@ exports.addWhite = (address) => {
 exports.removeWhite = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (whiteList.indexOf(hostname) == -1) { reject(new Error('not white')); return; }
+        if (whiteList.indexOf(hostname) === -1) { reject(new Error('not white')); return; }
 
         whiteList.splice(whiteList.indexOf(hostname), 1);
         eventEmitter.emit('contactUpdate');

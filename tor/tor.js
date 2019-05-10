@@ -71,7 +71,7 @@ exports.start = () => {
 }
 
 torControl.event.on('process', (percent) => {
-    if (bootProcess != percent) {
+    if (bootProcess !== percent) {
         bootProcess = percent;
         eventEmitter.emit("update");
     }
@@ -114,7 +114,7 @@ function pushLog(data) {
             const percentStr = parser.findStringBetween(line, 'Bootstrapped ', '%');
             if (percentStr) {
                 const percent = percentStr * 1
-                if (0 < percent && bootProcess != percent) {
+                if (0 < percent && bootProcess !== percent) {
                     bootProcess = percent;
                     eventEmitter.emit("update");
                 }

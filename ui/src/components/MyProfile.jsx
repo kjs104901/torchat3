@@ -41,7 +41,7 @@ export default class MyProfile extends Component {
         let myName = "";
         const myProfileName = remoteControl.getSetting().profileName;
         if (myProfileName) { myName = myProfileName; }
-        if (myName.length == 0) { myName = "tc3:" + myAddress }
+        if (myName.length === 0) { myName = "tc3:" + myAddress }
 
         const myProfileInfo = remoteControl.getSetting().profileInfo;
 

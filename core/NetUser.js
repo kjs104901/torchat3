@@ -94,7 +94,7 @@ class NetUser extends EventEmitter {
         this.fileSendList.on('senddata', (fileID, blockIndex, blockData) => {
             if (this.isBothConnected()) {
                 const sendResult = this.socketIn.sendFiledata(fileID, blockIndex, blockData);
-                if (sendResult == false) {
+                if (sendResult === false) {
                     this.fileSendList.setSocketDrain(false);
                 }
             }
@@ -110,7 +110,7 @@ class NetUser extends EventEmitter {
         }
 
         if (contact.isFriend(this.hostname) || parser.isMyHostname(this.hostname) || this.socketIn) {
-            if (!this.socketOut && this.socketOutConnecting == false && this.socketOutWaitingTime <= 0) {
+            if (!this.socketOut && this.socketOutConnecting === false && this.socketOutWaitingTime <= 0) {
                 this.socketOutConnecting = true;
 
                 const options = config.getProxyOptions(this.hostname);
@@ -157,7 +157,7 @@ class NetUser extends EventEmitter {
             }
         }
 
-        if (contact.isBlack(this.hostname) && this.destroyed == false) {
+        if (contact.isBlack(this.hostname) && this.destroyed === false) {
             this.destroy();
         }
     }
@@ -223,7 +223,7 @@ class NetUser extends EventEmitter {
         this.socketIn.on('drain', () => { this.fileSendList.setSocketDrain(true); })
 
         this.socketIn.on('ping', (hostname, cookieOppsite) => {
-            if (this.hostname != hostname) { debug.log('<invalid2>'); this.destroy(); return; }
+            if (this.hostname !== hostname) { debug.log('<invalid2>'); this.destroy(); return; }
             debug.log("cookieOppsite", cookieOppsite);
             this.reserveSendPong(cookieOppsite);
         })
@@ -231,13 +231,13 @@ class NetUser extends EventEmitter {
             this.pongValidate(cookie, clientName, clientVersion);
         })
         this.socketIn.on('alive', (status) => {
-            if (this.status != status) {
+            if (this.status !== status) {
                 this.status = status;
                 this.emit('status', status);
             }
         })
         this.socketIn.on('profile', (profileName, profileInfo) => {
-            if (this.profileName != profileName || this.profileInfo != profileInfo) {
+            if (this.profileName !== profileName || this.profileInfo !== profileInfo) {
                 this.profileName = profileName; this.profileInfo = profileInfo;
                 this.emit('profile', profileName, profileInfo);
             }
@@ -276,7 +276,7 @@ class NetUser extends EventEmitter {
     }
 
     pongValidate(cookie, clientName, clientVersion) {
-        if (this.cookie != cookie) { debug.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
+        if (this.cookie !== cookie) { debug.log('<invalid3>', this.cookie, cookie); this.destroy(); return; }
 
         this.pongWait = false;
         this.socketInConnected = true;
@@ -285,7 +285,7 @@ class NetUser extends EventEmitter {
 
         this.reserveSendProfile();
 
-        if (this.clientName != clientName || this.clientVersion != clientVersion) {
+        if (this.clientName !== clientName || this.clientVersion !== clientVersion) {
             this.clientName = clientName; this.clientVersion = clientVersion;
             this.emit('client', clientName, clientVersion);
         }

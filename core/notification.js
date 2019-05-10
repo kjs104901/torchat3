@@ -13,7 +13,7 @@ let newMessageList = [];
 let newConnectionList = [];
 
 exports.newMessage = (address, message) => {
-    if (newMessageList.indexOf(address) == -1) {
+    if (newMessageList.indexOf(address) === -1) {
         newMessageList.push(address);
 
         let nickname = netUserList.getUserName(address);
@@ -23,7 +23,7 @@ exports.newMessage = (address, message) => {
 }
 
 exports.newConnection = (address) => {
-    if (newConnectionList.indexOf(address) == -1) {
+    if (newConnectionList.indexOf(address) === -1) {
         newConnectionList.push(address);
 
         let nickname = netUserList.getUserName(address);

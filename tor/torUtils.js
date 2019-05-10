@@ -93,7 +93,7 @@ exports.generateControlPassword = () => {
                 if (execString.length > 0) {
                     const execList = execString.split('\n');
                     execList.forEach(line => {
-                        if (line.indexOf('16:') == 0) {
+                        if (line.indexOf('16:') === 0) {
                             controlPasswordHashed = line.replace('\r', '');
                         }
                     });

@@ -91,7 +91,7 @@ export default class SettingPage extends Component {
         if (this.state.inputProfileName.length > remoteControl.MaxLenProfileName) {
             this.showError(new Error("profile name too long"));
         }
-        else if ((/^[\x00-\xFF]*$/).test(this.state.inputProfileName) == false) {
+        else if ((/^[\x00-\xFF]*$/).test(this.state.inputProfileName) === false) {
             this.showError(new Error("profile name only ascii"));
         }
         else if (this.state.inputProfileInfo.length > remoteControl.MaxLenProfileInfo) {
@@ -143,7 +143,7 @@ export default class SettingPage extends Component {
     }
 
     renderSetting = () => {
-        if (this.state.selectedSetting == 1) { // 1: MenuMyProfile
+        if (this.state.selectedSetting === 1) { // 1: MenuMyProfile
             return (
                 <React.Fragment>
                     <div className="option-group">
@@ -171,14 +171,14 @@ export default class SettingPage extends Component {
                 </React.Fragment>
             )
         }
-        else if (this.state.selectedSetting == 2) { // 2: MenuGeneral 
+        else if (this.state.selectedSetting === 2) { // 2: MenuGeneral 
             return (
                 <React.Fragment>
                 </React.Fragment>
             )
 
         }
-        else if (this.state.selectedSetting == 3) { // 3: MenuConnections
+        else if (this.state.selectedSetting === 3) { // 3: MenuConnections
             return (
                 <React.Fragment>
                     <div className="option-group">
@@ -223,7 +223,7 @@ export default class SettingPage extends Component {
             )
 
         }
-        else if (this.state.selectedSetting == 4) { // 4: MenuBlacklist 
+        else if (this.state.selectedSetting === 4) { // 4: MenuBlacklist 
 
             let low = [];
 
@@ -271,7 +271,7 @@ export default class SettingPage extends Component {
                 </React.Fragment>
             )
         }
-        else if (this.state.selectedSetting == 5) { // 5: MenuAppearence
+        else if (this.state.selectedSetting === 5) { // 5: MenuAppearence
             return (
                 <React.Fragment>
                     <div className="option-group">
@@ -315,7 +315,7 @@ export default class SettingPage extends Component {
                 </React.Fragment>
             )
         }
-        else if (this.state.selectedSetting == 6) { // 6: MenuBackup
+        else if (this.state.selectedSetting === 6) { // 6: MenuBackup
         }
     }
 
@@ -326,7 +326,7 @@ export default class SettingPage extends Component {
         let myName = "";
         const myProfileName = remoteControl.getSetting().profileName;
         if (myProfileName) { myName = myProfileName; }
-        if (myName.length == 0) { myName = "tc3:" + myAddress }
+        if (myName.length === 0) { myName = "tc3:" + myAddress }
 
         const myProfileInfo = remoteControl.getSetting().profileInfo;
 
@@ -362,27 +362,27 @@ export default class SettingPage extends Component {
                             style={{ width: '100%', height: '100%' }}
                             option={{ suppressScrollX: true }}>
 
-                            <div className={"option-list__option" + (this.state.selectedSetting == 1 ? " selected" : "")}
+                            <div className={"option-list__option" + (this.state.selectedSetting === 1 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(1) }}>
                                 <div className="option-name">{langs.get('MenuMyProfile')}</div>
                             </div>
-                            <div className={"option-list__option" + (this.state.selectedSetting == 2 ? " selected" : "")}
+                            <div className={"option-list__option" + (this.state.selectedSetting === 2 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(2) }}>
                                 <div className="option-name">{langs.get('MenuGeneral')}</div>
                             </div>
-                            <div className={"option-list__option" + (this.state.selectedSetting == 3 ? " selected" : "")}
+                            <div className={"option-list__option" + (this.state.selectedSetting === 3 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(3) }}>
                                 <div className="option-name">{langs.get('MenuConnections')}</div>
                             </div>
-                            <div className={"option-list__option" + (this.state.selectedSetting == 4 ? " selected" : "")}
+                            <div className={"option-list__option" + (this.state.selectedSetting === 4 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(4) }}>
                                 <div className="option-name">{langs.get('MenuBlacklist')}</div>
                             </div>
-                            <div className={"option-list__option" + (this.state.selectedSetting == 5 ? " selected" : "")}
+                            <div className={"option-list__option" + (this.state.selectedSetting === 5 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(5) }}>
                                 <div className="option-name">{langs.get('MenuAppearence')}</div>
                             </div>
-                            <div className={"option-list__option" + (this.state.selectedSetting == 6 ? " selected" : "")}
+                            <div className={"option-list__option" + (this.state.selectedSetting === 6 ? " selected" : "")}
                                 onClick={() => { this.selectSetting(6) }}>
                                 <div className="option-name">{langs.get('MenuBackup')}</div>
                             </div>
