@@ -26,34 +26,11 @@ import imgSetting from '../assets/setting.png'
 import imgInfo from '../assets/info.png'
 import imgUpload from '../assets/upload.png'
 
-//test temp example
-/**
-MySwal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'okay',
-    cancelButtonText: 'cancel',
-    heightAuto: false,
-    width: 400,
-}).then((result) => {
-    if (result.value) {
-        MySwal.fire({
-            title: 'Deleted!',
-            text: 'Your file has been deleted.',
-            heightAuto: false,
-            width: 400,
-        })
-    }
-})
-*/
-
-
 export default class ChatPage extends Component {
     constructor(props) {
         super(props);
+
+        this.scrollReq = false;
 
         this.state = {
             selectedUser: null,
@@ -85,6 +62,16 @@ export default class ChatPage extends Component {
         }
     }
 
+    componentDidUpdate() {
+        if (this.scrollReq) {
+            this.scrollReq = false;
+
+            if (this.chatMessagePageRef) {
+                this.chatMessagePageRef.scrollToEnd();
+            }
+        }
+    }
+
     updateUI = () => {
         this.forceUpdate();
     }
@@ -107,8 +94,15 @@ export default class ChatPage extends Component {
     selectUserByAddress = (address) => {
         if (address && address.length > 0) {
             const user = userList.findUser(address);
-            if (user) { this.setState({ selectedUser: user, showProfile: false }) }
+            if (user) {
+                this.selectUser(user, false)
+            }
         }
+    }
+
+    selectUser = (user, showProfile) => {
+        this.setState({ selectedUser: user, showProfile: showProfile })
+        this.scrollReq = true;
     }
 
     turnProfile = (onOff) => {
@@ -138,17 +132,17 @@ export default class ChatPage extends Component {
 
             row.push(
                 <div className={selected ? "user selected" : "user"} key={index}
-                    onClick={() => { this.setState({ selectedUser: user, showProfile: false }) }}>
+                    onClick={() => { this.selectUser(user, false); }}>
                     <div className="profile__head">
                         <div className={"profile__head__background " + color}></div>
                         <img className="image-button profile__head__picture"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 if (window.innerWidth > 500) {
-                                    this.setState({ selectedUser: user, showProfile: true })
+                                    this.selectUser(user, true);
                                 }
                                 else {
-                                    this.setState({ selectedUser: user, showProfile: false })
+                                    this.selectUser(user, false);
                                 }
                             }}
                             src={"data:image/png;base64," + user.profile.image} />
@@ -201,7 +195,7 @@ export default class ChatPage extends Component {
                         <div id='user-list' >
                             <PerfectScrollbar
                                 style={{ width: '100%', height: '100%' }}
-                                option={{suppressScrollX: true}}>
+                                option={{ suppressScrollX: true }}>
                                 {this.renderUserList()}
                             </PerfectScrollbar>
                         </div>
@@ -212,7 +206,9 @@ export default class ChatPage extends Component {
                         this.state.showProfile ?
                             <ProfilePage selectedUser={this.state.selectedUser} turnProfile={this.turnProfile} />
                             :
-                            <ChatMessagePage selectedUser={this.state.selectedUser} turnProfile={this.turnProfile} />
+                            <ChatMessagePage
+                                ref={(ref) => { this.chatMessagePageRef = ref }}
+                                selectedUser={this.state.selectedUser} turnProfile={this.turnProfile} />
                         :
                         <React.Fragment>
                             <div style={{ width: '100%', height: 'calc(50% - 25px)' }}></div>

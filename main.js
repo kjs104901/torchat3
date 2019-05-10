@@ -94,7 +94,7 @@ function openMainWindow() {
 
         mainWindow.once('ready-to-show', () => { });
         mainWindow.on('close', (event) => {
-            if (!appQuiting && config.getSetting().minimizeToTray) {
+            if (!appQuiting && config.getSetting().minimizeToTray && tor.getSuccess()) {
                 event.preventDefault();
                 hideMainWindow();
             }

@@ -18,11 +18,15 @@ export default class ChatMessage extends Component {
     };
 
     componentDidMount() {
-        userList.event.on('updateFile', this.updateFileUI)
+        if (this.props.message.options.fileID) {
+            userList.event.on('updateFile', this.updateFileUI)
+        }
     }
 
     componentWillUnmount() {
-        userList.event.removeListener('updateFile', this.updateFileUI)
+        if (this.props.message.options.fileID) {
+            userList.event.removeListener('updateFile', this.updateFileUI)
+        }
     }
 
     updateFileUI = (address) => {
@@ -47,7 +51,6 @@ export default class ChatMessage extends Component {
         let lows = [];
         const messageList = message.split('\n');
 
-        //test
         messageList.forEach((message, index) => {
             lows.push(
                 <React.Fragment key={index}>

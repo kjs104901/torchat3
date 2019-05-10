@@ -40,9 +40,14 @@ export default class ChatMessagePage extends Component {
     componentDidUpdate() {
         if (this.scrollRef) {
             if (this.scrollReachEnd) {
-                this.scrollRef.scrollTop = this.scrollRef.scrollHeight;
+                this.scrollToEnd();
             }
         }
+    }
+
+    scrollToEnd() {
+        this.scrollRef.scrollTop = this.scrollRef.scrollHeight;
+        this.scrollReachEnd = true;
     }
 
     sendMessage = () => {

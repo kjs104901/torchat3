@@ -27,7 +27,6 @@ class NetUser extends EventEmitter {
     constructor(hostname) {
         super();
         this.hostname = hostname;
-        debug.log("userStart")
 
         this.socketIn = null;
         this.socketInConnected = false;

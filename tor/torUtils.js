@@ -85,9 +85,6 @@ exports.generateControlPassword = () => {
                     ['--hash-password', controlPassword],
                     { cwd: torDir, encoding: 'utf8' });
 
-                //test
-                console.log("try:", index, 'execString', execString);
-
                 if (execString.length > 0) {
                     const execList = execString.split('\n');
                     execList.forEach(line => {
