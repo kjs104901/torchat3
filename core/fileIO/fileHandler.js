@@ -54,7 +54,7 @@ exports.getMD5 = getMD5;
 
 
 // creating temp directory and clean
-let tempDirBase = os.tmpdir() + "/torchat3temp";
+let tempDirBase = os.tmpdir() + "/torchat3_temp";
 let tempDirCount = 0;
 let tempDir = tempDirBase + "_" + tempDirCount;
 try {
@@ -144,3 +144,21 @@ function move(oldPath, newPath) {
     })
 }
 exports.move = move;
+
+exports.saveProfileImage = (hostname, profileImageStr) => {
+    try {
+        if (fs.existsSync(tempDir)) {
+            fs.writeFileSync(tempDir + "/" + hostname + ".png", Buffer.from(profileImageStr, 'base64'))
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.getProfileImagePath = (hostname) => {
+    const targetPath = tempDir + "/" + hostname + ".png";
+    if (fs.existsSync(targetPath)) {
+        return targetPath;
+    }
+    return __base + '/data/logoNofication.png';
+}

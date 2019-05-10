@@ -78,6 +78,13 @@ export default class ChatPage extends Component {
         remoteControl.event.removeListener('clickUser', this.selectUserByAddress);
     }
 
+    componentWillUpdate() {
+        const targetUserList = userList.getList();
+        if (targetUserList.indexOf(this.state.selectedUser) === -1) {
+            this.state.selectedUser = null;
+        }
+    }
+
     updateUI = () => {
         this.forceUpdate();
     }
@@ -144,7 +151,7 @@ export default class ChatPage extends Component {
                                     this.setState({ selectedUser: user, showProfile: false })
                                 }
                             }}
-                            src={"data:image/svg+xml;base64," + user.profile.image} />
+                            src={"data:image/png;base64," + user.profile.image} />
                     </div>
                     <div className="profile__body">
                         <div className={"profile__body__nickname " + (lastMessage ? '' : 'alone')}>{name}</div>

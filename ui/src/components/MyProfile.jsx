@@ -63,7 +63,7 @@ export default class MyProfile extends Component {
                     <div className="profile__head big">
                         <div className={"profile__head__background big " + myColor}></div>
                         <img className="profile__head__picture big"
-                            src={"data:image/svg+xml;base64," + myProfileImage} />
+                            src={"data:image/png;base64," + myProfileImage} />
                     </div>
                     <div className="profile__body big">
                         <div className="profile__body__nickname big">{myName}</div>

@@ -211,7 +211,7 @@ export default class ChatMessagePage extends Component {
                 <div id='content__header'>
                     <img id="content__header__picture" className="image-button"
                         onClick={() => { this.props.turnProfile(true) }}
-                        src={"data:image/svg+xml;base64," + selectedProfileImage} />
+                        src={"data:image/png;base64," + selectedProfileImage} />
                     <div id='content__header__info'>
                         <div id='content__header__info__nickname'>
                             {selectedName}

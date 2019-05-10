@@ -91,15 +91,17 @@ export default class ChatMessage extends Component {
                     )
 
                 }
-                if (options.finished) {// save button
-                    buttonList.push(
-                        <div className="message__button" key={2}>
-                            <button className="button-custom confirm"
-                                onClick={() => { this.saveFile(options.fileID, message) }}>
-                                {langs.get('ButtonSaveFile')}
-                            </button>
-                        </div>
-                    )
+                if (options.finished) {
+                    if (!options.saved) { // save button
+                        buttonList.push(
+                            <div className="message__button" key={2}>
+                                <button className="button-custom confirm"
+                                    onClick={() => { this.saveFile(options.fileID, message) }}>
+                                    {langs.get('ButtonSaveFile')}
+                                </button>
+                            </div>
+                        )
+                    }
                 }
             }
             if (!options.finished) { // cancel button
@@ -136,9 +138,14 @@ export default class ChatMessage extends Component {
                                     <div style={{ width: '100%', textAlign: 'center' }}>{langs.get('StatusAcceptWaiting')}</div>
                                 </React.Fragment>
                                 : options.finished ?
-                                    <React.Fragment>
-                                        <div style={{ width: '100%', textAlign: 'center' }}>{langs.get('StatusCompleted')}</div>
-                                    </React.Fragment>
+                                    !options.saved ?
+                                        <React.Fragment>
+                                            <div style={{ width: '100%', textAlign: 'center' }}>{langs.get('StatusCompleted')}</div>
+                                        </React.Fragment>
+                                        :
+                                        <React.Fragment>
+                                            <div style={{ width: '100%', textAlign: 'center' }}>{langs.get('StatusSaved')}</div>
+                                        </React.Fragment>
                                     : <React.Fragment>
                                         <Line style={{ width: "100%", height: 10 }}
                                             percent={percent} strokeWidth="2" strokeColor="#5C3E73" /><br />

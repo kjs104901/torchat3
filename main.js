@@ -69,7 +69,7 @@ let mainWindowHided = false;
 let mainWindowSetting = {
     width: 1600, height: 800,
     minWidth: 350, minHeight: 460,
-    backgroundColor: '#ffffff', //TODO change it depends on theme
+    backgroundColor: '#ffffff',
     resizable: true,
     webPreferences: {
         sandbox: true,
@@ -117,7 +117,7 @@ function showMainWindow() {
 //// ------------ Tray ------------ ////
 let tray = null
 app.on('ready', () => {
-    tray = new Tray(`${__base}/data/logo.png`); //TODO change this to proper ico icon.
+    tray = new Tray(`${__base}/data/logoTray.png`);
     const contextMenu = Menu.buildFromTemplate([
         //LANG
         { label: 'Show App', click: () => { showMainWindow(); } },

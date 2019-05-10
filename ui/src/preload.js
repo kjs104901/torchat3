@@ -221,16 +221,14 @@ window.remoteControl = {
 let userList = [];
 
 class User {
-    constructor(address) {
-        const hash = crypto.createHash('md5').update(address).digest("hex").substr(0, 32);
-
+    constructor(address, profileImage) {
         this.address = address;
         this.socketOutConnected = false;
         this.socketInConnected = false;
         this.status = 0;
         this.profile = {
             name: "", info: "",
-            image: new Identicon(hash, { format: 'svg', background: [255, 255, 255, 255] }).toString()
+            image: profileImage
         };
         this.client = { name: "", version: "" };
 
@@ -309,10 +307,10 @@ window.userList = {
         }
     },
 
-    addUser: (address) => {
+    addUser: (address, profileImage) => {
         let targetUser = findUser(address);
         if (!targetUser) {
-            targetUser = new User(address)
+            targetUser = new User(address, profileImage)
             userList.push(targetUser);
 
             eventUserEmitter.emit('updated');
@@ -455,10 +453,21 @@ window.userList = {
             return targetMessage;
         }
     },
+
     fileCancel: (address, fileID) => {
         const targetMessage = findMessage(address, fileID)
         if (targetMessage) {
             targetMessage.options.canceled = true;
+
+            eventUserEmitter.emit('updateFile', address);
+            return targetMessage;
+        }
+    },
+
+    fileSaved: (address, fileID) => {
+        const targetMessage = findMessage(address, fileID)
+        if (targetMessage) {
+            targetMessage.options.saved = true;
 
             eventUserEmitter.emit('updateFile', address);
             return targetMessage;
@@ -508,7 +517,7 @@ config.event.on('settingUpdate', () => { eventEmitter.emit('settingUpdate'); });
 contact.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
 
 // user
-netUserList.event.on('newUser', (address) => { window.userList.addUser(address); });
+netUserList.event.on('newUser', (address, profileImage) => { window.userList.addUser(address, profileImage); });
 
 netUserList.event.on('userSocketOutConnected', (address) => { window.userList.socketOutConnected(address); });
 netUserList.event.on('userSocketOutDisconnected', (address) => { window.userList.socketOutDisconnected(address); });
@@ -525,6 +534,7 @@ netUserList.event.on('userFileAccept', (address, fileID) => { window.userList.fi
 netUserList.event.on('userFileFinished', (address, fileID) => { window.userList.fileFinished(address, fileID); });
 netUserList.event.on('userFileError', (address, fileID) => { window.userList.fileError(address, fileID); });
 netUserList.event.on('userFileCancel', (address, fileID) => { window.userList.fileCancel(address, fileID); });
+netUserList.event.on('userFileSaved', (address, fileID) => { window.userList.fileSaved(address, fileID); });
 netUserList.event.on('userFileData', (address, fileID, accumSize) => { window.userList.fileData(address, fileID, accumSize); });
 netUserList.event.on('userFileSpeed', (address, fileID, speed) => { window.userList.fileSpeed(address, fileID, speed); });
 

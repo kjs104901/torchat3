@@ -40,7 +40,7 @@ exports.getUserName = (address) => {
 
 function addUser(address) {
     removeDestroyedUser()
-    
+
     const hostname = parser.normalizeHostname(address);
     if (!parser.checkHostname(hostname)) { return; } // hostname error
 
@@ -50,7 +50,7 @@ function addUser(address) {
     targetUser = new User(hostname);
     userList.push(targetUser);
 
-    eventEmitter.emit('newUser', hostname);
+    eventEmitter.emit('newUser', hostname, targetUser.profileImage);
 
     targetUser.on('socketOutConnected', () => { eventEmitter.emit('userSocketOutConnected', hostname); })
     targetUser.on('socketOutDisconnected', () => { eventEmitter.emit('userSocketOutDisconnected', hostname); })
@@ -69,6 +69,7 @@ function addUser(address) {
     targetUser.on('filefinished', (fileID) => { eventEmitter.emit('userFileFinished', hostname, fileID); })
     targetUser.on('fileerror', (fileID) => { eventEmitter.emit('userFileError', hostname, fileID); })
     targetUser.on('filecancel', (fileID) => { eventEmitter.emit('userFileCancel', hostname, fileID); })
+    targetUser.on('filesaved', (fileID) => { eventEmitter.emit('userFileSaved', hostname, fileID); })
     targetUser.on('filedata', (fileID, accumSize) => { eventEmitter.emit('userFileData', hostname, fileID, accumSize); })
     targetUser.on('filespeed', (fileID, speed) => { eventEmitter.emit('userFileSpeed', hostname, fileID, speed); })
 

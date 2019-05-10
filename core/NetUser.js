@@ -7,6 +7,8 @@ const path = require('path');
 const EventEmitter = require('events');
 const SocksClient = require('socks').SocksClient;
 
+const Identicon = require('identicon.js');
+
 const config = require(`${__base}/core/config`);
 const constant = require(`${__base}/core/constant`);
 
@@ -46,6 +48,11 @@ class NetUser extends EventEmitter {
 
         this.profileName = "";
         this.profileInfo = "";
+
+        const profileImageHash = crypto.createHash('md5').update(this.hostname).digest("hex").substr(0, 32);
+        this.profileImage = new Identicon(profileImageHash, { background: [255, 255, 255, 255] }).toString();
+        fileHandler.saveProfileImage(this.hostname, this.profileImage);
+
         this.clientName = "";
         this.clientVersion = "";
 
@@ -67,7 +74,7 @@ class NetUser extends EventEmitter {
 
             this.sendAliveIntv = setInterval(() => {
                 this.sendAlive();
-                
+
             }, 1000 * 20); // seconds
 
             this.fileCheckIntv = setInterval(() => {
@@ -92,6 +99,7 @@ class NetUser extends EventEmitter {
         this.fileRecvList.on('accept', (fileID) => { this.emit('fileaccept', fileID) });
         this.fileRecvList.on('finished', (fileID) => { this.emit('filefinished', fileID) });
         this.fileRecvList.on('cancel', (fileID) => { this.emit('filecancel', fileID) });
+        this.fileRecvList.on('saved', (fileID) => { this.emit('filesaved', fileID) });
         this.fileRecvList.on('error', (fileID) => { this.emit('fileerror', fileID) });
         this.fileRecvList.on('data', (fileID, sendSize) => { this.emit('filedata', fileID, sendSize) });
         this.fileRecvList.on('speed', (fileID, speed) => { this.emit('filespeed', fileID, speed) });
@@ -233,6 +241,8 @@ class NetUser extends EventEmitter {
 
             if (this.socketIn) { this.socketIn.destroy(); }
             this.socketIn = null;
+
+            this.cancelSendPong();
         })
         this.socketIn.on('invalid', () => { debug.log('<invalid1>'); this.destroy(); })
 
@@ -262,7 +272,7 @@ class NetUser extends EventEmitter {
             this.pushMessage(message, { fromSelf: false });
         })
         this.socketIn.on('filesend', (fileID, fileSize, fileName) => {
-            this.pushMessage(fileName, { fromSelf: false, fileID, fileSize });
+            this.pushMessage(fileName, { fromSelf: false, fileID, fileSize, saved: false });
             this.fileRecvList.push(fileID, fileSize);
         })
         this.socketIn.on('fileaccept', (fileID) => {
@@ -284,6 +294,10 @@ class NetUser extends EventEmitter {
         debug.log('<sendpong reserve>')
         this.cookieOppsite = cookieOppsite;
         this.sendPongReq = true;
+    }
+
+    cancelSendPong() {
+        this.sendPongReq = false;
     }
 
     reserveSendProfile() {

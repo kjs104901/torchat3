@@ -4,6 +4,7 @@ const notifier = require('node-notifier');
 
 const contact = require(`${__base}/core/contact`);
 const netUserList = require(`${__base}/core/netUserList`);
+const fileHandler  = require(`${__base}/core/fileIO/fileHandler`)
 
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
@@ -38,13 +39,13 @@ exports.clearHistory = () => {
     newConnectionList = [];
 }
 
-//TODO icon 넣을 수 있으면 넣기 icon: path.join(__dirname, 'coulson.jpg'),
 function notify(address, title, message) {
     if (message.length > 50) { message = message.substr(0, 50) + "..."; }
     if (title.length > 30) { title = title.substr(0, 30) + "..."; }
+    const icon = fileHandler.getProfileImagePath(address);
 
     notifier.notify({
-        address, title, message,
+        address, title, message, icon,
         sound: true,
         wait: true,
     });

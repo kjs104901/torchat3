@@ -134,7 +134,7 @@ export default class ProfilePage extends Component {
 
                 <div className="profile-group"
                     style={{ textAlign: "center" }}>
-                    <img className="profile-image" src={"data:image/svg+xml;base64," + selectedProfileImage} />
+                    <img className="profile-image" src={"data:image/png;base64," + selectedProfileImage} />
                 </div>
 
                 <div className="profile-group">

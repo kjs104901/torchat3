@@ -74,12 +74,13 @@ class FileRecvList extends EventEmitter {
             let fromFilePath = fileHandler.getTempDir() + '/' + fileID;
             if (fs.existsSync(fromFilePath)) {
                 fileHandler.move(fromFilePath, toFilePath)
-                .then(() => {
-                    resolve();
-                })
-                .catch((err) => {
-                    reject(err);
-                })
+                    .then(() => {
+                        this.emit('saved', fileID);
+                        resolve();
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    })
             }
             else {
                 reject(new Error('no downloaded temp file'));
@@ -160,7 +161,7 @@ class FileRecvList extends EventEmitter {
             }
         });
     }
-    
+
     destroy() {
         this.removeAllListeners();
     }

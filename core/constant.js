@@ -8,6 +8,7 @@ module.exports = {
     HiddenServiceVersion: 3,
 
     BufferMaximum: 10000,
+    BufferFileMaximum: (1024 * 8) * (16) * (2), // blocksize * windowsize * double
 
     ConnectionTimeOut: 1000 * 60 * 2, // minuites
     KeepAliveTime: 1000 * 30, // seconds

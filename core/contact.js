@@ -53,6 +53,8 @@ exports.removeFriend = (address) => {
         if (friendList.indexOf(hostname) === -1) { reject(new Error('not friend')); return; }
 
         friendList.splice(friendList.indexOf(hostname), 1);
+        nicknameList[hostname] = "";
+
         eventEmitter.emit('contactUpdate')
         resolve();
     })
