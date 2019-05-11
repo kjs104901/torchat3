@@ -169,6 +169,7 @@ window.remoteControl = {
     MaxLenChatMessage: constant.MaxLenChatMessage,
     MaxLenProfileName: constant.MaxLenProfileName,
     MaxLenProfileInfo: constant.MaxLenProfileInfo,
+    ClientVersion: constant.ClientVersion,
 
     // Chatting
     sendMessage: (address, message) => {

@@ -71,7 +71,13 @@
     "appId": "com.kjs104901.torchat3",
     "win": {
       "target": [
-        "zip"
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
       ],
       "icon": "./assets/icon.ico"
     },

@@ -35,7 +35,7 @@ export default class SettingPage extends Component {
             selectedSetting: 1,
             // 1: MenuMyProfile // 2: MenuGeneral // 3: MenuConnections
             // 4: MenuBlockedlist // 5: MenuAppearence // 6: MenuBackup
-            // 7: Licenses
+            // 7: License
 
             inputProfileName: this.settingValue.profileName,
             inputProfileInfo: this.settingValue.profileInfo,
@@ -203,7 +203,7 @@ export default class SettingPage extends Component {
             }
         })
     }
-    
+
 
     logsRender = () => {
         let low = [];
@@ -343,10 +343,10 @@ export default class SettingPage extends Component {
                     <div className="clearfix"></div>
                     <div className="option-group">
                         <li>{langs.get('OptionTorLogs')}</li>
-                        
+
                         <PerfectScrollbar
                             style={{ width: "100%", height: 200, marginTop: 20, fontSize: 12, overflow: 'auto' }}
-                            option={{suppressScrollX: true}}>
+                            option={{ suppressScrollX: true }}>
                             {this.logsRender()}
                         </PerfectScrollbar>
                     </div>
@@ -489,7 +489,75 @@ export default class SettingPage extends Component {
 
         }
         else if (this.state.selectedSetting === 7) { // 7: MenuLicense
+            return (
+                <React.Fragment>
+                    <PerfectScrollbar
+                        style={{ width: '100%', height: '100%' }}
+                        option={{ suppressScrollX: true }}>
 
+                        <div className="option-group">
+                            <li>base32.js</li>
+                            <div>[MIT] https://github.com/speakeasyjs/base32.js</div>
+                        </div>
+                        <div className="option-group">
+                            <li>csv-parse</li>
+                            <div>[MIT] https://github.com/adaltas/node-csv-parse</div>
+                        </div>
+                        <div className="option-group">
+                            <li>identicon.js</li>
+                            <div>[BSD 2-Clause] https://github.com/stewartlord/identicon.js</div>
+                        </div>
+                        <div className="option-group">
+                            <li>lowdb</li>
+                            <div>[MIT] https://github.com/typicode/lowdb</div>
+                        </div>
+                        <div className="option-group">
+                            <li>node-notifier</li>
+                            <div>[MIT] https://github.com/mikaelbr/node-notifier</div>
+                        </div>
+                        <div className="option-group">
+                            <li>rc-progress</li>
+                            <div>[MIT] https://github.com/react-component/progress</div>
+                        </div>
+                        <div className="option-group">
+                            <li>react</li>
+                            <div>[MIT] https://github.com/facebook/react</div>
+                        </div>
+                        <div className="option-group">
+                            <li>react-collapsible</li>
+                            <div>[MIT] https://github.com/glennflanagan/react-collapsible</div>
+                        </div>
+                        <div className="option-group">
+                            <li>react-perfect-scrollbar</li>
+                            <div>[MIT] https://github.com/goldenyz/react-perfect-scrollbar</div>
+                        </div>
+                        <div className="option-group">
+                            <li>react-select</li>
+                            <div>[MIT] https://github.com/JedWatson/react-select</div>
+                        </div>
+                        <div className="option-group">
+                            <li>react-switch</li>
+                            <div>[MIT] https://github.com/markusenglund/react-switch</div>
+                        </div>
+                        <div className="option-group">
+                            <li>sha3</li>
+                            <div>[MIT] https://github.com/phusion/node-sha3</div>
+                        </div>
+                        <div className="option-group">
+                            <li>socks</li>
+                            <div>[MIT] https://github.com/JoshGlazebrook/socks</div>
+                        </div>
+                        <div className="option-group">
+                            <li>supercop.js</li>
+                            <div>https://github.com/1p6/supercop.js</div>
+                        </div>
+                        <div className="option-group" style={{ paddingBottom: 50 }}>
+                            <li>sweetalert2</li>
+                            <div>[MIT] https://github.com/sweetalert2/sweetalert2</div>
+                        </div>
+                    </PerfectScrollbar>
+                </React.Fragment>
+            )
         }
     }
 

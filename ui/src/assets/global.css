@@ -391,6 +391,8 @@ input[type=text]:focus, textarea:focus {
 #content__header {
     width: 100%;
     height: 50px;
+    padding-top: 3px;
+    padding-bottom: 2px;
     background-color: var(--color-background__main-header);
 }
 
@@ -524,7 +526,7 @@ input[type=text]:focus, textarea:focus {
 
 #message-input {
     width: 100%;
-    height: 50px;
+    height: 45px;
     background-color: var(--color-background-5);
 }
 

@@ -50,6 +50,7 @@ export default class BootPage extends Component {
                 <div className="centered" style={{ width: "80%", paddingTop: "10vh" }}>
                     <img className='centered' src={logo} style={{ width: "30%", maxWidth: 150 }} />
                     <h1>Torchat3</h1>
+                    <h5>v{remoteControl.ClientVersion}</h5>
                     <Line percent={remoteControl.getProgress()} strokeWidth="2" strokeColor="#5C3E73" style={{ width: "80%", maxWidth: 360, height: 10 }} /><br />
                     {remoteControl.getProgress()}%<br /><br />
 

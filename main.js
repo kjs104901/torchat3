@@ -79,7 +79,7 @@ function appQuit() {
 let mainWindow
 let mainWindowHided = false;
 let mainWindowSetting = {
-    width: 1600, height: 800,
+    width: 800, height: 700,
     minWidth: 350, minHeight: 460,
     backgroundColor: '#ffffff',
     resizable: true,
@@ -92,6 +92,7 @@ let mainWindowSetting = {
 function openMainWindow() {
     if (!mainWindow) {
         mainWindow = new BrowserWindow(mainWindowSetting);
+        mainWindow.setMenu(null);
 
         //Security: set a fake proxy to prevent the app from connecting to internet
         mainWindow.webContents.session.setProxy({ proxyRules: fakeProxy }, () => {
@@ -114,7 +115,7 @@ function openMainWindow() {
             return false;
         });
 
-        mainWindow.webContents.openDevTools();
+        //mainWindow.webContents.openDevTools();
     }
 }
 

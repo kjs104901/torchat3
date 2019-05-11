@@ -44,6 +44,21 @@ export default class ChatMessagePage extends Component {
             }
         }
     }
+    
+    showError = (err) => {
+        if (err) {
+            console.log(err);
+            let errStr = err.message;
+            if (errStr) {
+                MySwal.fire({
+                    title: 'Error',
+                    text: errStr,
+                    heightAuto: false,
+                    width: 400,
+                })
+            }
+        }
+    }
 
     scrollToEnd() {
         this.scrollRef.scrollTop = this.scrollRef.scrollHeight;

@@ -6,7 +6,7 @@
 ,ButtonCancelFile,Cancel,취소
 ,ButtonSaveFile,Save,저장
 ,StatusCanceled,Canceled,취소됨
-,StatusAcceptWaiting,Waiting to accept file,파일 수락 기다리는 중
+,StatusAcceptWaiting,Waiting to be accepted,파일 수락 기다리는 중
 ,StatusCompleted,Completed,완료됨
 ,AlertNotFriend,[Alert] Not a friend.,[경고] 친구가 아닙니다
 ,PopupSetNickname,Set nickname,닉네임 설정
