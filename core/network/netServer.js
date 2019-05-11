@@ -5,11 +5,12 @@ const net = require('net');
 const config = require(`${__base}/core/config`);
 const constant = require(`${__base}/core/constant`);
 
-const contact = require(`${__base}/core/contact`);
+const contacts = require(`${__base}/core/contacts`);
 const netUserList = require(`${__base}/core/netUserList`);
 const protocol = require(`${__base}/core/network/protocol`);
 const parser = require(`${__base}/core/network/parser`);
 const debug = require(`${__base}/core/debug`);
+const langs = require(`${__base}/core/langs`);
 
 const torUtil = require(`${__base}/tor/torUtils`)
 
@@ -49,8 +50,8 @@ let server = net.createServer((client) => {
 
                         hostname = torUtil.generateHostname(publicKey);
                         if ((torUtil.verify(publicKeyStr + cookieOppsite, signed, publicKey)) &&
-                            (!config.getSetting().blackList || !contact.isBlack(hostname)) &&
-                            (!config.getSetting().whiteList || contact.isWhite(hostname))) {
+                            (!config.getSetting().blackList || !contacts.isBlack(hostname)) &&
+                            (!config.getSetting().whiteList || contacts.isWhite(hostname))) {
                             const targetUser = netUserList.addUser(hostname);
                             if (targetUser) {
                                 client.removeAllListeners();
@@ -93,7 +94,7 @@ let server = net.createServer((client) => {
 exports.start = () => {
     return new Promise((resolve, reject) => {
         server.on('close', () => {
-            reject(new Error("Server Terminated"));
+            reject(new Error(langs.get('ErrorServerTerminated')));
         });
 
         server.on('error', (err) => {

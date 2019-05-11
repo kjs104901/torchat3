@@ -12,10 +12,11 @@ const Identicon = require('identicon.js');
 const config = require(`${__base}/core/config`);
 const constant = require(`${__base}/core/constant`);
 
-const contact = require(`${__base}/core/contact`);
+const contacts = require(`${__base}/core/contacts`);
 const parser = require(`${__base}/core/network/parser`);
 const fileHandler = require(`${__base}/core/fileIO/fileHandler`);
 const debug = require(`${__base}/core/debug`);
+const langs = require(`${__base}/core/langs`);
 
 const SocketIn = require(`${__base}/core/network/NetSocketIn`);
 const SocketOut = require(`${__base}/core/network/NetSocketOut`);
@@ -128,7 +129,7 @@ class NetUser extends EventEmitter {
             this.socketOutWaitingTime -= 10; // milliseconds
         }
 
-        if (contact.isFriend(this.hostname) || parser.isMyHostname(this.hostname) || this.socketIn) {
+        if (contacts.isFriend(this.hostname) || parser.isMyHostname(this.hostname) || this.socketIn) {
             if (!this.socketOut && this.socketOutConnecting === false && this.socketOutWaitingTime <= 0) {
                 this.socketOutConnecting = true;
 
@@ -145,7 +146,7 @@ class NetUser extends EventEmitter {
                     this.socketOutConnecting = false;
                 });
                 this.socksClient.on('error', (err) => {
-                    debug.log("[Proxy] Connect error: ", this.hostname);
+                    debug.log("[Proxy] Connect error: ", this.hostname, err);
                     this.socketOutConnecting = false;
                     this.socketOutWaitingTime = constant.ConnectionRetryTime;
                     this.socketOutWaitingTime += (Math.floor(Math.random() * 10) * 1000); // 0 ~ 9 seconds
@@ -176,7 +177,7 @@ class NetUser extends EventEmitter {
             }
         }
 
-        if (contact.isBlack(this.hostname) && this.destroyed === false) {
+        if (contacts.isBlack(this.hostname) && this.destroyed === false) {
             this.destroy();
         }
     }
@@ -340,8 +341,8 @@ class NetUser extends EventEmitter {
 
     sendMessage(message) { //interface
         return new Promise((resolve, reject) => {
-            if (!this.isBothConnected()) { reject(new Error("Not connected")); return; }
-            if (!contact.isFriend(this.hostname)) { reject(new Error("Not Friend")); return; }
+            if (!this.isBothConnected()) { reject(new Error(langs.get('ErrorNotConnected'))); return; }
+            if (!contacts.isFriend(this.hostname)) { reject(new Error(langs.get('ErrorChatNotFriend'))); return; }
 
             this.pushMessage(message, { fromSelf: true });
             this.socketOut.sendMessage(message);
@@ -351,13 +352,13 @@ class NetUser extends EventEmitter {
 
     sendFile(file) { //interface
         return new Promise((resolve, reject) => {
-            if (!this.isBothConnected()) { reject(new Error("Not connected")); return; }
-            if (!contact.isFriend(this.hostname)) { reject(new Error("Not Friend")); return; }
+            if (!this.isBothConnected()) { reject(new Error(langs.get('ErrorNotConnected'))); return; }
+            if (!contacts.isFriend(this.hostname)) { reject(new Error(langs.get('ErrorChatNotFriend'))); return; }
 
-            if (!fs.existsSync(file)) { reject(new Error("File not exist")); return; }
-            if (!fileHandler.isFile(file)) { reject(new Error("Not a File")); return; }
-            if (fileHandler.getSize(file) <= 0) { reject(new Error("File size zero")); return; }
-            if (fileHandler.getSize(file) > constant.FileMaximumSize) { reject(new Error("File size too big")); return; }
+            if (!fs.existsSync(file)) { reject(new Error(langs.get('ErrorFileNotExists'))); return; }
+            if (!fileHandler.isFile(file)) { reject(new Error(langs.get('ErrorNotFile'))); return; }
+            if (fileHandler.getSize(file) <= 0) { reject(new Error(langs.get('ErrorEmptyFile'))); return; }
+            if (fileHandler.getSize(file) > constant.FileMaximumSize) { reject(new Error(langs.get('ErrorFileTooBig'))); return; }
 
             const fileID = crypto.randomBytes(20).toString('hex');
             const fileName = path.basename(file);
@@ -374,8 +375,8 @@ class NetUser extends EventEmitter {
 
     acceptFile(fileID) { //interface
         return new Promise((resolve, reject) => {
-            if (!this.isBothConnected()) { reject(new Error("Not connected")); return; }
-            if (!contact.isFriend(this.hostname)) { reject(new Error("Not Friend")); return; }
+            if (!this.isBothConnected()) { reject(new Error(langs.get('ErrorNotConnected'))); return; }
+            if (!contacts.isFriend(this.hostname)) { reject(new Error(langs.get('ErrorChatNotFriend'))); return; }
 
             this.fileRecvList.acceptFile(fileID);
             this.socketOut.sendFileaccept(fileID);
@@ -398,7 +399,7 @@ class NetUser extends EventEmitter {
                 resolve();
             }
             else {
-                reject(new Error("no such file"));
+                reject(new Error(langs.get('ErrorNoSuchFile')));
             }
         });
     }

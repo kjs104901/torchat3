@@ -3,6 +3,7 @@
 var os = require('os');
 const fs = require('fs');
 const crypto = require('crypto');
+const langs = require(`${__base}/core/langs`);
 
 function isFile(file) {
     const stats = fs.statSync(file);
@@ -109,7 +110,7 @@ function writeFileAppend(file, block) {
             })
         }
         else {
-            reject(new Error("no such file"));
+            reject(new Error(langs.get('ErrorNoSuchFile')));
         }
     });
 }

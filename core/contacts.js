@@ -6,6 +6,8 @@ exports.event = eventEmitter;
 
 const constant = require(`${__base}/core/constant`);
 const parser = require(`${__base}/core/network/parser`);
+const langs = require(`${__base}/core/langs`);
+const fs = require('fs');
 
 /**
  * low db
@@ -26,6 +28,43 @@ function saveContact() {
 exports.saveContact = saveContact;
 /** */
 
+exports.exportContact = (filePath) => {
+    fs.copyFile(`${__base}/data/contact`, filePath, (err) => {
+        console.log(err);
+    });
+}
+
+exports.importContact = (filePath) => {
+    if (fs.existsSync(filePath)) {
+        const importAdapter = new FileSync(filePath);
+        const importDB = low(importAdapter);
+
+        const importFriendList = importDB.get('friend').value();
+        importFriendList.forEach((friend) => {
+            if (friendList.indexOf(friend) == -1) { friendList.push(friend); }
+        });
+
+        const importBlackList = importDB.get('black').value();
+        importBlackList.forEach((black) => {
+            if (blackList.indexOf(black) == -1) { blackList.push(black); }
+        });
+
+        const importWhiteList = importDB.get('white').value();
+        importWhiteList.forEach((white) => {
+            if (whiteList.indexOf(white) == -1) { whiteList.push(white); }
+        });
+
+        const importNicknameList = importDB.get('nickname').value();
+        for (const key in importNicknameList) {
+            if (importNicknameList[key].length && importNicknameList[key].length > 0) {
+                nicknameList[key] = importNicknameList[key];
+            }
+        }
+
+        saveContact();
+    }
+}
+
 // ############################ friend List ############################ //
 let friendList = contactDB.get('friend').value();
 exports.getFriendList = () => { return friendList; }
@@ -38,9 +77,9 @@ exports.isFriend = (hostname) => {
 exports.addFriend = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (!parser.checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
-        if (parser.isMyHostname(hostname)) { reject(new Error('my hostname')); return; }
-        if (friendList.indexOf(hostname) > -1) { reject(new Error('already friend')); return; }
+        if (!parser.checkHostname(hostname)) { reject(new Error(langs.get('ErrorInvalidAddress'))); return; }
+        if (parser.isMyHostname(hostname)) { reject(new Error(langs.get('ErrorMyAddress'))); return; }
+        if (friendList.indexOf(hostname) > -1) { reject(new Error(langs.get('ErrorAlreadyFriend'))); return; }
 
         friendList.push(hostname);
         eventEmitter.emit('contactUpdate')
@@ -50,7 +89,7 @@ exports.addFriend = (address) => {
 exports.removeFriend = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (friendList.indexOf(hostname) === -1) { reject(new Error('not friend')); return; }
+        if (friendList.indexOf(hostname) === -1) { reject(new Error(langs.get('ErrorNotFriend'))); return; }
 
         friendList.splice(friendList.indexOf(hostname), 1);
         nicknameList[hostname] = "";
@@ -92,9 +131,9 @@ exports.isBlack = isBlack;
 exports.addBlack = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (!parser.checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
-        if (parser.isMyHostname(hostname)) { reject(new Error('my hostname')); return; }
-        if (blackList.indexOf(hostname) > -1) { reject(new Error('already black')); return; }
+        if (!parser.checkHostname(hostname)) { reject(new Error(langs.get('ErrorInvalidAddress'))); return; }
+        if (parser.isMyHostname(hostname)) { reject(new Error(langs.get('ErrorMyAddress'))); return; }
+        if (blackList.indexOf(hostname) > -1) { reject(new Error(langs.get('ErrorAlreadyBlack'))); return; }
 
         blackList.push(hostname);
         eventEmitter.emit('contactUpdate');
@@ -104,7 +143,7 @@ exports.addBlack = (address) => {
 exports.removeBlack = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (blackList.indexOf(hostname) === -1) { reject(new Error('not black')); return; }
+        if (blackList.indexOf(hostname) === -1) { reject(new Error(lagns.get('ErrorNotBlack'))); return; }
 
         blackList.splice(blackList.indexOf(hostname), 1);
         eventEmitter.emit('contactUpdate');
@@ -125,9 +164,9 @@ exports.isWhite = isWhite;
 exports.addWhite = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (!parser.checkHostname(hostname)) { reject(new Error('invalid hostname')); return; }
-        if (parser.isMyHostname(hostname)) { reject(new Error('my hostname')); return; }
-        if (whiteList.indexOf(hostname) > -1) { reject(new Error('already white')); return; }
+        if (!parser.checkHostname(hostname)) { reject(new Error(langs.get('ErrorInvalidAddress'))); return; }
+        if (parser.isMyHostname(hostname)) { reject(new Error(langs.get('ErrorMyAddress'))); return; }
+        if (whiteList.indexOf(hostname) > -1) { reject(new Error(langs.get('ErrorAlreadyWhite'))); return; }
 
         whiteList.push(hostname);
         eventEmitter.emit('contactUpdate');
@@ -137,7 +176,7 @@ exports.addWhite = (address) => {
 exports.removeWhite = (address) => {
     return new Promise((resolve, reject) => {
         const hostname = parser.normalizeHostname(address);
-        if (whiteList.indexOf(hostname) === -1) { reject(new Error('not white')); return; }
+        if (whiteList.indexOf(hostname) === -1) { reject(new Error(lagns.get('ErrorNotWhite'))); return; }
 
         whiteList.splice(whiteList.indexOf(hostname), 1);
         eventEmitter.emit('contactUpdate');

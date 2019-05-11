@@ -93,13 +93,13 @@ export default class SettingPage extends Component {
 
     saveProfile = () => {
         if (this.state.inputProfileName.length > remoteControl.MaxLenProfileName) {
-            this.showError(new Error("profile name too long"));
+            this.showError(new Error(langs.get('ErrorProfileNameTooLong')));
         }
         else if ((/^[\x00-\xFF]*$/).test(this.state.inputProfileName) === false) {
-            this.showError(new Error("profile name only ascii"));
+            this.showError(new Error(langs.get('ErrorProfileNameOnlyAscii')));
         }
         else if (this.state.inputProfileInfo.length > remoteControl.MaxLenProfileInfo) {
-            this.showError(new Error("profile info too long"));
+            this.showError(new Error(langs.get('ErrorProfileInfoTooLong')));
         }
         else {
             remoteControl.saveProfile(this.state.inputProfileName, this.state.inputProfileInfo);
@@ -158,6 +158,65 @@ export default class SettingPage extends Component {
 
     setLanguage = (value) => {
         remoteControl.setLanguage(value);
+    }
+
+    exportKeyBackup = () => {
+        remoteControl.exportKeyBackup();
+    }
+
+    importKeyBackup = () => {
+        MySwal.fire({
+            title: langs.get('PopupImportKeyTitle'),
+            text: langs.get('PopupExportKeyText'),
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'okay',
+            cancelButtonText: 'cancel',
+            heightAuto: false,
+            width: 400,
+        }).then((result) => {
+            if (result.value) {
+                remoteControl.importKeyBackup();
+            }
+        })
+    }
+
+    exportContactsBackup = () => {
+        remoteControl.exportContactsBackup();
+    }
+
+    importContactsBackup = () => {
+        MySwal.fire({
+            title: langs.get('PopupImportContactsTitle'),
+            text: langs.get('PopupImportContactsText'),
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'okay',
+            cancelButtonText: 'cancel',
+            heightAuto: false,
+            width: 400,
+        }).then((result) => {
+            if (result.value) {
+                remoteControl.importContactsBackup();
+            }
+        })
+    }
+    
+
+    logsRender = () => {
+        let low = [];
+        const bootLogs = remoteControl.getBootLogs();
+        bootLogs.forEach((log, index) => {
+            low.unshift(
+                <React.Fragment key={index}>
+                    <div> {log} </div>
+                    <br />
+                </React.Fragment>
+            )
+        });
+        return low;
     }
 
     renderSetting = () => {
@@ -247,6 +306,7 @@ export default class SettingPage extends Component {
                             value={this.state.inputTorrcExpand}
                             onChange={(e) => { this.setState({ inputTorrcExpand: e.target.value }) }} />
                     </div>
+                    <div className="clearfix"></div>
 
                     <div className="option-group">
                         <li>{langs.get('OptionBridge')}</li>
@@ -270,6 +330,7 @@ export default class SettingPage extends Component {
                             value={this.state.inputBridge}
                             onChange={(e) => { this.setState({ inputBridge: e.target.value }) }} />
                     </div>
+                    <div className="clearfix"></div>
 
                     <div className="option-group">
                         <button className="button-custom confirm"
@@ -277,6 +338,17 @@ export default class SettingPage extends Component {
                             onClick={() => { this.saveConnection() }}>
                             {langs.get('ButtonSave')}
                         </button>
+                    </div>
+
+                    <div className="clearfix"></div>
+                    <div className="option-group">
+                        <li>{langs.get('OptionTorLogs')}</li>
+                        
+                        <PerfectScrollbar
+                            style={{ width: "100%", height: 200, marginTop: 20, fontSize: 12, overflow: 'auto' }}
+                            option={{suppressScrollX: true}}>
+                            {this.logsRender()}
+                        </PerfectScrollbar>
                     </div>
                 </React.Fragment>
             )
@@ -377,6 +449,43 @@ export default class SettingPage extends Component {
             )
         }
         else if (this.state.selectedSetting === 6) { // 6: MenuBackup
+            return (
+                <React.Fragment>
+                    <div className="option-group">
+                        <li>{langs.get('OptionKeyBackup')}</li>
+                        <div>{langs.get('OptionKeyBackupRestart')}</div>
+                        <div>{langs.get('OptionKeyBackupAlert')}</div>
+                        <div className="clearfix"></div>
+                        <button className="button-custom tor"
+                            style={{ float: "right" }}
+                            onClick={() => { this.exportKeyBackup() }}>
+                            {langs.get('ButtonExport')}
+                        </button>
+                        <button className="button-custom cancel"
+                            style={{ float: "right" }}
+                            onClick={() => { this.importKeyBackup() }}>
+                            {langs.get('ButtonImport')}
+                        </button>
+                    </div>
+                    <div className="clearfix"></div>
+
+                    <div className="option-group">
+                        <li>{langs.get('OptionContactsBackup')}</li>
+                        <button className="button-custom tor"
+                            style={{ float: "right" }}
+                            onClick={() => { this.exportContactsBackup() }}>
+                            {langs.get('ButtonExport')}
+                        </button>
+                        <button className="button-custom cancel"
+                            style={{ float: "right" }}
+                            onClick={() => { this.importContactsBackup() }}>
+                            {langs.get('ButtonImport')}
+                        </button>
+                    </div>
+                    <div className="clearfix"></div>
+
+                </React.Fragment>
+            )
 
         }
         else if (this.state.selectedSetting === 7) { // 7: MenuLicense

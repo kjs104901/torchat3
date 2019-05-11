@@ -118,6 +118,8 @@ export default class ChatPage extends Component {
         targetUserList.sort((a, b) => { return userList.compareUser(a, b); });
 
         targetUserList.forEach((user, index) => {
+            if (user.address === remoteControl.getHostname()) { return; }
+
             let selected = false;
             if (user === this.state.selectedUser) { selected = true; }
 

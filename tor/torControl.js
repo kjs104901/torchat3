@@ -7,6 +7,7 @@ const config = require(`${__base}/core/config`);
 const constant = require(`${__base}/core/constant`);
 
 const parser = require(`${__base}/core/network/parser`);
+const langs = require(`${__base}/core/langs`);
 
 const EventEmitter = require('events');
 let eventEmitter = new EventEmitter();
@@ -15,6 +16,7 @@ exports.event = eventEmitter;
 const torDir = fixPathForAsarUnpack(__dirname + "/bin");
 
 let controlConnection = null;
+let controlConnectionConnected = false;
 let controlAuth = false;
 let controlHiddenService = false;
 let controlHiddenServiceDestroy = false;
@@ -54,29 +56,30 @@ exports.start = (controlPassword, keyPair) => {
         try {
             constrolPortStr = fs.readFileSync(controlPortFile, { encoding: 'utf8' });
         } catch (error) {
-            reject(new Error("no control port file"));
+            reject(new Error(langs.get('ErrorNoControlFile')));
             return;
         }
 
         if (constrolPortStr && constrolPortStr.split) {
             controlPort = ((constrolPortStr.split('\n'))[0]).replace('\r', '').substr(constrolPortStr.indexOf(':') + 1) * 1;
         }
-        if (!controlPort) { reject(new Error("control port error")); return; }
+        if (!controlPort) { reject(new Error(langs.get('ErrorControlPort'))); return; }
 
         controlConnection = net.connect({ host: "127.0.0.1", port: controlPort });
 
         controlConnection.once('connect', () => {
+            controlConnectionConnected = true;
             controlConnection.write('AUTHENTICATE "' + controlPassword.string + '" \r\n');
         })
 
         controlConnection.once('error', (err) => {
-            if (err) {
-                reject(err);
-            }
+            controlConnectionConnected = false;
+            if (err) { reject(err); }
         });
 
         controlConnection.once('end', () => {
             controlConnection = null;
+            controlConnectionConnected = false;
             controlAuth = false;
             controlHiddenService = null;
         })
@@ -95,7 +98,7 @@ exports.start = (controlPassword, keyPair) => {
 
                         controlConnection.write(
                             `ADD_ONION ED25519-V3:${secretKeySerial} ` +
-                            `Flags=DiscardPK,Detach ` +
+                            `Flags=DiscardPK ` +
                             `Port=${constant.ServiceInsidePort},127.0.0.1:${config.getServicePort()} \r\n`
                         );
 
@@ -113,7 +116,7 @@ exports.start = (controlPassword, keyPair) => {
                         }
                     }
                     else {
-                        reject(new Error("hidden service start failed"));
+                        reject(new Error(langs.get('ErrorHiddenService')));
                     }
                 }
                 else {
@@ -138,10 +141,11 @@ exports.start = (controlPassword, keyPair) => {
     })
 }
 
-exports.controlDisconnect = (force) => {
-    if (controlConnection) {
-        if (force) { controlConnection.end(); }
-        else { controlConnection.write('QUIT\r\n'); }
+exports.destroy = () => {
+    if (controlConnection && !controlConnection.destroyed && controlConnectionConnected) {
+        controlConnection.write(`DEL_ONION ${controlHiddenService} \r\n`);
+        controlConnection.write(`SIGNAL SHUTDOWN \r\n`);
+        controlConnection.write('QUIT\r\n');
     }
 }
 

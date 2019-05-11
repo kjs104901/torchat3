@@ -11,6 +11,7 @@ const parser = require(`${__base}/core/network/parser`);
 const config = require(`${__base}/core/config`);
 const langs = require(`${__base}/core/langs`);
 const debug = require(`${__base}/core/debug`);
+debug.setLogAvailable(false);
 const tor = require(`${__base}/tor/tor`);
 
 //// ------------ App ------------ ////
@@ -37,7 +38,6 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
     }
 })
 
-
 //Security: set a fake proxy to prevent the app from connecting to internet
 const fakeProxy = 'null://255.255.255.0:65535'
 app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1'); // map every hostname to local host
@@ -61,8 +61,18 @@ app.on('will-quit', () => {
 
 let appQuiting = false;
 function appQuit() {
-    appQuiting = true;
-    app.quit();
+    if (!appQuiting) {
+        appQuiting = true;
+
+        tor.destroy();
+        if (mainWindow) { mainWindow.close(); }
+        if (tray) { tray.destroy(); tray = null; }
+
+        setTimeout(() => {
+            app.quit();
+            process.exit();
+        }, 1000 * 3); // wait for Tor to exit safely
+    }
 }
 
 //// ------------ Main windows ------------ ////
@@ -97,6 +107,9 @@ function openMainWindow() {
             if (!appQuiting && config.getSetting().minimizeToTray && tor.getSuccess()) {
                 event.preventDefault();
                 hideMainWindow();
+            }
+            else {
+                mainWindow = null
             }
             return false;
         });

@@ -53,7 +53,7 @@ export default class ChatMessagePage extends Component {
     sendMessage = () => {
         if (this.props.selectedUser && this.state.inputMessage.length > 0) {
             if (this.state.inputMessage.length > remoteControl.MaxLenChatMessage) {
-                this.showError(new Error("can't send over char: " + remoteControl.MaxLenChatMessage));
+                this.showError(new Error(langs.get('ErrorChatMessageLength') + ': ' + remoteControl.MaxLenChatMessage));
             }
             else {
                 remoteControl.sendMessage(this.props.selectedUser.address, this.state.inputMessage);
@@ -140,7 +140,7 @@ export default class ChatMessagePage extends Component {
 
     handleDrop = (files, event) => {
         if (files.length > 10) {
-            this.showError(new Error("more than 10 files"))
+            this.showError(new Error(langs.get('ErrorChatFileMax') + ': 10'))
         }
         else {
             for (let index = 0; index < files.length; index++) {

@@ -15,7 +15,6 @@ const torUtil = require(`${__base}/tor/torUtils`)
 const parser = require(`${__base}/core/network/parser`);
 const protocol = require(`${__base}/core/network/protocol`);
 const fileHandler = require(`${__base}/core/fileIO/fileHandler`);
-const contact = require(`${__base}/core/contact`);
 const debug = require(`${__base}/core/debug`);
 
 class SocksOut extends EventEmitter {

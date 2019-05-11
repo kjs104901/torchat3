@@ -4,6 +4,7 @@ const child_process = require('child_process');
 
 const config = require(`${__base}/core/config`);
 const parser = require(`${__base}/core/network/parser`);
+const langs = require(`${__base}/core/langs`);
 const torUtils = require(`${__base}/tor/torUtils`);
 const torControl = require(`${__base}/tor/torControl`);
 
@@ -42,13 +43,13 @@ let socksPort;
 exports.start = () => {
     const controlPassword = torUtils.generateControlPassword();
     keyPair = torUtils.generateKeyPair();
-    if (!keyPair) { eventEmitter.emit("fail", new Error("failed to generate key pair")); return; }
+    if (!keyPair) { eventEmitter.emit("fail", new Error(langs.get('ErrorFailedKeypair'))); return; }
 
     hostname = torUtils.generateHostname(keyPair.publicKey);
     debug.log("hostname: ", hostname);
 
-    if (!controlPassword) { eventEmitter.emit("fail", new Error("failed to generate control Password")); return; }
-    if (!hostname) { eventEmitter.emit("fail", new Error("failed to generate hostname")); return; }
+    if (!controlPassword) { eventEmitter.emit("fail", new Error(langs.get('ErrorFailedControlPassword'))); return; }
+    if (!hostname) { eventEmitter.emit("fail", new Error(langs.get('ErrorFailedHostname'))); return; }
 
     torUtils.makeTorrc(controlPassword);
     torControl.deleteControlFile();
@@ -82,6 +83,8 @@ torControl.event.on('socksport', (port) => {
     config.setProxyPort(socksPort);
 })
 
+exports.destroy = () => { torControl.destroy() }
+
 exports.getProgress = () => { return bootProcess; }
 exports.getBootLogs = () => { return bootLogs; }
 
@@ -92,7 +95,11 @@ exports.getFail = () => { if (bootError) { return true; } else { return false; }
 exports.getKeyPair = () => { return keyPair; }
 exports.getHostname = () => { return hostname; }
 
+exports.exportKeyPair = (filePath) => { torUtils.exportKeyPair(filePath) }
+exports.importKeyPair = (filePath) => { torUtils.importKeyPair(filePath) }
+
 function startTorProcess() {
+    //detached: true
     torProcess = child_process.spawn(torDir + '/tor.exe', ['-f', torDir + '/torrc'], { cwd: torDir });
 
     torProcess.stdout.on('data', (data) => { pushLog(data); });
@@ -100,7 +107,6 @@ function startTorProcess() {
 
     torProcess.on('exit', (code) => {
         torProcess = null;
-        torControl.controlDisconnect(true);
     });
 }
 
@@ -109,6 +115,7 @@ function pushLog(data) {
     lines.forEach(line => {
         line = line.replace('\r', '')
         if (line.length > 0) {
+            debug.log(line);
             bootLogs.push(line);
             eventEmitter.emit("update");
             const percentStr = parser.findStringBetween(line, 'Bootstrapped ', '%');
@@ -127,7 +134,7 @@ function checkBootProcess() {
     return new Promise((resolve, reject) => {
         const bootIntv = setInterval(() => {
             torControl.controlCheckBootstrap();
-            if (bootError) {
+            if (bootError) {+
                 clearInterval(bootIntv);
 
                 bootSuccess = false;

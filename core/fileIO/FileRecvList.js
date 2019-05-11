@@ -5,6 +5,7 @@ const fs = require('fs');
 
 const fileHandler = require(`${__base}/core/fileIO/fileHandler`);
 const debug = require(`${__base}/core/debug`);
+const langs = require(`${__base}/core/langs`);
 
 class FileRecvList extends EventEmitter {
     constructor() {
@@ -83,7 +84,7 @@ class FileRecvList extends EventEmitter {
                     })
             }
             else {
-                reject(new Error('no downloaded temp file'));
+                reject(new Error(langs.get('ErrorNoTempFile')));
             }
         })
     }

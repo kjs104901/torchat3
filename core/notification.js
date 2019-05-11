@@ -2,7 +2,6 @@
 
 const notifier = require('node-notifier');
 
-const contact = require(`${__base}/core/contact`);
 const netUserList = require(`${__base}/core/netUserList`);
 const fileHandler  = require(`${__base}/core/fileIO/fileHandler`)
 const langs = require(`${__base}/core/langs`);

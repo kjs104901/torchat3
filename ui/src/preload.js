@@ -15,7 +15,7 @@ const { BrowserWindow, dialog, app } = remote;
 const __base = app.getAppPath()
 
 const netUserList = remote.require(`${__base}/core/netUserList`);
-const contact = remote.require(`${__base}/core/contact`);
+const contacts = remote.require(`${__base}/core/contacts`);
 const config = remote.require(`${__base}/core/config`);
 const constant = remote.require(`${__base}/core/constant`);
 const langs = remote.require(`${__base}/core/langs`);
@@ -27,6 +27,42 @@ const torControl = remote.require(`${__base}/tor/torControl`);
 // ------------------------- ------------- ------------------------- //
 // ------------------------- remoteControl ------------------------- //
 // ------------------------- ------------- ------------------------- //
+
+//dialog
+function getPathOpenDialog() {
+    return new Promise((resolve, reject) => {
+        const targetWindow = BrowserWindow.getFocusedWindow();
+        if (targetWindow) {
+            dialog.showOpenDialog(targetWindow, { properties: ['openFile'] }, (files) => {
+                if (files && files[0] && files[0].length > 0) {
+                    resolve(files[0]);
+                    return;
+                }
+                reject();
+            });
+            return;
+        }
+        reject();
+    })
+}
+
+function getPathSaveDialog(defaultPath) {
+    return new Promise((resolve, reject) => {
+        const targetWindow = BrowserWindow.getFocusedWindow();
+        if (targetWindow) {
+            dialog.showSaveDialog(targetWindow, { defaultPath },
+                (filePath) => {
+                    if (filePath) {
+                        resolve(filePath);
+                        return;
+                    }
+                    reject();
+                })
+            return;
+        }
+        reject();
+    });
+}
 
 let eventEmitter = new EventEmitter();
 window.remoteControl = {
@@ -45,20 +81,20 @@ window.remoteControl = {
 
     newHiddenService: () => { torControl.newHiddenService(); },
 
-    // contact
-    isFriend: (address) => { return contact.isFriend(address); },
+    // contacts
+    isFriend: (address) => { return contacts.isFriend(address); },
     addFriend: (address) => {
-        contact.addFriend(address)
+        contacts.addFriend(address)
             .then(() => {
                 netUserList.addUserFromFriendList();
-                contact.saveContact();
+                contacts.saveContact();
             })
             .catch((err) => { eventEmitter.emit('contactError', err); })
     },
     removeFriend: (address) => {
-        contact.removeFriend(address)
+        contacts.removeFriend(address)
             .then(() => {
-                contact.saveContact();
+                contacts.saveContact();
             })
             .then((err) => { eventEmitter.emit('contactError', err); })
     },
@@ -67,27 +103,27 @@ window.remoteControl = {
         return netUserList.getUserName(address);
     },
     getNickname: (address) => {
-        return contact.getNickname(address);
+        return contacts.getNickname(address);
     },
     setNickname: (address, nickname) => {
-        contact.setNickname(address, nickname);
-        contact.saveContact();
+        contacts.setNickname(address, nickname);
+        contacts.saveContact();
     },
 
-    isBlack: (address) => { return contact.isBlack(address); },
-    getBlackList: () => { return contact.getBlackList(); },
+    isBlack: (address) => { return contacts.isBlack(address); },
+    getBlackList: () => { return contacts.getBlackList(); },
     addBlack: (address) => {
-        contact.addBlack(address)
+        contacts.addBlack(address)
             .then(() => {
-                contact.saveContact();
+                contacts.saveContact();
             })
             .catch((err) => { eventEmitter.emit('contactError', err); })
     },
 
     removeBlack: (address) => {
-        contact.removeBlack(address)
+        contacts.removeBlack(address)
             .then(() => {
-                contact.saveContact();
+                contacts.saveContact();
             })
             .catch((err) => { eventEmitter.emit('contactError', err); })
     },
@@ -114,7 +150,7 @@ window.remoteControl = {
         config.setNightMode(value);
         config.saveSetting();
     },
-    
+
     setLanguage: (lang) => {
         config.setLanguage(lang);
         config.saveSetting();
@@ -144,26 +180,22 @@ window.remoteControl = {
                 })
         }
         else {
-            eventEmitter.emit('chatError', new Error("failed to find user"));
+            eventEmitter.emit('chatError', new Error(langs.get('ErrorNoSuchUser')));
         }
     },
 
     sendFileDialog: (address) => {
-        const targetWindow = BrowserWindow.getFocusedWindow();
-        if (targetWindow) {
-            dialog.showOpenDialog(targetWindow, { properties: ['openFile'] }, (files) => {
-                if (files && files[0] && files[0].length > 0) {
-                    const file = files[0];
-                    const targetUser = netUserList.findUser(address);
-                    if (targetUser) {
-                        targetUser.sendFile(file)
-                            .catch((err) => { eventEmitter.emit('chatError', err); })
-                    }
-                    else {
-                        eventEmitter.emit('chatError', new Error("failed to find user"));
-                    }
-                }
-            });
+        const targetUser = netUserList.findUser(address);
+        if (targetUser) {
+            getPathOpenDialog()
+                .then((filePath) => {
+                    targetUser.sendFile(filePath)
+                        .catch((err) => { eventEmitter.emit('chatError', err); })
+                })
+                .catch((err) => { })
+        }
+        else {
+            eventEmitter.emit('chatError', new Error(langs.get('ErrorNoSuchUser')));
         }
     },
 
@@ -174,7 +206,7 @@ window.remoteControl = {
                 .catch((err) => { eventEmitter.emit('chatError', err); })
         }
         else {
-            eventEmitter.emit('chatError', new Error("failed to find user"));
+            eventEmitter.emit('chatError', new Error(langs.get('ErrorNoSuchUser')));
         }
     },
 
@@ -185,7 +217,7 @@ window.remoteControl = {
                 .catch((err) => { eventEmitter.emit('chatError', err); })
         }
         else {
-            eventEmitter.emit('chatError', new Error("failed to find user"));
+            eventEmitter.emit('chatError', new Error(langs.get('ErrorNoSuchUser')));
         }
     },
 
@@ -196,32 +228,59 @@ window.remoteControl = {
                 .catch((err) => { eventEmitter.emit('chatError', err); })
         }
         else {
-            eventEmitter.emit('chatError', new Error("failed to find user"));
+            eventEmitter.emit('chatError', new Error(langs.get('ErrorNoSuchUser')));
         }
     },
 
     saveFile: (address, fileID, fileName) => {
         const targetUser = netUserList.findUser(address);
         if (targetUser) {
-            const targetWindow = BrowserWindow.getFocusedWindow();
-            if (targetWindow) {
-                dialog.showSaveDialog(targetWindow, {
-                    defaultPath: fileName
-                }, (filePath) => {
-                    if (filePath) {
-                        targetUser.saveFile(fileID, filePath)
-                            .catch((err) => {
-                                eventEmitter.emit('chatError', err);
-                            })
-
-                    }
+            getPathSaveDialog(fileName)
+                .then((filePath) => {
+                    targetUser.saveFile(fileID, filePath)
+                        .catch((err) => {
+                            eventEmitter.emit('chatError', err);
+                        })
                 })
-            }
+                .catch((err) => { })
         }
         else {
-            eventEmitter.emit('chatError', new Error("failed to find user"));
+            eventEmitter.emit('chatError', new Error(langs.get('ErrorNoSuchUser')));
         }
-    }
+    },
+
+    // backup
+    exportKeyBackup: () => {
+        getPathSaveDialog("backupKey")
+            .then((filePath) => {
+                tor.exportKeyPair(filePath);
+            })
+            .catch((err) => { })
+    },
+
+    importKeyBackup: () => {
+        getPathOpenDialog()
+            .then((filePath) => {
+                tor.importKeyPair(filePath);
+            })
+            .catch((err) => { })
+    },
+
+    exportContactsBackup: () => {
+        getPathSaveDialog("backupContact")
+            .then((filePath) => {
+                contacts.exportContact(filePath)
+            })
+            .catch((err) => { })
+    },
+
+    importContactsBackup: () => {
+        getPathOpenDialog()
+            .then((filePath) => {
+                contacts.importContact(filePath)
+            })
+            .catch((err) => { })
+    },
 }
 
 // ------------------------- -------- ------------------------- //
@@ -307,11 +366,11 @@ window.userList = {
         }
         else if ((connectCountA === 1) && (connectCountA === 1)) {
 
-            if (!contact.isBlack(userA.address) && contact.isBlack(userB.address)) { return -1; }
-            else if (contact.isBlack(userA.address) && !contact.isBlack(userB.address)) { return 1; }
+            if (!contacts.isBlack(userA.address) && contacts.isBlack(userB.address)) { return -1; }
+            else if (contacts.isBlack(userA.address) && !contacts.isBlack(userB.address)) { return 1; }
 
-            else if (contact.isFriend(userA.address) && !contact.isFriend(userB.address)) { return -1; }
-            else if (!contact.isFriend(userA.address) && contact.isFriend(userB.address)) { return 1; }
+            else if (contacts.isFriend(userA.address) && !contacts.isFriend(userB.address)) { return -1; }
+            else if (!contacts.isFriend(userA.address) && contacts.isFriend(userB.address)) { return 1; }
 
             else { return 0; }
         }
@@ -329,7 +388,6 @@ window.userList = {
     },
 
     socketOutConnected: (address) => {
-        console.log('socketOutconnected');
         let targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.socketOutConnected === false) {
@@ -341,7 +399,6 @@ window.userList = {
     },
 
     socketOutDisconnected: (address) => {
-        console.log('socketOutDisconnected');
         let targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.socketOutConnected === true) {
@@ -353,7 +410,6 @@ window.userList = {
     },
 
     socketInConnected: (address) => {
-        console.log('socketInConnected');
         let targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.socketInConnected === false) {
@@ -365,7 +421,6 @@ window.userList = {
     },
 
     socketInDisconnected: (address) => {
-        console.log('socketInDisconnected');
         let targetUser = findUser(address);
         if (targetUser) {
             if (targetUser.socketInConnected === true) {
@@ -523,8 +578,8 @@ tor.event.on('fail', (err) => { eventEmitter.emit('torFail', err); });
 // setting
 config.event.on('settingUpdate', () => { eventEmitter.emit('settingUpdate'); });
 
-// contact
-contact.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
+// contacts
+contacts.event.on('contactUpdate', () => { eventEmitter.emit('contactUpdate'); })
 
 // user
 netUserList.event.on('newUser', (address, profileImage) => { window.userList.addUser(address, profileImage); });

@@ -6,7 +6,7 @@ const config = require(`${__base}/core/config`);
 
 const User = require(`${__base}/core/NetUser`);
 const parser = require(`${__base}/core/network/parser`);
-const contact = require(`${__base}/core/contact`);
+const contacts = require(`${__base}/core/contacts`);
 
 const tor = require(`${__base}/tor/tor`);
 
@@ -29,7 +29,7 @@ function findUser(hostname) {
 exports.findUser = findUser;
 
 exports.getUserName = (address) => {
-    let nickname = contact.getNickname(address);
+    let nickname = contacts.getNickname(address);
     if (nickname.length === 0) {
         const targetUser = findUser(address);
         if (targetUser) { nickname = targetUser.profileName; }
@@ -86,10 +86,10 @@ function destroyUser(hostname) {
 }
 
 function addUserFromFriendList() {
-    const friendList = contact.getFriendList();
+    const friendList = contacts.getFriendList();
     friendList.forEach(address => {
-        if (config.getSetting().blackList && contact.isBlack(address)) { return; }
-        if (!config.getSetting().whiteList || (config.getSetting().whiteList && contact.isWhite(address))) {
+        if (config.getSetting().blackList && contacts.isBlack(address)) { return; }
+        if (!config.getSetting().whiteList || (config.getSetting().whiteList && contacts.isWhite(address))) {
             addUser(address);
         }
     });

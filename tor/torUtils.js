@@ -26,30 +26,57 @@ function fixPathForAsarUnpack(targetPath) {
 exports.generateKeyPair = () => {
     let secretKey, publicKey;
 
-    const secretKeyDir = hiddenServiceDir + "/secretKey";
-    const publicKeyDir = hiddenServiceDir + "/publicKey";
+    const keyPairPath = hiddenServiceDir + '/keyPair';
 
     try {
         if (!fs.existsSync(hiddenServiceDir)) { fs.mkdirSync(hiddenServiceDir) }
 
-        if (fs.existsSync(secretKeyDir) && fs.existsSync(publicKeyDir)) { // already exists
-            secretKey = fs.readFileSync(secretKeyDir);
-            publicKey = fs.readFileSync(publicKeyDir);
-            return { secretKey, publicKey }
+        if (fs.existsSync(keyPairPath)) { // already exists
+
+            const keyJsonStr = fs.readFileSync(keyPairPath, 'utf8');
+            const keyJson = JSON.parse(keyJsonStr);
+            secretKey = Buffer.from(keyJson.secretKey, 'base64');
+            publicKey = Buffer.from(keyJson.publicKey, 'base64');
+
+            const testMsg = Buffer.from("testMsg");
+            const testSig = supercop.sign(testMsg, publicKey, secretKey)
+
+            if (supercop.verify(testSig, testMsg, publicKey)) {
+                return { secretKey, publicKey }
+            }
         }
         else {
             const keyPair = supercop.createKeyPair(supercop.createSeed());
             secretKey = keyPair.secretKey;
             publicKey = keyPair.publicKey;
 
-            fs.writeFileSync(secretKeyDir, secretKey);
-            fs.writeFileSync(publicKeyDir, publicKey);
+            fs.writeFileSync(keyPairPath, JSON.stringify({
+                secretKey: secretKey.toString('base64'),
+                publicKey: publicKey.toString('base64')
+            }), 'utf8')
+
             return { secretKey, publicKey }
         }
     } catch (error) {
         console.log(error);
         return;
     }
+}
+
+exports.exportKeyPair = (filePath) => {
+    const keyPairPath = hiddenServiceDir + '/keyPair';
+    
+    fs.copyFile(keyPairPath, filePath, (err) => {
+        if (err) { console.log(err);}
+    });
+}
+
+exports.importKeyPair = (filePath) => {
+    const keyPairPath = hiddenServiceDir + '/keyPair';
+    
+    fs.copyFile(filePath, keyPairPath, (err) => {
+        if (err) { console.log(err);}
+    });
 }
 
 exports.generateHostname = (publicKey) => {

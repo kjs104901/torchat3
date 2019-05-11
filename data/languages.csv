@@ -1,6 +1,7 @@
 ﻿Excel,Default,English,Korean
 ,ButtonTorConf,Tor Configurations,Tor 설정
 ,ButtonSave,Save,저장
+,ButtonLoad,Load,불러오기
 ,ButtonAcceptFile,Accept,수락
 ,ButtonCancelFile,Cancel,취소
 ,ButtonSaveFile,Save,저장
@@ -10,7 +11,7 @@
 ,AlertNotFriend,[Alert] Not a friend.,[경고] 친구가 아닙니다
 ,PopupSetNickname,Set nickname,닉네임 설정
 ,PopupBlockTitle,Block,블랙리스트에 추가
-,PopupBlockText,"Connetion will be lost, and you won't be able to talk.","연결이 끊어지며, 대화가 불가능합니다"
+,PopupBlockText,"Connetion will be lost, and you won't be able to talk","연결이 끊어지며, 대화가 불가능합니다"
 ,PopupBlockFinishedTitle,Blocked,블랙리스트에 추가됨
 ,PopupBlockFinishedText,You can unblock on the settings,설정에서 제거 가능합니다
 ,MenuChat,Chat,채팅
@@ -43,10 +44,48 @@
 ,OptionLanguage,Language,언어
 ,StatusSaved,Saved,저장됨
 ,PopupConnectionAlertTitle,Alert,경고
-,PopupConnectionAlertText,This setting can cause the app to fail to start.,이 설정은 앱의 시작을 실패하게 만들 수 있습니다.
+,PopupConnectionAlertText,This setting can cause the app to fail to start,이 설정은 앱의 시작을 실패하게 만들 수 있습니다.
 ,MenuLicense,License,라이선스
 ,OptionMinimizeToTray,Minimize to Tray when close,종료시 트레이 아이콘으로
 ,OptionNotification,Notification when Tray mode,트레이 모드시 알림
 ,NotificationConnected,Connected,연결됨
 ,TrayMenuOpen,Open,열기
 ,TrayMenuQuit,Quit,종료
+,OptionKeyBackup,Key Backup,키 백업
+,OptionContactsBackup,Contacts Backup,연락처 백업
+,ButtonImport,Import,가져오기
+,ButtonExport,Export,내보내기
+,PopupImportKeyTitle,Key Import,키 불러오기
+,PopupExportKeyText,My address is deleted and can not be recovered,내 주소가 삭제되며 복구할 수 없습니다
+,PopupImportContactsTitle,Contacts Import,주소록 불러오기
+,PopupImportContactsText,Existing address book data will be overwritten,기존 주소록 데이터가 덮어씌워집니다
+,OptionKeyBackupRestart,Restart the app for the changes to take effect,변경 사항을 적용하기 위해 앱을 재시작 해야 합니다
+,OptionKeyBackupAlert,Import can temporarily cause connection failure,가져오기는 일시적으로 연결 실패를 일으킬 수 있습니다.
+,OptionTorLogs,Tor Logs,Tor 로그
+,ErrorInvalidAddress,Invalid Address,잘못된 주소입니다
+,ErrorMyAddress,Your address,본인의 주소입니다
+,ErrorAlreadyFriend,Already Friend,이미 친구입니다
+,ErrorNotFriend,Not Friend,친구가 아닙니다
+,ErrorAlreadyBlack,Already blocked,이미 차단되어 있습니다
+,ErrorNotBlack,Not blocked,차단되어 있지 않습니다
+,ErrorNoSuchFile,No such file,파일을 찾을 수 없습니다
+,ErrorNoTempFile,No downloaded temp file,다운로드한 임시파일을 찾을 수 없습니다
+,ErrorNotConnected,Not connected,연결되어 있지 않습니다
+,ErrorChatNotFriend,Add to friends to chat,대화하려면 친구가 되어야 합니다
+,ErrorFileNotExists,File doesn't exist,파일이 존재하지 않습니다
+,ErrorNotFile,Not a file,파일이 아닙니다
+,ErrorEmptyFile,Empty file,빈 파일입니다
+,ErrorFileTooBig,File size if too big,파일 크기가 너무 큽니다
+,ErrorServerTerminated,Server terminated,서버 종료됨
+,ErrorFailedKeypair,Failed to generate a key pair,키 생성 실패
+,ErrorFailedControlPassword,Failed to generate control Password,Control 암호 생성 실패
+,ErrorFailedHostname,Failed to generate hostname,Hostname 생성 실패
+,ErrorNoControlFile,No control port file,Control 포트 파일이 없습니다
+,ErrorControlPort,Control port error,Control 포트 에러
+,ErrorHiddenService,Failed to start Hidden service,Hidden service 시작 실패
+,ErrorChatMessageLength,The message is too long to send,메시지가 너무 깁니다
+,ErrorChatFileMax,Can't send too many files at the same time,너무 많은 파일을 동시에 보낼 수 없습니다
+,ErrorProfileNameTooLong,Profile name is too long,프로필 이름이 너무 깁니다
+,ErrorProfileNameOnlyAscii,Profile name should be only Ascii code,프로필 이름은 아스키코드로만 가능합니다
+,ErrorProfileInfoTooLong,Profile message is too long,프로필 메시지가 너무 깁니다
+,ErrorNoSuchUser,No such user,사용자를 찾을 수 없습니다
