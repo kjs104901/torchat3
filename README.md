@@ -2,7 +2,7 @@
 
 Electron-based torchat
 
-![screenshot](./assets/screenshot.png)
+![screenshot](https://github.com/kjs104901/torchat3/blob/master/assets/screenshot.PNG)
 
 ## Warning!!!
 
